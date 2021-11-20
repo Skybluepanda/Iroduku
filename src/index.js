@@ -11,6 +11,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 for (const file of commandFiles) {
 	const command = require(`../commands/${file}`);
 	client.commands.set(command.data.name, command);
+	console.log(`Command ${file} sucessfully added to commands.`)
 }
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
@@ -19,8 +20,10 @@ for (const file of eventFiles) {
 	const event = require(`../events/${file}`);
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));
+		console.log(`Event ${file} sucessfully triggered once.`)
 	} else {
 		client.on(event.name, (...args) => event.execute(...args));
+		console.log(`Event ${file} sucessfully added to events.`)
 	}
 }
 client.on('interactionCreate', async interaction => {
