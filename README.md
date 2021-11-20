@@ -1,0 +1,2 @@
+# mmoidlebot
+MMO Idle Bot
