@@ -11,3 +11,4 @@ to run the bot
 to run the bot and make it restart each time you save
     nodemon -e js
 
+This is unimportant change. Remove eventually please.
