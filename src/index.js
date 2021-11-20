@@ -1,6 +1,8 @@
 const fs = require('fs');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 const { Client, Collection, Intents } = require('discord.js');
-const { token } = require('../data/config.json');
+const { clientId, guildId, token } = require('../data/config.json');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
