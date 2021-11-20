@@ -1,3 +1,6 @@
 node_modules/
 .vscode/
 data/configure.json
+package-lock.json
+package.json
+
