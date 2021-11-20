@@ -23,6 +23,10 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
 
+    const command = client.commands.get(interaction.commandName);
+})
 
 client.login(token);
