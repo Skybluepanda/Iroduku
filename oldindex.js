@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, Intents, CommandInteractionOptionResolver } = require('discord.js');
 const { clientId, guildId, token } = require('./data/config.json');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
@@ -11,7 +11,7 @@ const fishCommandFiles = fs.readdirSync('./fishcommands').filter(file => file.en
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
-	client.commands.set(command.data.name, command);
+	client.commands.set(command.data.name, command);	
 }
 
 for (const file of fishCommandFiles) {
