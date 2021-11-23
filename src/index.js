@@ -19,4 +19,5 @@ const commandFolders = fs.readdirSync("./src/commands");
 	client.handleEvents(eventFiles, "./src/events");
 	client.handleCommands(commandFolders, "./src/commands");
 	client.login(token);
+	client.dbLogin();
 })();
