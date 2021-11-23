@@ -1,6 +1,6 @@
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { clientId, guildId, token } = require('./data/config.json');
+const { clientId, guildId, token } = require('../data/config.json');
 const fs = require('fs');
 
 const commands = [];
