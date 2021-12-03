@@ -3,8 +3,14 @@ MMO Idle Bot
 
 install packages
 npm init
-npm install discord.js
-npm install @discordjs/builders @discordjs/rest discord-api-types
+// Main discord package
+npm i discord.js
+// Discord API packages
+npm i @discordjs/builders @discordjs/rest discord-api-types
+// Database
+npm i sequelize sqlite3
+// Autorun package
+npm i -g nodemon  
 
 to run the bot 
     node .
