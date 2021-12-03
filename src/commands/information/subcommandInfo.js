@@ -4,6 +4,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('info')
 		.setDescription('Replies with Pong!')
+        .setDefaultPermission(false)
         .addSubcommand(subcommand => 
             subcommand
                 .setName("user")
