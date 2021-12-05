@@ -6,5 +6,6 @@ module.exports = {
     execute(client) {
         console.log(`Ready! Logged in as ${client.user.tag}`);
         database.Tags.sync();
+        database.Player.sync();
     },
 };

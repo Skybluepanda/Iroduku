@@ -24,5 +24,19 @@ const Tags = sequelize.define('tags', {
 	},
 });
 
+const Player = sequelize.define('player', {
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+	},
+	Level_Cap: {
+		type: Sequelize.INTEGER,
+		defaultValue: 100,
+		unique:false,
+	},
+});
+
+
 exports.sequelize = sequelize;
 exports.Tags = Tags;
+exports.Player = Player;
