@@ -8,8 +8,8 @@ module.exports = {
     async execute(interaction) {
         await interaction.reply('Showing all players...');
         const playerList = await database.Player.findAll({ attributes: ['name'] });
-        const playerString = playerList.map(p => p.name).join(', ') || 'No tags set.';
+        const playerString = playerList.map(p => p.name).join(', ') || 'No players set.';
 
-        return interaction.editReply(`List of tags: ${playerString}`);
+        return interaction.editReply(`List of players: ${playerString}`);
     },
 };

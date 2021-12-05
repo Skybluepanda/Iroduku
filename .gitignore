@@ -4,3 +4,4 @@ data/
 package-lock.json
 package.json
 
+database.sqlite

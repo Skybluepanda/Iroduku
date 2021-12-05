@@ -7,10 +7,12 @@ module.exports = {
         .setDescription('Initiates player profile'),
     async execute(interaction) {
         await interaction.reply('Creating Profile...');
-        const userID = interaction.user.id
+        const username = interaction.user.id;
+        const userId = interaction.user.username;
         try {
             const player = await database.Player.create({
-                playerID: userID,
+                playerID: username,
+                name: userId,
             });
             return interaction.editReply(`Player Profile Created!`);
         } catch (error) {
