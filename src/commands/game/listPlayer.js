@@ -3,13 +3,13 @@ const database = require('../../database.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('showtags')
-        .setDescription('Shows all tags'),
+        .setName('playerlist')
+        .setDescription('Shows list of players'),
     async execute(interaction) {
-        await interaction.reply('Showing all tags...');
-        const tagList = await database.Tags.findAll({ attributes: ['name'] });
-        const tagString = tagList.map(t => t.name).join(', ') || 'No tags set.';
+        await interaction.reply('Showing all players...');
+        const playerList = await database.Player.findAll({ attributes: ['name'] });
+        const playerString = playerList.map(p => p.name).join(', ') || 'No tags set.';
 
-        return interaction.editReply(`List of tags: ${tagString}`);
+        return interaction.editReply(`List of tags: ${playerString}`);
     },
 };

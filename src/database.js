@@ -29,6 +29,10 @@ const Player = sequelize.define('player', {
 		type: Sequelize.INTEGER,
 		unique: true,
 	},
+	Name: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
 	Level_Cap: {
 		type: Sequelize.INTEGER,
 		defaultValue: 100,
