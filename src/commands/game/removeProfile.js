@@ -12,7 +12,7 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         const targetId = interaction.options.getString('id');
-        const rowCount = await database.Player.destroy({ where: { name: targetId } });
+        const rowCount = await database.Player.destroy({ where: { playerID: targetId } });
         const userId = interaction.user.id;
 
         const embed = new MessageEmbed();

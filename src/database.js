@@ -50,21 +50,21 @@ const Player = sequelize.define('player', {
 	}	
 });
 
-const Character = sequelize.define('character', {
-	characterID: {
-		type: Sequelize.INTEGER,
-		unique: true,
-	},
+// const Character = sequelize.define('character', {
+// 	characterID: {
+// 		type: Sequelize.INTEGER,
+// 		unique: true,
+// 	},
 	
-});
+// });
 
-Character.hasOne(Player, {
-	foreignKey: 'playerID'
-});
-Player.belongsTo(Character);
+// Character.hasOne(Player, {
+// 	foreignKey: 'playerID'
+// });
+// Player.belongsTo(Character);
 
 
 exports.sequelize = sequelize;
 exports.Tags = Tags;
 exports.Player = Player;
-exports.Character = Character;
+// exports.Character = Character;
