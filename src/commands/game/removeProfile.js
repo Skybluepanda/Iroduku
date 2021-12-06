@@ -9,11 +9,13 @@ module.exports = {
         .addStringOption(option => 
             option.setName('id')
                 .setDescription('discord ID of the profile being removed')
-                .setRequired(true)),
+                .setRequired(false)),
     async execute(interaction) {
-        const targetId = interaction.options.getString('id');
+        const targetId = interaction.user.id;
+        if (interaction.options.getString('id') != null) {
+            targetId = interaction.options.getString('id');
+        }
         const rowCount = await database.Player.destroy({ where: { playerID: targetId } });
-        const userId = interaction.user.id;
 
         const embed = new MessageEmbed();
         const embedNew = new MessageEmbed();

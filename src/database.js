@@ -38,6 +38,22 @@ const Player = sequelize.define('player', {
 		defaultValue: 100,
 		unique:false,
 	},
+});
+
+const Character = sequelize.define('character', {
+	characterID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+	},
+	name: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+	level: {
+		type: Sequelize.INTEGER,
+		defaultValue: 1,
+		unique:false,
+	},
 	hunger: {
 		type: Sequelize.INTEGER,
 		unique: false,
@@ -47,24 +63,20 @@ const Player = sequelize.define('player', {
 		type: Sequelize.INTEGER,
 		unique: false,
 		defaultValue: 1,
-	}	
+	},
+	fishXP: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+	},
+	fishLevel: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+	},
 });
-
-// const Character = sequelize.define('character', {
-// 	characterID: {
-// 		type: Sequelize.INTEGER,
-// 		unique: true,
-// 	},
-	
-// });
-
-// Character.hasOne(Player, {
-// 	foreignKey: 'playerID'
-// });
-// Player.belongsTo(Character);
-
 
 exports.sequelize = sequelize;
 exports.Tags = Tags;
 exports.Player = Player;
-// exports.Character = Character;
+exports.Character = Character;

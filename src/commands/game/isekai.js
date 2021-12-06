@@ -4,48 +4,54 @@ const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('stats')
-        .setDescription('Check your character stats'),
+        .setName('isekai')
+        .setDescription('Becomes a character in the game'),
     async execute(interaction) {
         const username = interaction.user.username;
         const userId = interaction.user.id;
         
         const embed = new MessageEmbed();
-        const embedDone = new MessageEmbed();
+        const embedNew = new MessageEmbed();
         const embedError = new MessageEmbed();
+        const embedDupe = new MessageEmbed();
 
-        embed.setTitle("Checking Stats")
+        embed.setTitle("Incoming Truck-kun.")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Checking for ${username}'s account.`)
-            .setColor("AQUA")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
-
-        embedDone.setTitle("Stats")
-            .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+            .setDescription(`Brooom`)
             .setColor("GREEN")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
-        embedError.setTitle("Unknown Error")
+        embedNew.setTitle("Isekaied")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Please report the error if it persists.`)
+            .setDescription(`Player ${username} was Isekaied`)
+            .setColor("GREEN")
+            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
+
+        embedError.setTitle("Failed to Isekai")
+            .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+            .setDescription(`Please find another truck-kun.`)
             .setColor("RED")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
+        embedDupe.setTitle("Already Isekaied")
+            .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+            .setDescription(`You already Isekaied.`)
+            .setColor("RED")
+            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
+
+        
+
         await interaction.reply({ embeds: [embed] });
         try {
-            const character = await database.Character.findOne({ where: { characterID: userId } })
-            console.log(character);
-            if (character) {
-                embedDone.setDescription(`
-                Name: ${character.name}
-                Hunger: ${character.hunger}
-                Fish: ${character.fish}`);
-            } else {
-                embedDone.setDescription('Character does not exist.')
-                        .setColor('RED');
-            }
-            return interaction.editReply({ embeds: [embedDone] });
+            const character = await database.Character.create({
+                playerID: userId,
+                name: username,
+            });
+            return interaction.editReply({ embeds: [embedNew] });
         } catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                return interaction.editReply({ embeds: [embedDupe] });
+            }
             return interaction.editReply({ embeds: [embedError] });
         }
     },
