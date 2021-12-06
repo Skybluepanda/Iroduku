@@ -44,7 +44,7 @@ module.exports = {
         await interaction.reply({ embeds: [embed] });
         try {
             const character = await database.Character.create({
-                playerID: userId,
+                characterID: userId,
                 name: username,
             });
             return interaction.editReply({ embeds: [embedNew] });
