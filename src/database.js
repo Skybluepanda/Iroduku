@@ -41,7 +41,7 @@ const Player = sequelize.define('player', {
 	hunger: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		defaultValue: 20,
+		defaultValue: 5,
 	},
 	fish: {
 		type: Sequelize.INTEGER,

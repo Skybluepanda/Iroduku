@@ -34,7 +34,6 @@ module.exports = {
         await interaction.reply({ embeds: [embed] });
         try {
             const player = await database.Player.findOne({ where: { playerID: userId } })
-            console.log(player);
             if (player) {
                 embedDone.setDescription(`
                 Name: ${player.name}
