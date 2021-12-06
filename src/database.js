@@ -57,7 +57,7 @@ const Character = sequelize.define('character', {
 	hunger: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		defaultValue: 20,
+		defaultValue: 5,
 	},
 	fish: {
 		type: Sequelize.INTEGER,

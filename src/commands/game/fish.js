@@ -10,22 +10,27 @@ module.exports = {
         const username = interaction.user.username;
         const userId = interaction.user.id;
         const player = await database.Player.findOne({ where: { playerID: userId } })
-        console.log(player);
         if (player) {
+            // remove hunger here
+            player.increment('hunger', { by: -1 });
             // chance calculation
             var succeedChance = 0.5;
             if (Math.random() < succeedChance) {
                 // add the fish to database here
                 player.increment('fish', { by: 1 });
-                // remove hunger here
-                player.increment('hunger', { by: -1 });
                 // do death checking here
-                if (player.hunger <= 0) {
+                if (player.hunger-1 <= 0) {
                     // player is dead
+                    return interaction.editReply(`One fish caught!\nPlayer had died :(\nFinal fish count: ${player.fish+1}`)
                 }
                 // fish caught!
                 return interaction.editReply(`One fish caught!\nFish count: ${player.fish+1}`);
 
+            }
+            // do death checking here
+            if (player.hunger-1 <= 0) {
+                // player is dead
+                return interaction.editReply(`No fish caught :(\nPlayer had died :(\nFinal fish count: ${player.fish}`)
             }
             // failed
             return interaction.editReply("No fish caught :(");
