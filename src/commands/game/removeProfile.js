@@ -4,26 +4,31 @@ const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('start')
-        .setDescription('Initiates player profile'),
+        .setName('removeprofile')
+        .setDescription('Removes a profile')
+        .addStringOption(option => 
+            option.setName('id')
+                .setDescription('discord ID of the profile being removed')
+                .setRequired(true)),
     async execute(interaction) {
-        const username = interaction.user.username;
+        const targetId = interaction.options.getString('id');
+        const rowCount = await database.Player.destroy({ where: { name: targetId } });
         const userId = interaction.user.id;
-        
+
         const embed = new MessageEmbed();
         const embedNew = new MessageEmbed();
         const embedError = new MessageEmbed();
-        const embedDupe = new MessageEmbed();
+        const embedExist = new MessageEmbed();
 
-        embed.setTitle("Creating Profile")
+        embed.setTitle("Removing Profile")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Checking for ${username}'s account.`)
+            .setDescription(`Removing Profile ${targetId}.`)
             .setColor("AQUA")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
-        embedNew.setTitle("Profile Created")
+        embedNew.setTitle("Profile Removed")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Profile ${username} was created using discord ID ${userId}`)
+            .setDescription(`Profile ${targetId} was removed.`)
             .setColor("GREEN")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
@@ -33,26 +38,17 @@ module.exports = {
             .setColor("RED")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
-        embedDupe.setTitle("Account Exists")
+        embedExist.setTitle("Account Doesn't Exist")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Account with discord ID ${userId} already exists`)
+            .setDescription(`Profile with ID ${targetId} deosn't exist.`)
             .setColor("RED")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
-        
-
         await interaction.reply({ embeds: [embed] });
-        try {
-            const player = await database.Player.create({
-                playerID: username,
-                name: userId,
-            });
-            return interaction.editReply({ embeds: [embedNew] });
-        } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                return interaction.editReply({ embeds: [embedDupe] });
-            }
-            return interaction.editReply({ embeds: [embedError] });
+        
+        if (!rowCount) {
+            return interaction.editReply({ embeds: [embedExist] });
         }
+        return interaction.editReply({ embeds: [embedNew] });
     },
 };

@@ -1,13 +1,13 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-const Discord = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
     .setName('embed')
     .setDescription('makes an embed!'),
     async execute(interaction) {
-        const embed = new Discord.MessageEmbed();
+        const embed = new MessageEmbed();
 
         embed.setTitle("This is a test embed")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }), "https://nhentai.net/g/349045/")
