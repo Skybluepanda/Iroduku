@@ -23,10 +23,18 @@ module.exports = {
             if (character.fish > 0) {
                 character.increment('hunger', { by: 3 });
                 character.increment('fish', { by: -1 });
-                embed.setDescription(`Ate a fish!\nFish count: ${character.fish-1}`)
+                embed.setDescription(`
+                Ate a fish!
+                Hunger: ${character.hunger+3}
+                Fish: ${character.fish-1}
+                `);
                 return interaction.reply({ embeds: [embed] });
             } else {
-                embed.setDescription(`No fish to eat :(\nFish count: ${character.fish}`)
+                embed.setDescription(`
+                No fish to eat :(
+                Hunger: ${character.hunger}
+                Fish count: ${character.fish}
+                `);
                 return interaction.reply({ embeds: [embed] });
             }
         } else {

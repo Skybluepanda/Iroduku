@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, channelMention } = require('@discordjs/builders');
 const database = require('../../database.js');
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, Guild } = require('discord.js');
 
 /**
  * Creates an embed for the command.
@@ -33,6 +33,31 @@ function findCharacter(id) {
         return character;
     }
     
+}
+
+function xpCheck(character, interaction, xp) {
+    const xpUp = new MessageEmbed();
+    const lvlUp = new MessageEmbed();
+    const xpCap = 10;
+    const xpTotal = character.fishXP + xp;
+
+    xpUp.setTitle("Fishing XP gained")
+        .setDescription(`Gained ${xp} fishing XP.`)
+        .setColor("AQUA");
+    
+    lvlUp.setTitle("Fishing Level gained")
+        .setDescription(`Gained a fishing level.
+        Your fishing level is now ${character.fishLevel+1}.`)
+        .setColor("GOLD");
+
+    character.increment('fishXP', { by: xp });
+    interaction.channel.send({ embeds: [xpUp] });
+    if (xpTotal >= xpCap) {
+        //levelup
+        character.increment('fishXP', { by: -xpCap });
+        character.increment('fishLevel', { by: 1 });
+        interaction.channel.send({ embeds: [lvlUp] });
+    }
 }
 
 /**
@@ -118,15 +143,18 @@ module.exports = {
             // chance calculation
             var succeedChance = 0.5;
             if (character.hunger > 0) {
+                
                 if (Math.random() < succeedChance) {
                     // add the fish to database here
                     character.increment('fish', { by: 1 });
+                    xpCheck(character, interaction, 3);
                     // fish caught!
                     fishCaught(embed, character, interaction);
                     return;
                 } else {
                     // failed
                     fishFail(embed, character, interaction);
+                    xpCheck(character, interaction, 1);
                     return;
                     // TODO: maybe randomize the failed message
                 }
