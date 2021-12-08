@@ -17,5 +17,5 @@ to run the bot
 to run the bot and make it restart each time you save  
     nodemon -e js  
 
-
-This is unimportant change. Remove eventually please.
+to make a command unusable by normal plebs add
+    if (!interaction.member.roles.cache.has('908920221568483368')) return;
