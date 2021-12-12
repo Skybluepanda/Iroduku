@@ -38,7 +38,7 @@ module.exports = {
             if (character) {
                 embedDone.setDescription(`
                 Name: ${character.name}
-                Hunger: ${character.hunger}
+                Stamina: ${character.stamina}
                 Fish: ${character.fish}`);
             } else {
                 embedDone.setDescription('Character does not exist.')

@@ -8,7 +8,7 @@ module.exports = {
         database.Tags.sync();
         database.Player.sync();
         database.Character.sync();
-        database.Skill.sync();
+        database.Skills.sync();
         database.SkillDesc.sync();
     },
 };

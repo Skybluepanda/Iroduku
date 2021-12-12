@@ -21,18 +21,18 @@ module.exports = {
         if (character) {
             // remove hunger here
             if (character.fish > 0) {
-                character.increment('hunger', { by: 3 });
+                character.increment('stamina', { by: 3 });
                 character.increment('fish', { by: -1 });
                 embed.setDescription(`
                 Ate a fish!
-                Hunger: ${character.hunger+3}
+                Stamina: ${character.stamina+3}
                 Fish: ${character.fish-1}
                 `);
                 return interaction.reply({ embeds: [embed] });
             } else {
                 embed.setDescription(`
                 No fish to eat :(
-                Hunger: ${character.hunger}
+                Stamina: ${character.stamina}
                 Fish count: ${character.fish}
                 `);
                 return interaction.reply({ embeds: [embed] });
