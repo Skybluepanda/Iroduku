@@ -4,7 +4,7 @@ const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('stats')
+        .setName('profile')
         .setDescription('Check your character stats'),
     async execute(interaction) {
         const username = interaction.user.username;
@@ -33,13 +33,18 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
         try {
-            const character = await database.Character.findOne({ where: { characterID: userId } })
-            console.log(character);
-            if (character) {
+            const player = await database.Player.findOne({ where: { playerID: userId } })
+            console.log(player);
+            if (player) {
                 embedDone.setDescription(`
-                Name: ${character.name}
-                Stamina: ${character.stamina}
-                Fish: ${character.fish}`);
+                Name: ${player.name}
+                Level: ${player.level} (${player.xp}/10)
+                Gems: ${player.gems}
+                Money: ${player.money}
+                Karma: ${player.karma}
+                Inventory: ${player.inventory}
+                Permissions: Weeb
+                `)
             } else {
                 embedDone.setDescription('Character does not exist.')
                         .setColor('RED');

@@ -5,7 +5,7 @@ const { MessageEmbed } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('isekai')
-        .setDescription('Becomes a character in the game'),
+        .setDescription('Initiates player profile'),
     async execute(interaction) {
         const username = interaction.user.username;
         const userId = interaction.user.id;
@@ -15,27 +15,27 @@ module.exports = {
         const embedError = new MessageEmbed();
         const embedDupe = new MessageEmbed();
 
-        embed.setTitle("Incoming Truck-kun.")
+        embed.setTitle("Creating Profile")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Brooom`)
+            .setDescription(`Checking for ${username}'s account.`)
+            .setColor("AQUA")
+            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
+
+        embedNew.setTitle("Profile Created")
+            .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+            .setDescription(`Profile ${username} was created using discord ID ${userId}`)
             .setColor("GREEN")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
-        embedNew.setTitle("Isekaied")
+        embedError.setTitle("Unknown Error")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Player ${username} was Isekaied`)
-            .setColor("GREEN")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
-
-        embedError.setTitle("Failed to Isekai")
-            .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Please find another truck-kun.`)
+            .setDescription(`Please report the error if it persists.`)
             .setColor("RED")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
-        embedDupe.setTitle("Already Isekaied")
+        embedDupe.setTitle("Account Exists")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`You already Isekaied.`)
+            .setDescription(`Account with discord ID ${userId} already exists`)
             .setColor("RED")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
@@ -43,8 +43,8 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
         try {
-            const character = await database.Character.create({
-                characterID: userId,
+            const player = await database.Player.create({
+                playerID: userId,
                 name: username,
             });
             return interaction.editReply({ embeds: [embedNew] });

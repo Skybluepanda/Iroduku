@@ -10,6 +10,6 @@ module.exports = {
 			console.error(error);
 			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 		}
-		await console.log(`${interaction.user.tag} in #${interaction.channel.name} triggered an interaction.`);
+		await console.log(`${interaction.user.tag} in #${interaction.channel.name} triggered an interaction ${interaction.commandId}.`);
 	},
 };
