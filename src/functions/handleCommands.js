@@ -2,13 +2,10 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const { clientId, guildId, token } = require("../../data/config.json");
 const fs = require("fs");
-const { getPriority } = require("os");
-const { Guild } = require("discord.js");
 
 module.exports = (client) => {
     client.handleCommands = async (commandsFolders, path) => {
         client.commandArray = [];
-        client.commands.delete();
         for (folder of commandsFolders) {
             const commandFiles = fs
                 .readdirSync(`src/commands/${folder}`)
@@ -36,15 +33,6 @@ module.exports = (client) => {
         }
 
         const rest = new REST({ version: "9" }).setToken(token);
-        rest.get(Routes.applicationGuildCommands(clientId, guildId)).then(data => {
-                const promises = [];
-                for (const command of data) {
-                    const deleteUrl = `${Routes.applicationGuildCommands(clientId, guildId)}/${command.id}`;
-                    promises.push(rest.delete(deleteUrl));
-                }
-                return Promise.all(promises);
-            });
-
         (async () => {
             try {
                 console.log("Started refreshing application (/) commands.");

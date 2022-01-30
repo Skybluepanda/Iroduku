@@ -88,8 +88,8 @@ const Player = sequelize.define('player', {
 const Character = sequelize.define('character', {
 	characterID: {
 		type: Sequelize.INTEGER,
-		unique: true,
-		allowNull: false,
+		autoIncrement: true,
+		primaryKey: true,
 	},
 	characterName: {
 		type: Sequelize.STRING,
@@ -121,22 +121,29 @@ const Character = sequelize.define('character', {
 const Series = sequelize.define('series', {
 	seriesID: {
 		type: Sequelize.INTEGER,
-		unique: true,
-		allowNull: false,
+		autoIncrement: true,
+		primaryKey: true,
+		initialAutoIncrement: 1
 	},
 	seriesName: {
 		type: Sequelize.STRING,
-		unique: false,
+		unique: true,
 		allowNull: false,
 	},
+	malLink: {
+		type: Sequelize.STRING,
+		unique: true,
+		allowNull: false,
+	},
+		
 });
 
 
 const Image = sequelize.define('image', {
 	imageID: {
 		type: Sequelize.INTEGER,
-		unique: true,
-		allowNull: false,
+		autoIncrement: true,
+		primaryKey: true,
 	},
 	characterID: {
 		type: Sequelize.STRING,
@@ -158,8 +165,8 @@ const Image = sequelize.define('image', {
 const Card = sequelize.define('card', {
 	cardID: {
 		type: Sequelize.INTEGER,
-		unique: true,
-		allowNull: false,
+		autoIncrement: true,
+		primaryKey: true,
 	},
 	PlayerID: {
 		type: Sequelize.STRING,
@@ -177,6 +184,11 @@ const Card = sequelize.define('card', {
 		allowNull: false,
 	},
 	imageNumber: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	imageID: {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
