@@ -123,7 +123,6 @@ const Series = sequelize.define('series', {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,
 		primaryKey: true,
-		initialAutoIncrement: 1
 	},
 	seriesName: {
 		type: Sequelize.STRING,
@@ -135,7 +134,6 @@ const Series = sequelize.define('series', {
 		unique: true,
 		allowNull: false,
 	},
-		
 });
 
 

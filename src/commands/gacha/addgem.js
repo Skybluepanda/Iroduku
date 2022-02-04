@@ -38,7 +38,7 @@ module.exports = {
             console.log(player);
             if (player) {
 				await player.increment('gems', {by: 1});
-				embedDone.setDescription(`
+				await embedDone.setDescription(`
                 Gems: ${player.gems}
                 `)
             } else {

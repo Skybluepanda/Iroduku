@@ -15,7 +15,7 @@ module.exports = (client) => {
                 const command = require(`../../src/commands/${folder}/${file}`);
                 client.commands.set(command.data.name, command);
                 client.commandArray.push(command.data.toJSON());
-                console.log(`Command ${file}, ${command}id sucessfully added to list of commands.`);
+                console.log(`1Command ${file} sucessfully added to list of commands.`);
             }
         }
 
@@ -28,7 +28,7 @@ module.exports = (client) => {
             const command = require(`../commands/${file}`);
             commands.push(command.data.toJSON());
             console.log(
-                `Command ${file} sucessfully added to list of commands.`
+                `2Command ${file} sucessfully added to list of commands.`
             );
         }
 
