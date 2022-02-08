@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../src/database.js');
+const database = require('../../database');
+const { MessageEmbed, Guild } = require('discord.js');
+const { Op } = require("sequelize");
 
 /**
  * Creates an embed for the command.
@@ -9,14 +11,50 @@ const database = require('../src/database.js');
 function createEmbed(interaction) {
     const embed = new MessageEmbed();
 
-    embed.setTitle("Fishing once")
+    embed.setTitle("Listing Series")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription("Casting...")
+        .setDescription("List of Series")
         .setColor("AQUA")
         .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
     
     return embed;
 }
+
+function joinBar(series){
+    return [series.seriesID, series.seriesName].join("| ");
+}
+
+async function nameList(embed, interaction, name, page){
+    const min = ((page - 1) * 20) + 1;
+    const max = (page * 20);
+    const list = await database.Series.findAll(
+        {attributes: ['seriesID', 'seriesName'],
+        order: ['seriesID'],
+    where: {
+        seriesName: {[Op.like]: '%' + name + '%'},
+        seriesID: {[Op.between]: [min, max]}
+    }}
+        );
+    const listString = await list.map(joinBar).join(`\n`);
+    await embed.setDescription(`${listString}`);
+    return await interaction.reply({ embeds: [embed]});
+};
+
+async function pageList(embed, interaction, page){
+    //use page for pages
+    const min = ((page - 1) * 20) + 1;
+    const max = (page * 20);
+    const list = await database.Series.findAll(
+        {attributes: ['seriesID', 'seriesName'],
+        order: ['seriesID'],
+    where: {
+        seriesID: {[Op.between]: [min, max]}
+    }}
+        );
+    const listString = await list.map(joinBar).join(`\n`);
+    await embed.setDescription(`${listString}`);
+    return await interaction.reply({ embeds: [embed]});
+};
 
 /**
  * Listing series
@@ -52,20 +90,27 @@ module.exports = {
                         )),
 	async execute(interaction) {
 		const embed = createEmbed(interaction);
-		await interaction.reply();
 		//first bring up list from 1 for default call.
 		//then select pages
 		//then select by name
 		//then lets embed.
 		if (interaction.options.getSubcommand() === "name") {
+            const name = await interaction.options.getString('name')
+            return nameList(embed, interaction, name, 1);
 			//do name here
-			return interaction.reply(`You tried to do name search but it doesn't work yet.`)
 		} else if (interaction.options.getSubcommand() === "page") {
+            //No filters counts all items in database then splits them
+            //into pages then depending on option view page.
+            //Also add buttons to navigate between pages or to choose
+            //a number for the page.
 			if (interaction.options.getInteger('page')) {
-				const page = interaction.options.getInteger('page')
-				//Show page at page number if it exists.
+				const page = await interaction.options.getInteger('page')
+				return pageList(embed, interaction, page);
 			} else {
 				//Show page 1
+                //
+                return pageList(embed, interaction, 1);
+                
 			}
 
 			return interaction.reply(`You tried to do page search but it doesn't work yet.`)
