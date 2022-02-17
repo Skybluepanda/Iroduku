@@ -96,23 +96,31 @@ const Character = sequelize.define('character', {
 		unique: false,
 		allowNull: false,
 	},
+	infoLink: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
 	seriesID: {
 		type: Sequelize.INTEGER,
-		unique: true,
+		unique: false,
 		allowNull: false,
 	},
 	alias: {
 		type: Sequelize.STRING,
 		unique: false,
+		defaultValue: "none",
 	},
 	simps: {
 		type: Sequelize.INTEGER,
-		unique: true,
+		unique: false,
+		defaultValue: 0,
 		allowNull: false,
 	},
 	imageCount: {
 		type: Sequelize.INTEGER,
-		unique: true,
+		unique: false,
+		defaultValue: 0,
 		allowNull: false,
 	}
 });
@@ -126,7 +134,7 @@ const Series = sequelize.define('series', {
 	},
 	seriesName: {
 		type: Sequelize.STRING,
-		unique: true,
+		unique: false,
 		allowNull: false,
 	},
 	malLink: {
@@ -135,6 +143,7 @@ const Series = sequelize.define('series', {
 		allowNull: false,
 	},
 });
+
 
 
 const Image = sequelize.define('image', {
@@ -153,11 +162,15 @@ const Image = sequelize.define('image', {
 		unique: false,
 		allowNull: false,
 	},
-	iamgeURL: {
+	imageURL: {
 		type: Sequelize.STRING,
 		unique: true,
 		allowNull: false,
-	}
+	},
+	nsfw: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
 });
 
 const Card = sequelize.define('card', {
@@ -227,6 +240,9 @@ const Rarity = sequelize.define('rarity', {
 	},
 }); 
 
+
+Series.hasMany(Character);
+Character.belongsTo(Series);
 
 
 exports.sequelize = sequelize;

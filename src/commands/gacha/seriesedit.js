@@ -1,5 +1,26 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database');
+const { MessageEmbed } = require('discord.js');
+
+
+function embedSuccess(interaction) {
+    const embedSuccess = new MessageEmbed();
+    embedSuccess.setTitle("Series edited")
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Series is being edited.`)
+        .setColor("ORANGE")
+        .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
+    return embedSuccess;
+};
+
+function embedError(interaction) {
+    const embedError = new MessageEmbed();
+    embedError.setTitle("Unknown Error")
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Please report the error if it persists.`)
+        .setColor("RED");
+    return embedError;
+};
 
 async function selectOption(interaction) {
     const id = interaction.options.getInteger('id');
@@ -18,7 +39,7 @@ async function selectOption(interaction) {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('sedit')
-		.setDescription('Replies with Pong!')
+		.setDescription('Edits Series Details')
         .addSubcommand(subcommand => 
             subcommand
                 .setName("name")
@@ -52,7 +73,8 @@ module.exports = {
                         .setRequired(true)
                         )),
 	async execute(interaction) {
-        await interaction.reply('Editing series...');
+        const embedS = embedSuccess(interaction);
+        const embedE = embedError(interaction);
         const id = interaction.options.getInteger('id');
         try {
             await selectOption(interaction, database)

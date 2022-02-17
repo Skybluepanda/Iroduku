@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../database');
+const database = require('../../database.js');
 const { MessageEmbed, Guild } = require('discord.js');
 const { Op } = require("sequelize");
 
@@ -94,33 +94,30 @@ module.exports = {
 		//then select pages
 		//then select by name
 		//then lets embed.
-		if (interaction.options.getSubcommand() === "name") {
-            const name = await interaction.options.getString('name')
-            return nameList(embed, interaction, name, 1);
-			//do name here
-		} else if (interaction.options.getSubcommand() === "page") {
-            //No filters counts all items in database then splits them
-            //into pages then depending on option view page.
-            //Also add buttons to navigate between pages or to choose
-            //a number for the page.
-			if (interaction.options.getInteger('page')) {
-				const page = await interaction.options.getInteger('page')
-				return pageList(embed, interaction, page);
-			} else {
-				//Show page 1
-                //
-                return pageList(embed, interaction, 1);
-                
-			}
-
-			return interaction.reply(`You tried to do page search but it doesn't work yet.`)
-		}
-        
-        const id = interaction.options.getInteger('id');
         try {
-            await selectOption(interaction, database)
+            if (interaction.options.getSubcommand() === "name") {
+                const name = await interaction.options.getString('name')
+                nameList(embed, interaction, name, 1);
+                
+                //do name here
+            } else if (interaction.options.getSubcommand() === "page") {
+                //No filters counts all items in database then splits them
+                //into pages then depending on option view page.
+                //Also add buttons to navigate between pages or to choose
+                //a number for the page.
+                if (interaction.options.getInteger('page')) {
+                    const page = await interaction.options.getInteger('page')
+                    pageList(embed, interaction, page);
+                    
+                } else {
+                    //Show page 1
+                    pageList(embed, interaction, 1);
+                    
+                    
+                }
+            }
         } catch (error) {
-            return interaction.editReply(`Error has occured, report to a dev if it reoccurs.`);
+            return interaction.reply("Error has occured");
         }
 	},
 };

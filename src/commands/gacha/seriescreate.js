@@ -11,12 +11,12 @@ module.exports = {
             .setDescription('Enter the series name')
             .setRequired(true))
         .addStringOption(option => option
-            .setName('mallink')
+            .setName('link')
             .setDescription('Enter the mal link for the series or a game link.')
             .setRequired(true)),
 	async execute(interaction) {
 		const name = interaction.options.getString('sname');
-        const mlink = interaction.options.getString('mallink');
+        const mlink = interaction.options.getString('link');
 
 		const embed = new MessageEmbed();
         const embedNew = new MessageEmbed();
