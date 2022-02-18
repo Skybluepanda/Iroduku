@@ -92,18 +92,19 @@ async function viewImage(embed, interaction, imageNumber) {
     const cid = await interaction.options.getInteger("id");
     const art = await database.Image.findOne({
         offset: imageNumber, 
-        order: ['title', 'ASC'],
+        order: [['imageNumber', 'ASC']],
         where: {
             characterID: cid,}
         })
     const imgNo = art.imageNumber;
-    const url = art.imageURL;
+    const url = await art.imageURL;
     const artist = art.artist;
     const source = art.source;
-    await embed
-        .setImage(url)
-        .setFooter({ text: `Art by ${artist} | Uploaded by ${uploader} | Source: ${source}` })
-    await embed.setImage
+    const uploader = art.uploader;
+    console.log("bruh");
+    //const footer = `Art by ${artist} | Uploaded by ${uploader} | Source: ${source}`;
+    await embed.setImage(url);
+        //.setFooter({ text: `${footer}` })
 }
 
 async function cinfoID(embed, interaction) {
@@ -113,8 +114,8 @@ async function cinfoID(embed, interaction) {
             characterID: cid
         }
     })
-    if (char.imageCount > 0) {
-        viewImage(embed, interaction, 0);
+    if (char.imageCount != 0) {
+        await viewImage(embed, interaction, 0);
     } 
     const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
     await embed
@@ -137,6 +138,9 @@ async function updateEmbed(cid, interaction, embed) {
         where: { characterName: {[Op.like]: '%' + cname + '%'},}
         });
     const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
+    if (char.imageCount > 0) {
+        await viewImage(embed, interaction, 0);
+    } 
     await embed
         .setDescription(`
         Character ID: ${char.characterID}
@@ -164,6 +168,7 @@ module.exports = {
                     option
                         .setName("name")
                         .setDescription("The name you want find")
+                        .setRequired(true)
                         ))
         .addSubcommand(subcommand =>
             subcommand
@@ -173,6 +178,7 @@ module.exports = {
                     option
                         .setName("id")
                         .setDescription("The id of the character")
+                        .setRequired(true)
                         )),
 	async execute(interaction) {
 		const embed = createEmbed(interaction);

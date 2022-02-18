@@ -93,8 +93,8 @@ async function upload(interaction) {
 		uploader: uploader,
 	});
 	console.log("6");
-	await database.Character.increment({imageCount: 1}, {where:{ characterID: cid}})
 	try {
+		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		await database.Player.increment({gems: 10}, {where: {playerID: interaction.user.id}})
 	} catch(error) {
 		interaction.followUp("You are not a registered player");
