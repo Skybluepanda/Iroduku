@@ -153,7 +153,7 @@ const Image = sequelize.define('image', {
 		primaryKey: true,
 	},
 	characterID: {
-		type: Sequelize.STRING,
+		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
 	},
@@ -164,7 +164,17 @@ const Image = sequelize.define('image', {
 	},
 	imageURL: {
 		type: Sequelize.STRING,
-		unique: true,
+		unique: false,
+		allowNull: false,
+	},
+	artist: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	source: {
+		type: Sequelize.STRING,
+		unique: false,
 		allowNull: false,
 	},
 	nsfw: {

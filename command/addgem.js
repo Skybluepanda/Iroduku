@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../database.js');
+const database = require('../src/database.js');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
@@ -39,7 +39,7 @@ module.exports = {
             if (player) {
 				await player.increment('gems', {by: 1});
 				await embedDone.setDescription(`
-                Gems: ${player.gems}
+                Gems: ${player.gems+1}
                 `)
             } else {
                 embedDone.setDescription('You must first create an account using /isekai.')
