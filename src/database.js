@@ -181,6 +181,11 @@ const Image = sequelize.define('image', {
 		type: Sequelize.BOOLEAN,
 		allowNull: false,
 	},
+	uploader: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	}
 });
 
 const Card = sequelize.define('card', {

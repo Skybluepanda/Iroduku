@@ -88,6 +88,24 @@ async function charList(interaction, embed){
     return await interaction.reply({embeds: [embed]});
 }
 
+async function viewImage(embed, interaction, imageNumber) {
+    const cid = await interaction.options.getInteger("id");
+    const art = await database.Image.findOne({
+        offset: imageNumber, 
+        order: ['title', 'ASC'],
+        where: {
+            characterID: cid,}
+        })
+    const imgNo = art.imageNumber;
+    const url = art.imageURL;
+    const artist = art.artist;
+    const source = art.source;
+    await embed
+        .setImage(url)
+        .setFooter({ text: `Art by ${artist} | Uploaded by ${uploader} | Source: ${source}` })
+    await embed.setImage
+}
+
 async function cinfoID(embed, interaction) {
     const cid = await interaction.options.getInteger("id");
     const char = await database.Character.findOne({
@@ -95,6 +113,9 @@ async function cinfoID(embed, interaction) {
             characterID: cid
         }
     })
+    if (char.imageCount > 0) {
+        viewImage(embed, interaction, 0);
+    } 
     const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
     await embed
         .setDescription(`

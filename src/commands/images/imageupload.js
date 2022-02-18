@@ -6,28 +6,32 @@ const database = require('../../database.js');
 async function checkIDS(interaction) {
 	const cid = interaction.options.getInteger('cid');
 	const iNumber = interaction.options.getInteger('image_number')
-	console.log("9");
+	console.log("10");
 	try {
+		console.log("10.1");
 		if (0 <= iNumber < 25) {
+			console.log("10.2");
 			const count = await database.Image.count({ where: {characterID: cid, imageNumber: iNumber}})
 			console.log(count);
 			if (count != 0) {
-				await interaction.followUp(`Character ${cid} already has an image ${iNumber}, maximum is 24.`)
+				console.log("10.3");
+				await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 24.`)
 			} else {
+				console.log("10.4");
 				upload(interaction);
 			};
 		} else {
-			await interaction.followUp("Range of image number is 0-24.")
+			await interaction.reply("Range of image number is 0-24.")
 		}
 	} catch(error){
-		await interaction.followUp("Error has occured");
+		await interaction.reply("Error has occured");
 	}
 }
 
 async function border(interaction) {
 	const imagelink = await interaction.options.getString('image_link')
-	const canvas = createCanvas(225, 350);
-	const context = canvas.getContext('2d');
+	const canvas = await createCanvas(225, 350);
+	const context = await canvas.getContext('2d');
 	const pic = await loadImage(imagelink);
 	context.drawImage(pic, 0, 0, canvas.width, canvas.height);
 	context.strokeStyle = '#ffffff';
@@ -41,7 +45,6 @@ async function border(interaction) {
 	await interaction.reply({ files: [attachment] });
 	
 	console.log("9");
-	
 }
 
 function checkNSFW(interaction){
@@ -64,11 +67,12 @@ async function upload(interaction) {
 	const art = await interaction.options.getString('artist_name');
 	const sauce = await interaction.options.getString('source');
 	const isnsfw = await interaction.options.getBoolean('nsfw');
+	const uploader = await interaction.user.id;
 	await border(interaction);
 	const message = await interaction.fetchReply();
 	console.log("8");
 
-	const link = message.attachments.first().url;
+	const link = await message.attachments.first().url;
 	// const link = await message.attachments.getString(attachment => {
 	// 	const link = attachment.proxyURL;
 	// 	console.log(link);
@@ -86,8 +90,15 @@ async function upload(interaction) {
 		artist: art,
 		source: sauce,
 		nsfw: isnsfw, 
+		uploader: uploader,
 	});
 	console.log("6");
+	await database.Character.increment({imageCount: 1}, {where:{ characterID: cid}})
+	try {
+		await database.Player.increment({gems: 10}, {where: {playerID: interaction.user.id}})
+	} catch(error) {
+		interaction.followUp("You are not a registered player");
+	}
 	return await interaction.followUp("Image added to the database.")
 }
 
@@ -133,7 +144,7 @@ module.exports = {
 				return await interaction.reply("None NSFW images have number 0-9, NSFW images have number 10-24")
 			}
 		} catch(error){
-			return await interaction.followUp("Error has occured");
+			return await interaction.channel.send("Error has occured");
 		}
 		
 	}
