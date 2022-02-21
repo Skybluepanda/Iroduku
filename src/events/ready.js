@@ -14,8 +14,6 @@ module.exports = {
         database.Character.sync();
         database.Image.sync();
         database.Series.sync();
-        database.Card.sync();
-        database.Rarity.sync();
         console.log('database sync complete!');
     },
 };

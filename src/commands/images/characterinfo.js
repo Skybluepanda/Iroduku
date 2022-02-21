@@ -1,8 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database');
-const { MessageEmbed, Guild, Message } = require('discord.js');
+const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
 const { Op } = require("sequelize");
 
+var currentImage;
+var totalImage;
 /**
  * Creates an embed for the command.
  * @param {*} interaction the interaction that the bot uses to reply.
@@ -14,12 +16,77 @@ function createEmbed(interaction) {
     embed.setTitle("Char Search")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("Character Not Found. It's possible that the character doesn't exist.")
-        .setColor("RED")
-        .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
+        .setColor("RED");
     
     return embed;
 }
 
+async function createButton() {
+    const row = await new MessageActionRow()
+        .addComponents(
+            new MessageButton()
+                .setCustomId('prev')
+                .setLabel('prev')
+                .setStyle('PRIMARY')
+        )
+        .addComponents(
+            new MessageButton()
+                .setCustomId('next')
+                .setLabel('next')
+                .setStyle('PRIMARY')
+        )
+        .addComponents(
+            new MessageButton()
+                .setCustomId('search')
+                .setLabel('search')
+                .setStyle('PRIMARY')
+        )
+    return row;
+}
+
+async function countImage(cid) {
+    const char = await database.Character.findOne({where: {characterID: cid}});
+    return await (char.imageCount - 1);
+}
+
+async function checkInumber(embed, interaction, direction, currentImage, totalImage){
+    if (currentImage == 0 && direction == -1) {
+        currentImage = totalImage;
+    } else if (currentImage == totalImage && direction == 1) {
+        currentImage = 0;
+    } else {
+        currentImage += direction;
+    }
+    const image = await currentImage;
+
+    viewImage(embed, interaction, image);
+    updateEmbed(embed, interaction);
+    buttonManager(embed, interaction, msg, currentImage, totalImage);
+}
+
+async function buttonManager(embed, interaction, msg, currentImage, totalImage) {
+    const filter = i => i.user.id === interaction.user.id;
+    const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+    collector.on('collect', async i => {
+        switch (i.customId){
+            case 'prev':
+                checkInumber(embed, interaction, -1, currentImage, totalImage);
+                
+                break;
+            
+            case 'next':
+                checkInumber(embed, interaction, 1, currentImage, totalImage);
+                break;
+            
+            case 'search':
+                await interaction.followUp('search is not functional.');
+                buttonManager(embed, interaction, msg, currentImage, totalImage);
+                break;
+        };
+        i.deferUpdate();
+    }
+    );
+}
 async function subcommandProcess(embed, interaction) {
     const subCommand = interaction.options.getSubcommand();
     switch (subCommand) {
@@ -56,7 +123,7 @@ async function cinfoName(embed, interaction) {
                     attributes: ['characterID'],
                     where: { characterName: {[Op.like]: '%' + cname + '%'},}
                 })
-                return updateEmbed(char, interaction, embed);
+                return sendEmbed(interaction, embed);
 
             default:
                 charList(interaction, embed);
@@ -88,23 +155,28 @@ async function charList(interaction, embed){
     return await interaction.reply({embeds: [embed]});
 }
 
-async function viewImage(embed, interaction, imageNumber) {
-    const cid = await interaction.options.getInteger("id");
-    const art = await database.Image.findOne({
+async function viewImage(embed, interaction, imageNumber, cid) {
+    var art = await database.Image.findOne({
         offset: imageNumber, 
         order: [['imageNumber', 'ASC']],
         where: {
             characterID: cid,}
         })
-    const imgNo = art.imageNumber;
-    const url = await art.imageURL;
+    currentImage = imageNumber;
+    console.log("currentimage is" + currentImage);
+    const url = art.imageURL;
     const artist = art.artist;
     const source = art.source;
     const uploader = art.uploader;
-    console.log("bruh");
-    //const footer = `Art by ${artist} | Uploaded by ${uploader} | Source: ${source}`;
-    await embed.setImage(url);
-        //.setFooter({ text: `${footer}` })
+    const footer = `#${art.imageNumber} Art by ${artist} | Uploaded by ${uploader}
+    `;
+    await embed
+        .setImage(url)
+        .setFooter(`${footer}`)
+}
+
+async function updateEmbed(embed, interaction){
+    await interaction.editReply({ embeds:[embed], fetchReply: true});
 }
 
 async function cinfoID(embed, interaction) {
@@ -115,7 +187,7 @@ async function cinfoID(embed, interaction) {
         }
     })
     if (char.imageCount != 0) {
-        await viewImage(embed, interaction, 0);
+        await viewImage(embed, interaction, 0, cid);
     } 
     const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
     await embed
@@ -129,17 +201,20 @@ async function cinfoID(embed, interaction) {
         `)
         .setTitle(`${char.characterName}`)
         .setColor("GREEN");
-    return await interaction.reply( {embeds: [embed]});
+        const row = await createButton();
+    msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
+    await buttonManager(embed, interaction, msg, 0, countImage(cid));
 }
 
-async function updateEmbed(cid, interaction, embed) {
+async function sendEmbed(interaction, embed) {
     const cname = interaction.options.getString("name")
     const char = await database.Character.findOne({
         where: { characterName: {[Op.like]: '%' + cname + '%'},}
         });
     const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
+    const cid = await char.characterID;
     if (char.imageCount > 0) {
-        await viewImage(embed, interaction, 0);
+        await viewImage(embed, interaction, 0, cid);
     } 
     await embed
         .setDescription(`
@@ -152,7 +227,9 @@ async function updateEmbed(cid, interaction, embed) {
         `)
         .setTitle(`${char.characterName}`)
         .setColor("GREEN");
-    return await interaction.reply( {embeds: [embed]});
+    const row = await createButton();
+    msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
+    await buttonManager(embed, interaction, msg, 0, countImage(cid));
 }
 
 
@@ -183,9 +260,10 @@ module.exports = {
 	async execute(interaction) {
 		const embed = createEmbed(interaction);
         try {
-            subcommandProcess(embed, interaction);
+            await subcommandProcess(embed, interaction);
         } catch(error) {
-            return interaction.reply("Error has occured.")
+            await  interaction.reply("Error has occured.")
         }
+        
     }
 }
