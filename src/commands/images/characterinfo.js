@@ -3,8 +3,6 @@ const database = require('../../database');
 const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
 const { Op } = require("sequelize");
 
-var currentImage;
-var totalImage;
 /**
  * Creates an embed for the command.
  * @param {*} interaction the interaction that the bot uses to reply.
@@ -14,7 +12,7 @@ function createEmbed(interaction) {
     const embed = new MessageEmbed();
 
     embed.setTitle("Char Search")
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription("Character Not Found. It's possible that the character doesn't exist.")
         .setColor("RED");
     
@@ -186,9 +184,15 @@ async function cinfoID(embed, interaction) {
             characterID: cid
         }
     })
-    if (char.imageCount != 0) {
+
+    if (char) {
+        if (char.imageCount > 0){
         await viewImage(embed, interaction, 0, cid);
-    } 
+        }
+    } else {
+        embed.addField('No images found', 'add some', true);
+    }
+    const totalImage = await countImage(cid);
     const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
     await embed
         .setDescription(`
@@ -203,7 +207,7 @@ async function cinfoID(embed, interaction) {
         .setColor("GREEN");
         const row = await createButton();
     msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
-    await buttonManager(embed, interaction, msg, 0, countImage(cid));
+    await buttonManager(embed, interaction, msg, 0, totalImage);
 }
 
 async function sendEmbed(interaction, embed) {
@@ -213,6 +217,7 @@ async function sendEmbed(interaction, embed) {
         });
     const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
     const cid = await char.characterID;
+    const totalImage = await coucntImage(cid);
     if (char.imageCount > 0) {
         await viewImage(embed, interaction, 0, cid);
     } 
@@ -229,7 +234,7 @@ async function sendEmbed(interaction, embed) {
         .setColor("GREEN");
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
-    await buttonManager(embed, interaction, msg, 0, countImage(cid));
+    await buttonManager(embed, interaction, msg, 0, totalImage);
 }
 
 
@@ -263,7 +268,6 @@ module.exports = {
             await subcommandProcess(embed, interaction);
         } catch(error) {
             await  interaction.reply("Error has occured.")
-        }
-        
+        }        
     }
 }
