@@ -209,7 +209,6 @@ async function updateEmbed(embed, interaction){
 }
 
 async function cinfoID(embed, interaction) {
-<<<<<<< HEAD
     try {
         const cid = await interaction.options.getInteger("id");
         const char = await database.Character.findOne({
@@ -276,58 +275,6 @@ async function sendEmbed(interaction, embed) {
         console.log("error has occured in sendEmbed.");
     }
     
-=======
-    const cid = await interaction.options.getInteger("id");
-    const char = await database.Character.findOne({
-        where: {
-            characterID: cid
-        }
-    })
-    if (char.imageCount != 0) {
-        await viewImage(embed, interaction, 0, cid);
-    } 
-    const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
-    await embed
-        .setDescription(`
-        Character ID: ${char.characterID}
-        Character Alias: ${char.alias}
-        Character Link: ${char.infoLink}
-        Simps: ${char.simps}
-        Series: ${char.seriesID}| ${series.seriesName}
-        Image Count: ${char.imageCount}
-        `)
-        .setTitle(`${char.characterName}`)
-        .setColor("GREEN");
-        const row = await createButton();
-    msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
-    await buttonManager(embed, interaction, msg, 0, countImage(cid));
-}
-
-async function sendEmbed(interaction, embed) {
-    const cname = interaction.options.getString("name")
-    const char = await database.Character.findOne({
-        where: { characterName: {[Op.like]: '%' + cname + '%'},}
-        });
-    const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
-    const cid = await char.characterID;
-    if (char.imageCount > 0) {
-        await viewImage(embed, interaction, 0, cid);
-    } 
-    await embed
-        .setDescription(`
-        Character ID: ${char.characterID}
-        Character Alias: ${char.alias}
-        Character Link: ${char.infoLink}
-        Simps: ${char.simps}
-        Series: ${char.seriesID}| ${series.seriesName}
-        Image Count: ${char.imageCount}
-        `)
-        .setTitle(`${char.characterName}`)
-        .setColor("GREEN");
-    const row = await createButton();
-    msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
-    await buttonManager(embed, interaction, msg, 0, countImage(cid));
->>>>>>> parent of 2232ecf (Update characterinfo.js)
 }
 
 
@@ -360,13 +307,7 @@ module.exports = {
         try {
             await subcommandProcess(embed, interaction);
         } catch(error) {
-<<<<<<< HEAD
             await  interaction.reply("Error has occured while performing the command.")
         }        
-=======
-            await  interaction.reply("Error has occured.")
-        }
-        
->>>>>>> parent of 2232ecf (Update characterinfo.js)
     }
 }
