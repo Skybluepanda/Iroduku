@@ -31,24 +31,17 @@ module.exports = {
                 .setRequired(true)
                 ),
 	async execute(interaction) {
-        console.log("0");
 		const embed = createEmbed(interaction);
         const sid = await interaction.options.getInteger('sid');
-        console.log("1");
         try {
-            console.log("2");
             const series = await database.Series.findOne({ where: { seriesID: sid }});
-            console.log("2.5");
             if (series) {
-                console.log("3");
                 await embed.setDescription(`
                 Series ID: ${series.seriesID}
                 Series Name: ${series.seriesName}
                 Series Link: ${series.malLink}
                 `);
-                console.log("4");
                 return await interaction.reply( {embeds: [embed]});
-                console.log("5");
             }
         } catch(error) {
             return interaction.reply("Error has occured.")

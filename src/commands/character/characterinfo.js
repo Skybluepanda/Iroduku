@@ -60,7 +60,6 @@ async function countImage(cid) {
 async function checkInumber(embed, interaction, direction, currentImage, totalImage){
     try {
         const cid = await interaction.options.getInteger("id");
-        await console.log(currentImage);
         if (currentImage == 0 && direction == -1) {
             currentImage = totalImage;
         } else if (currentImage == totalImage && direction == 1) {
@@ -69,16 +68,9 @@ async function checkInumber(embed, interaction, direction, currentImage, totalIm
             currentImage += direction;
         }
         const image = await currentImage;
-        await console.log(currentImage);
-        
-
-        await console.log("view image start")
         await viewImage(embed, interaction, image, cid);
-        await console.log("view image end, updating");
         await updateEmbed(embed, interaction);
-        await console.log("update end, deploying button manager.")
         await buttonManager(embed, interaction, msg, currentImage, totalImage);
-        await console.log("button manager deployed.")
     } catch(error) {
         console.log("Error has occured in checkInumber");
     }
@@ -137,17 +129,13 @@ async function cinfoName(embed, interaction) {
             const charCount = await database.Character.count({ 
                 where: { characterName: {[Op.like]: '%' + cname + '%'},}
             })
-            console.log(`${charCount}`);
+            console.log(charCount);
             switch (charCount) {
                 case 0:
                     interaction.reply({embeds: [embed]});
                     break;
                 
                 case 1:
-                    const char = database.Character.findOne({
-                        attributes: ['characterID'],
-                        where: { characterName: {[Op.like]: '%' + cname + '%'},}
-                    })
                     return sendEmbed(interaction, embed);
 
                 default:
@@ -196,7 +184,6 @@ async function viewImage(embed, interaction, imageNumber, cid) {
                 characterID: cid,}
             })
         currentImage = imageNumber;
-        console.log("currentimage is" + currentImage);
         const url = art.imageURL;
         const artist = art.artist;
         const uploader = art.uploader;
@@ -261,10 +248,14 @@ async function sendEmbed(interaction, embed) {
             });
         const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
         const cid = await char.characterID;
-        const totalImage = await coucntImage(cid);
-        if (char.imageCount > 0) {
+        const totalImage = await countImage(cid);
+        if (char) {
+            if (char.imageCount > 0){
             await viewImage(embed, interaction, 0, cid);
-        } 
+            }
+        } else {
+            embed.addField('No images found', 'add some', true);
+        }
         await embed
             .setDescription(`
 Character ID: ${char.characterID}
@@ -284,6 +275,8 @@ Image Count: ${char.imageCount}
     }
     
 }
+
+
 
 
 module.exports = {

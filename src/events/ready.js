@@ -5,6 +5,7 @@ module.exports = {
     name: 'ready',
     once: true,
     execute(client) {
+        client.application.commands.set([]);
         console.log(`Ready! Logged in as ${client.user.tag}`);
         // database.Tags.sync();
         // database.Player.sync();

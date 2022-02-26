@@ -9,7 +9,6 @@ module.exports = {
     async execute(interaction) {
         const username = interaction.user.username;
         const userId = interaction.user.id;
-        
         const embed = new MessageEmbed();
         const embedDone = new MessageEmbed();
         const embedError = new MessageEmbed();
@@ -34,7 +33,6 @@ module.exports = {
         await interaction.reply({ embeds: [embed] });
         try {
             const player = await database2.Player.findOne({ where: { playerID: userId } });
-            console.log(player);
             if (player) {
                 embedDone.setDescription(`
                 Name: ${player.name}

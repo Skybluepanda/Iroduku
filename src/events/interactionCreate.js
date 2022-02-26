@@ -10,7 +10,7 @@ module.exports = {
 				console.error(error);
 				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 			}
-			await console.log(`${interaction.user.tag} in #${interaction.channel.name} triggered an interaction ${interaction.commandId}.`);
+			await console.log(`${interaction.user.tag} in #${interaction.channel.name} triggered an interaction ${interaction.commandId} : ${interaction.commandName}.`);
 			}
 		//  else if (interaction.isButton()) {
 		// 	const button = interaction.client.buttons.get(interaction.customId);

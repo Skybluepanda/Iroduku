@@ -19,51 +19,42 @@ async function checkIDS(interaction) {
 			await interaction.reply("Range of image number is 0-24.")
 		}
 	} catch(error){
-		await interaction.reply("Error has occured");
+        console.log("failed in id check.")
 	}
 }
 
 function imageFilename(interaction) {
-	try {
-		const cid = interaction.options.getInteger('cid');
-		const char = database.Character.findOne({where: {characterID: cid}});
-		const charname = char.characterName
-		const nsfw = interaction.options.getBoolean('nsfw');
-		if (nsfw) {
-			const imgName = 'SPOILER_'+ charname + '.png';
-			return imgName;
-		} else {
-			const imgName = charname + '.png';
-			return imgName;
-		}
-	} catch(error) {
-		console.log(error + " @imageupload/imagefilename.");
+	const nsfw = interaction.options.getBoolean('nsfw');
+    const cid = interaction.options.getInteger('cid');
+    const char = database.Character.findOne({where: {characterID: cid}});
+    const charname = char.characterName
+	if (nsfw) {
+		const imgName = 'SPOILER_'+ charname + '.gif';
+		return imgName;
+	} else {
+		const imgName = charname + '.gif';
+		return imgName;
 	}
-
 }
 
-async function border(interaction) {
-	try {
-		const imagelink = await interaction.options.getString('image_link')
-		const canvas = await createCanvas(225, 350);
-		const context = await canvas.getContext('2d');
-		const pic = await loadImage(imagelink);
-		const nsfw = await interaction.options.getBoolean('nsfw');
-		context.drawImage(pic, 0, 0, canvas.width, canvas.height);
-		context.strokeStyle = '#ffffff';
-		context.lineWidth = 4;
-
-	// Draw a rectangle with the dimensions of the entire canvas
-		context.strokeRect(0, 0, canvas.width, canvas.height);
-		const imgName = await imageFilename(interaction);
-		
-		const attachment = await new MessageAttachment(canvas.toBuffer(), imgName);
-		if (attachment) {await interaction.reply({ files: [attachment] });} else {
-			interaction.reply("Image error.")
-		}
-	} catch(error) {
-		console.log("Error with border funciton");
-	}
+async function check(interaction) {
+    try {
+        const url = await interaction.options.getString('gif_link');
+        if (url.endsWith(".gif")) {
+            const imgName = await imageFilename(interaction);
+            const attachment = await new MessageAttachment(url, imgName);
+            console.log(imgName);
+            if (attachment) {await interaction.reply({ files: [attachment] });} else {
+                interaction.reply("Image error.")
+            }
+            //add it to database
+        } else {
+            //fucking die u moron.
+            return interaction.reply("That's not a gif.")
+        }
+    } catch(error) {
+        console.log(error + "error in gifupload/check");
+    }
 }
 
 // function checkNSFW(interaction){
@@ -78,42 +69,50 @@ async function border(interaction) {
 
 
 async function upload(interaction) {
-	try {
-		const cid = await interaction.options.getInteger('cid');
-		const iNumber = await interaction.options.getInteger('image_number');
-		const art = await interaction.options.getString('artist_name');
-		const sauce = await interaction.options.getString('source');
-		const isnsfw = await interaction.options.getBoolean('nsfw');
-		const uploader = await interaction.user.username;
-		
-		await border(interaction);
-		const message = await interaction.fetchReply();
-			
+    try {
+        const cid = await interaction.options.getInteger('cid');
+        const iNumber = await interaction.options.getInteger('image_number');
+        const art = await interaction.options.getString('artist_name');
+        const sauce = await interaction.options.getString('source');
+        const isnsfw = await interaction.options.getBoolean('nsfw');
+        const uploader = await interaction.user.username;
+        // await check(interaction);
+        const url = await interaction.options.getString('gif_link');
 
-		const link = await message.attachments.first().url;
-		await database.Image.create({
-			characterID: cid,
-			imageNumber: iNumber,
-			imageURL: link,
-			artist: art,
-			source: sauce,
-			nsfw: isnsfw, 
-			uploader: uploader,
-		});
+        // const message = await interaction.fetchReply();
+
+        // const link = await message.attachments.first().url;
+        await console.log(url);
+        if (url.endsWith(".gif")) {
+            await database.Image.create({
+                characterID: cid,
+                imageNumber: iNumber,
+                imageURL: url,
+                artist: art,
+                source: sauce,
+                nsfw: isnsfw, 
+                uploader: uploader,
+            });
+        } else {
+            interaction.channel.send("Thats not a gif.")
+        }
+        await console.log("broke with this check?");
+	
 		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
 		await database2.Player.increment({gems: 10}, {where: {playerID: interaction.user.id}})
-		return await interaction.followUp("Image added to the database.")
+        await console.log("wait did we fail here because we never sent anything?");
+        return await interaction.reply(`Image added to the database.`)
 	} catch(error) {
-		interaction.channel.send("You are not a registered player");
+        console.log("upload failed.")
 	}
 	
 }
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('iupload')
+		.setName('gifupload')
 		.setDescription('Adding image to the database for the character, image should be 225x350px in size.')
 		.addIntegerOption(option => option
 			.setName('cid')
@@ -124,7 +123,7 @@ module.exports = {
 			.setDescription('id number for characters image slot. Pick an empty one.')
 			.setRequired(true))
 		.addStringOption(option => option
-			.setName('image_link')
+			.setName('gif_link')
 			.setDescription('link of the image or upload.')
 			.setRequired(true))
 		.addStringOption(option => option
@@ -143,6 +142,7 @@ module.exports = {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.
 		try {
+            // interaction.reply("Uploading gif.");
 			checkIDS(interaction);
 			// if (checkNSFW(interaction)){
 			// 	checkIDS(interaction);
