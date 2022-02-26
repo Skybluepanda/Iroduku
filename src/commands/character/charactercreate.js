@@ -58,11 +58,12 @@ module.exports = {
         const embedD = embedDupe(interaction);
         const embedE = embedError(interaction);
         
-        await interaction.reply({ embeds: [embedN] });
+     
         
         
         try {
-            if (interaction.channel.id === 947136227126177872) {
+            if (interaction.channel.id === '947136227126177872') {
+                await interaction.reply({ embeds: [embedN] });
                 const character = await database.Character.create({
                     characterName: name,
                     infoLink: link,

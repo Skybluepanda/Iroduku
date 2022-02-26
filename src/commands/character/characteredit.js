@@ -116,7 +116,7 @@ module.exports = {
 	async execute(interaction) {
         const id = interaction.options.getInteger('id');
         try {
-            if (interaction.channel.id === 947136227126177872) {
+            if (interaction.channel.id === '947136227126177872') {
                 await selectOption(interaction)
             
             } else {

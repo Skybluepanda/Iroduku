@@ -54,7 +54,7 @@ module.exports = {
                         )),
 	async execute(interaction) {
         try {
-            if (interaction.channel.id === 947136227126177872) {
+            if (interaction.channel.id === '947136227126177872') {
                 await selectOption(interaction, database)
             } else {
                 interaction.reply("Please use #series and characters channel for this command.")

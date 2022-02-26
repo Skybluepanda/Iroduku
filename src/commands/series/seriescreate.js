@@ -46,9 +46,10 @@ module.exports = {
             .setColor("RED");
 		
 		
-		await interaction.reply({ embeds: [embed] });
+		
         try {
-            if (interaction.channel.id === 947136227126177872) {
+            if (interaction.channel.id === '947136227126177872') {
+                await interaction.reply({ embeds: [embed] });
                 const series = await database.Series.create({
                     seriesName: name,
                     malLink: mlink,
