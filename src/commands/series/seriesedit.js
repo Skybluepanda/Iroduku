@@ -54,9 +54,14 @@ module.exports = {
                         )),
 	async execute(interaction) {
         try {
-            await selectOption(interaction, database)
+            if (interaction.channel.id === 947136227126177872) {
+                await selectOption(interaction, database)
+            } else {
+                interaction.reply("Please use #series and characters channel for this command.")
+            }
         } catch (error) {
             return interaction.followUp(`Error has occured, report to a dev if it reoccurs.`);
         }
+        
 	},
 };

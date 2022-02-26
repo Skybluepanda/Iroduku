@@ -103,11 +103,12 @@ async function upload(interaction) {
 		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
-		await database2.Player.increment({gems: 10}, {where: {playerID: interaction.user.id}})
+		await database2.Player.increment({gems: 50}, {where: {playerID: interaction.user.id}})
 		return await interaction.followUp("Image added to the database.")
 	} catch(error) {
 		interaction.channel.send("You are not a registered player");
 	}
+	
 	
 }
 
@@ -142,15 +143,19 @@ module.exports = {
 	async execute(interaction) {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.
-		try {
-			checkIDS(interaction);
-			// if (checkNSFW(interaction)){
-			// 	checkIDS(interaction);
-			// } else {
-			// 	return await interaction.reply("None NSFW images have number 0-9, NSFW images have number 10-24")
-			// }
-		} catch(error){
-			await interaction.channel.send("Error has occured");
+		if (interaction.channel.id === 947123054570512395) {
+			try {
+				checkIDS(interaction);
+				// if (checkNSFW(interaction)){
+				// 	checkIDS(interaction);
+				// } else {
+				// 	return await interaction.reply("None NSFW images have number 0-9, NSFW images have number 10-24")
+				// }
+			} catch(error){
+				await interaction.channel.send("Error has occured");
+			}
+		} else {
+			interaction.reply("use #send-image to send images please.")
 		}
 	}
 }

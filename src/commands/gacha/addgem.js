@@ -35,10 +35,16 @@ module.exports = {
         try {
             const player = await database2.Player.findOne({ where: { playerID: userId } })
             if (player) {
-				await player.increment('gems', {by: 1});
-				await embedDone.setDescription(`
-                Gems: ${player.gems+1}
-                `)
+                var succeedChance = 0.1;
+                if (Math.random() < succeedChance) {
+                    await player.increment('gems', {by: 1});
+                    await embedDone.setDescription(`
+                    Gems: ${player.gems+1}`);
+                } else {
+                    await embedDone.setDescription(`Failed to mine a gem. 10% chance as of current patch.`)
+                        .setColor("ORANGE");
+                    // TODO: maybe randomize the failed message
+                }
             } else {
                 embedDone.setDescription('You must first create an account using /isekai.')
                         .setColor('RED');

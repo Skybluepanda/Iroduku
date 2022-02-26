@@ -100,7 +100,7 @@ async function selectOption(interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('iedit')
+		.setName('idelete')
 		.setDescription('Edits image Details')
         //cid is constant
         //subcommands for
@@ -170,18 +170,14 @@ module.exports = {
 				.setDescription("nsfw")
 				.setRequired(true))),
 	async execute(interaction) {
-        if (interaction.channel.id === 947123054570512395) {
-            try {
-                const id = interaction.options.getInteger('id');
-                console.log("1");
-                await selectOption(interaction)
-                console.log("1");
-            } catch (error) {
-                console.log("u fucked up");
-                return interaction.reply({embeds: [embedError(interaction)]});
-            }
-        } else {
-			interaction.reply("use #send-image to edit images please.")
-		}
+		try {
+        	const id = interaction.options.getInteger('id');
+            console.log("1");
+            await selectOption(interaction)
+            console.log("1");
+        } catch (error) {
+            console.log("u fucked up");
+            return interaction.reply({embeds: [embedError(interaction)]});
+        }
 	},
 };

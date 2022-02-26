@@ -33,6 +33,7 @@ module.exports = {
 	async execute(interaction) {
 		const embed = createEmbed(interaction);
         const sid = await interaction.options.getInteger('sid');
+        
         try {
             const series = await database.Series.findOne({ where: { seriesID: sid }});
             if (series) {

@@ -26,33 +26,25 @@ function embedError(interaction) {
 };
 
 async function selectOption(interaction) {
-    console.log("2");
     const id = interaction.options.getInteger('id');
-    console.log("2");
     const embedS = await embedSuccess(interaction);
     switch (interaction.options.getSubcommand()) {
         case "name":
-            console.log("2.1");
             const name = interaction.options.getString('name');
-            console.log("2.1");
             await database.Character.update({ characterName: name }, { where: { characterID: id } });
-            console.log("2.1");
             return interaction.reply({embeds: [embedS]});
 
         case "link":
-            console.log("2.2");
             const link = interaction.options.getString('link');
             await database.Character.update({ infoLink: link }, { where: { characterID: id } });
             return interaction.reply({embeds: [embedS]});
 
         case "sid":
-            console.log("2.3");
             const sid = interaction.options.getInteger('sid');
             await database.Character.update({ seriesID: sid }, { where: { characterID: id } });
             return interaction.reply({embeds: [embedS]});
 
         case "alias":
-            console.log("2.4");
             const aname = interaction.options.getString('alias');
             await database.Character.update({ alias: aname }, { where: { characterID: id } });
             return interaction.reply({embeds: [embedS]});
@@ -124,11 +116,14 @@ module.exports = {
 	async execute(interaction) {
         const id = interaction.options.getInteger('id');
         try {
-            console.log("1");
-            await selectOption(interaction)
-            console.log("1");
+            if (interaction.channel.id === 947136227126177872) {
+                await selectOption(interaction)
+            
+            } else {
+                interaction.reply("Please use #series and characters channel for this command.")
+            }
+            
         } catch (error) {
-            console.log("u fucked up");
             return interaction.reply({embeds: [embedError(interaction)]});
         }
 	},

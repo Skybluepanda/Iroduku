@@ -33,7 +33,7 @@ const Player = sequelize.define('player', {
 	gems: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		defaultValue: 20,
+		defaultValue: 200,
 		allowNull: false,
 	},
 	money: {

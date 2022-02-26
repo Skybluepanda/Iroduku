@@ -48,14 +48,17 @@ module.exports = {
 		
 		await interaction.reply({ embeds: [embed] });
         try {
-            console.log('we got to here');
-            const series = await database.Series.create({
-                seriesName: name,
-                malLink: mlink,
-            });
-            console.log('we got to here');
-			embedNew.setDescription(`Series ${name} was created with id ${series.seriesID}`)
-            return interaction.editReply({ embeds: [embedNew] });
+            if (interaction.channel.id === 947136227126177872) {
+                const series = await database.Series.create({
+                    seriesName: name,
+                    malLink: mlink,
+                });
+                embedNew.setDescription(`Series ${name} was created with id ${series.seriesID}`)
+                return interaction.editReply({ embeds: [embedNew] });
+            } else {
+                interaction.reply("Please use #series and characters channel for this command.")
+            }
+            
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
                 return interaction.editReply({ embeds: [embedDupe] });

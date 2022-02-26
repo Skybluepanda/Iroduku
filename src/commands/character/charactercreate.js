@@ -59,18 +59,22 @@ module.exports = {
         const embedE = embedError(interaction);
         
         await interaction.reply({ embeds: [embedN] });
+        
+        
         try {
-            console.log('we got to here');
-            const character = await database.Character.create({
-                characterName: name,
-                infoLink: link,
-                seriesID: sid,
-            });
-            console.log('we got to here');
-            const series = await database.Series.findOne({ where: {seriesID: sid}});
-			embedN.setDescription(`Character ${name} was created with id ${character.characterID} in series ${series.seriesName}`);
-            embedN.setColor('GREEN');
-            return interaction.editReply({ embeds: [embedN] });
+            if (interaction.channel.id === 947136227126177872) {
+                const character = await database.Character.create({
+                    characterName: name,
+                    infoLink: link,
+                    seriesID: sid,
+                });
+                const series = await database.Series.findOne({ where: {seriesID: sid}});
+                embedN.setDescription(`Character ${name} was created with id ${character.characterID} in series ${series.seriesName}`);
+                embedN.setColor('GREEN');
+                return interaction.editReply({ embeds: [embedN] });
+            } else {
+                interaction.reply("Please use #series and characters channel for this command.")
+            }
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
                 return interaction.editReply({ embeds: [embedD] });
