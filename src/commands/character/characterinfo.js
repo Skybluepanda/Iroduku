@@ -36,12 +36,12 @@ async function createButton() {
                     .setLabel('next')
                     .setStyle('PRIMARY')
             )
-            .addComponents(
-                new MessageButton()
-                    .setCustomId('search')
-                    .setLabel('search')
-                    .setStyle('PRIMARY')
-            )
+            // .addComponents(
+            //     new MessageButton()
+            //         .setCustomId('search')
+            //         .setLabel('search')
+            //         .setStyle('PRIMARY')
+            // )
         return row;
     } catch(error) {
         console.log("error has occured in crearteButton");
@@ -59,6 +59,8 @@ async function countImage(cid) {
 
 async function checkInumber(embed, interaction, direction, currentImage, totalImage){
     try {
+        const cid = await interaction.options.getInteger("id");
+        await console.log(currentImage);
         if (currentImage == 0 && direction == -1) {
             currentImage = totalImage;
         } else if (currentImage == totalImage && direction == 1) {
@@ -67,17 +69,23 @@ async function checkInumber(embed, interaction, direction, currentImage, totalIm
             currentImage += direction;
         }
         const image = await currentImage;
+        await console.log(currentImage);
+        
 
-        viewImage(embed, interaction, image);
-        updateEmbed(embed, interaction);
-        buttonManager(embed, interaction, msg, currentImage, totalImage);
+        await console.log("view image start")
+        await viewImage(embed, interaction, image, cid);
+        await console.log("view image end, updating");
+        await updateEmbed(embed, interaction);
+        await console.log("update end, deploying button manager.")
+        await buttonManager(embed, interaction, msg, currentImage, totalImage);
+        await console.log("button manager deployed.")
     } catch(error) {
         console.log("Error has occured in checkInumber");
     }
 }
 
 async function buttonManager(embed, interaction, msg, currentImage, totalImage) {
-        try {   
+    try {   
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
         collector.on('collect', async i => {
@@ -191,14 +199,14 @@ async function viewImage(embed, interaction, imageNumber, cid) {
         console.log("currentimage is" + currentImage);
         const url = art.imageURL;
         const artist = art.artist;
-        const source = art.source;
         const uploader = art.uploader;
-        const footer = `#${art.imageNumber} Art by ${artist} | Uploaded by ${uploader}
-        Image ID is ${art.imageID} report any errors using ID.
+        const footer = `
+        #${art.imageNumber} Art by ${artist} | Uploaded by ${uploader}
+Image ID is ${art.imageID} report any errors using ID.
         `;
         await embed
             .setImage(url)
-            .setFooter({content: `${footer}`})
+            .setFooter(`${footer}`)
     } catch(error) {
         console.log("error has occured with view image");
     }
@@ -228,12 +236,12 @@ async function cinfoID(embed, interaction) {
         const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
         await embed
             .setDescription(`
-            Character ID: ${char.characterID}
-            Character Alias: ${char.alias}
-            Character Link: ${char.infoLink}
-            Simps: ${char.simps}
-            Series: ${char.seriesID}| ${series.seriesName}
-            Image Count: ${char.imageCount}
+Character ID: ${char.characterID}
+Character Alias: ${char.alias}
+Character Link: ${char.infoLink}
+Simps: ${char.simps}
+Series: ${char.seriesID}| ${series.seriesName}
+Image Count: ${char.imageCount}
             `)
             .setTitle(`${char.characterName}`)
             .setColor("GREEN");
@@ -259,12 +267,12 @@ async function sendEmbed(interaction, embed) {
         } 
         await embed
             .setDescription(`
-            Character ID: ${char.characterID}
-            Character Alias: ${char.alias}
-            Character Link: ${char.infoLink}
-            Simps: ${char.simps}
-            Series: ${char.seriesID}| ${series.seriesName}
-            Image Count: ${char.imageCount}
+Character ID: ${char.characterID}
+Character Alias: ${char.alias}
+Character Link: ${char.infoLink}
+Simps: ${char.simps}
+Series: ${char.seriesID}| ${series.seriesName}
+Image Count: ${char.imageCount}
             `)
             .setTitle(`${char.characterName}`)
             .setColor("GREEN");

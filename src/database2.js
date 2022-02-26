@@ -9,6 +9,64 @@ const sequelize = new Sequelize('database', 'user', 'password', {
 	storage: 'database2.sqlite',
 });
 
+const Player = sequelize.define('player', {
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+	},
+	name: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+	level: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	xp: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	gems: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 20,
+		allowNull: false,
+	},
+	money: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	karma: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	inventory: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	permissions: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	bans: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+});
 
 const Card = sequelize.define('card', {
 	cardID: {
@@ -78,10 +136,7 @@ const Rarity = sequelize.define('rarity', {
 });
 
 
-Series.hasMany(Character);
-Character.belongsTo(Series);
-
-
 exports.sequelize = sequelize;
+exports.Player = Player;
 exports.Card = Card;
 exports.Rarity = Rarity;

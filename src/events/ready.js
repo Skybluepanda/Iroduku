@@ -1,4 +1,5 @@
 const database = require('../database.js')
+const database2 = require('../database2.js')
 
 module.exports = {
     name: 'ready',
@@ -10,7 +11,7 @@ module.exports = {
         // database.Character.sync();
         // database.Skill.sync();
         // database.SkillDesc.sync();
-        database.Player.sync();
+        database2.Player.sync();
         database.Character.sync();
         database.Image.sync();
         database.Series.sync();

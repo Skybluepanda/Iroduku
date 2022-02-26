@@ -1,11 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../database.js');
+const database2 = require('../../database2.js');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('stats')
-        .setDescription('Check your character stats'),
+        .setName('addgem')
+        .setDescription('adds gem to your profile.'),
     async execute(interaction) {
         const username = interaction.user.username;
         const userId = interaction.user.id;
@@ -14,13 +14,13 @@ module.exports = {
         const embedDone = new MessageEmbed();
         const embedError = new MessageEmbed();
 
-        embed.setTitle("Checking Stats")
+        embed.setTitle("Adding Gem")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
             .setColor("AQUA")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
-        embedDone.setTitle("Stats")
+        embedDone.setTitle("Added Gems")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setColor("GREEN")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
@@ -33,25 +33,19 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
         try {
-            const player = await database.Player.findOne({ where: { playerID: userId } });
-            console.log(player);
+            const player = await database2.Player.findOne({ where: { playerID: userId } })
             if (player) {
-                embedDone.setDescription(`
-                Name: ${player.name}
-                Level: ${player.level} (${player.xp}/10)
-                Gems: ${player.gems}
-                Money: ${player.money}
-                Karma: ${player.karma}
-                Inventory: ${player.inventory}
-                Permissions: Weeblet
+				await player.increment('gems', {by: 1});
+				await embedDone.setDescription(`
+                Gems: ${player.gems+1}
                 `)
             } else {
-                embedDone.setDescription('Character does not exist.')
+                embedDone.setDescription('You must first create an account using /isekai.')
                         .setColor('RED');
             }
             return interaction.editReply({ embeds: [embedDone] });
         } catch (error) {
             return interaction.editReply({ embeds: [embedError] });
         }
-    },
+    }
 };

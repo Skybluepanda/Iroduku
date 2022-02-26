@@ -8,42 +8,67 @@ async function embedSuccess(interaction) {
     const id = await interaction.options.getInteger("id")
     const image = await database.Image.findOne({where: {imageID: id}});
     embedSuccess.setTitle(`Image ${id} edited`)
-        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Image ${id} has been edited`)
         .setColor("GREEN")
         .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
-    console.log("embed s dies")
     return embedSuccess;
 };
 
 function embedError(interaction) {
     const embedError = new MessageEmbed();
     embedError.setTitle("Unknown Error")
-	.setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+	.setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Please report the error if it persists.`)
         .setColor("RED");
     return embedError;
 };
 
+async function cidedit(interaction) {
+    console.log("3.1");
+    const id = await interaction.options.getInteger('id');
+    const cid = await interaction.options.getInteger('cid');
+    const inumber = await interaction.options.getInteger('inumber');
+    const image = await database.Image.findOne({where: {imageID: id}});
+    const oid = await image.characterID;
+    // const charold = await database.Character.findOne({ where: {characterID: oid}});
+    // const charnew = await database.Character.findOne({ where: {characterID: cid}});
+    const check = await database.Image.findOne({ where: {characterID: cid, imageNumber: inumber}});
+    console.log("3.2");
+    await database.Character.increment({imageCount: -1}, {where: {characterID: oid}});
+    await database.Character.increment({imageCount: 1}, {where: {characterID: cid}});
+    // charold.increment('imageCount', {by: -1})
+    // await charnew.increment('imageCount', {by: 1})
+    console.log("3.3");
+    console.log("3.4");
+    await image.update({characterID: cid});
+    console.log("3.5");
+}
+
 async function selectOption(interaction) {
     console.log("2");
-    const id = interaction.options.getInteger('id');
+    const id = await interaction.options.getInteger('id');
     console.log("2");
     const embedS = await embedSuccess(interaction);
-    switch (interaction.options.getSubcommand()) {
+    const scommand = await interaction.options.getSubcommand();
+    console.log("a");
+    switch (scommand) {
         case "cid":
-            console.log("2.1");
-            const name = interaction.options.getInteger('cid');
-            console.log("2.1");
-            await database.Image.update({ characterID: cid }, { where: { imageID: id } });
-            console.log("2.1");
-            return interaction.reply({embeds: [embedS]});
+            await console.log("2.1");
+            await cidedit(interaction);
+            return await interaction.reply({embeds: [embedS]});
 
         case "imagenumber":
             console.log("2.2");
-            const imageNumber = interaction.options.getString('imagenumber');
-            await database.Image.update({ imageNumber: imageNumber }, { where: { imageID: id } });
-            return interaction.reply({embeds: [embedS]});
+            const imageNumber = await interaction.options.getInteger('imagenumber');
+            console.log("2.2.1");
+            const cid = await database.Image.findOne({attributes: ['characterID']}, {where: {imageID: id}});
+            console.log("2.2.2");
+            const check = await database.Image.findOne({where:  { imageNumber: imageNumber, characterID: cid}});
+            console.log("2.2.3");
+            if (check) {await database.Image.update({ imageNumber: imageNumber }, { where: { imageID: id } })};
+            console.log("2.2.4");
+            return await interaction.reply({embeds: [embedS]});
 
         case "artist":
             console.log("2.3");
@@ -60,7 +85,9 @@ async function selectOption(interaction) {
 		case "nsfw":
 			console.log("2.5");
 			const nsfw = interaction.options.getBoolean('nsfw');
+            SPOILER_
 			await database.Image.update({ nsfw: nsfw }, { where: { imageID: id } });
+            await database.Image.update({ nsfw: nsfw }, { where: { imageID: id } });
 			return interaction.reply({embeds: [embedS]});
 
         default:
@@ -92,6 +119,10 @@ module.exports = {
                 .setRequired(true))
             .addIntegerOption(option => option
                 .setName("cid")
+                .setDescription("The id of the character")
+                .setRequired(true))
+            .addIntegerOption(option => option
+                .setName("imagenumber")
                 .setDescription("The id of the character")
                 .setRequired(true)))
         .addSubcommand(subcommand =>subcommand

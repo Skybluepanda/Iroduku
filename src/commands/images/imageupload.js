@@ -2,6 +2,7 @@ const { createCanvas, loadImage, Canvas } = require('canvas');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageAttachment, IntegrationApplication } = require('discord.js');
 const database = require('../../database.js');
+const database2 = require('../../database2.js');
 
 async function checkIDS(interaction) {
 	const cid = interaction.options.getInteger('cid');
@@ -47,16 +48,13 @@ async function border(interaction) {
 // Draw a rectangle with the dimensions of the entire canvas
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 	const cid = interaction.options.getInteger('cid');
-	const char = database.Character.findOne({where: {characterID: cid}});
-	const charname = char.characterName;
+	const charname = database.Character.findOne({attributes: characterName}, {where: {characterID: cid}});
 	const imgName = await imageFilename(interaction, charname);
 	
 	const attachment = await new MessageAttachment(canvas.toBuffer(), imgName);
 	if (attachment) {await interaction.reply({ files: [attachment] });} else {
 		interaction.reply("Image error.")
 	}
-	
-	
 }
 
 // function checkNSFW(interaction){
@@ -92,7 +90,9 @@ async function upload(interaction) {
 	});
 	try {
 		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
-		await database.Player.increment({gems: 10}, {where: {playerID: interaction.user.id}})
+		// const char = await database.Character.findOne({where: {characterID:cid}});
+		// await char.increment('imageCount', {by: 1});
+		await database2.Player.increment({gems: 10}, {where: {playerID: interaction.user.id}})
 	} catch(error) {
 		interaction.followUp("You are not a registered player");
 	}
@@ -101,7 +101,7 @@ async function upload(interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('imageupload')
+		.setName('iupload')
 		.setDescription('Adding image to the database for the character, image should be 225x350px in size.')
 		.addIntegerOption(option => option
 			.setName('cid')

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../database.js');
+const database2 = require('../../database2.js');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
@@ -43,7 +43,7 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
         try {
-            const player = await database.Player.create({
+            const player = await database2.Player.create({
                 playerID: userId,
                 name: username,
             });
