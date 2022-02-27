@@ -101,7 +101,7 @@ async function upload(interaction) {
 		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
-		await database2.Player.increment({gems: 75}, {where: {playerID: interaction.user.id}})
+		await database2.Player.increment({gems: 75, karma: 5}, {where: {playerID: interaction.user.id}})
         await console.log("wait did we fail here because we never sent anything?");
         return await interaction.reply(`Image added to the database.`)
 	} catch(error) {
@@ -141,7 +141,7 @@ module.exports = {
 	async execute(interaction) {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.
-		if (interaction.channel.id === 947123054570512395) {
+		if (interaction.channel.id === '947123054570512395') {
 			try {
             // interaction.reply("Uploading gif.");
 			checkIDS(interaction);

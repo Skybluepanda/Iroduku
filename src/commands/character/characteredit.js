@@ -49,6 +49,11 @@ async function selectOption(interaction) {
             await database.Character.update({ alias: aname }, { where: { characterID: id } });
             return interaction.reply({embeds: [embedS]});
 
+        case "imagecount":
+            const icount = interaction.options.getString('imagecount');
+            await database.Character.update({ imageCount: icount }, { where: { characterID: id } });
+            return interaction.reply({embeds: [embedS]});
+
         default:
             const embed = embedError(interaction);
             embed.setDescription("Error has occured, try using the command with a subcommand.")
@@ -112,6 +117,17 @@ module.exports = {
             .addStringOption(option => option
                 .setName("alias")
                 .setDescription("The alias")
+                .setRequired(true)))
+        .addSubcommand(subcommand =>subcommand
+            .setName("imagecount")
+            .setDescription("Edit the image count for the character manually if something goes wrong.")
+            .addIntegerOption(option => option
+                .setName("id")
+                .setDescription("The id of the character")
+                .setRequired(true))
+            .addStringOption(option => option
+                .setName("imagecount")
+                .setDescription("The imagecount")
                 .setRequired(true))),
 	async execute(interaction) {
         const id = interaction.options.getInteger('id');

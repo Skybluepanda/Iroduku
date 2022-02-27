@@ -3,101 +3,6 @@ const database = require('../../database');
 const { MessageEmbed } = require('discord.js');
 
 
-async function embedSuccess(interaction) {
-    const embedSuccess = new MessageEmbed();
-    const id = await interaction.options.getInteger("id")
-    const image = await database.Image.findOne({where: {imageID: id}});
-    embedSuccess.setTitle(`Image ${id} edited`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Image ${id} has been edited`)
-        .setColor("GREEN")
-        .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
-    return embedSuccess;
-};
-
-function embedError(interaction) {
-    const embedError = new MessageEmbed();
-    embedError.setTitle("Unknown Error")
-	.setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Please report the error if it persists.`)
-        .setColor("RED");
-    return embedError;
-};
-
-async function cidedit(interaction) {
-    console.log("3.1");
-    const id = await interaction.options.getInteger('id');
-    const cid = await interaction.options.getInteger('cid');
-    const inumber = await interaction.options.getInteger('inumber');
-    const image = await database.Image.findOne({where: {imageID: id}});
-    const oid = await image.characterID;
-    // const charold = await database.Character.findOne({ where: {characterID: oid}});
-    // const charnew = await database.Character.findOne({ where: {characterID: cid}});
-    const check = await database.Image.findOne({ where: {characterID: cid, imageNumber: inumber}});
-    console.log("3.2");
-    await database.Character.increment({imageCount: -1}, {where: {characterID: oid}});
-    await database.Character.increment({imageCount: 1}, {where: {characterID: cid}});
-    // charold.increment('imageCount', {by: -1})
-    // await charnew.increment('imageCount', {by: 1})
-    console.log("3.3");
-    console.log("3.4");
-    await image.update({characterID: cid});
-    console.log("3.5");
-}
-
-async function selectOption(interaction) {
-    console.log("2");
-    const id = await interaction.options.getInteger('id');
-    console.log("2");
-    const embedS = await embedSuccess(interaction);
-    const scommand = await interaction.options.getSubcommand();
-    console.log("a");
-    switch (scommand) {
-        case "cid":
-            await console.log("2.1");
-            await cidedit(interaction);
-            return await interaction.reply({embeds: [embedS]});
-
-        case "imagenumber":
-            console.log("2.2");
-            const imageNumber = await interaction.options.getInteger('imagenumber');
-            console.log("2.2.1");
-            const cid = await database.Image.findOne({attributes: ['characterID']}, {where: {imageID: id}});
-            console.log("2.2.2");
-            const check = await database.Image.findOne({where:  { imageNumber: imageNumber, characterID: cid}});
-            console.log("2.2.3");
-            if (check) {await database.Image.update({ imageNumber: imageNumber }, { where: { imageID: id } })};
-            console.log("2.2.4");
-            return await interaction.reply({embeds: [embedS]});
-
-        case "artist":
-            console.log("2.3");
-            const artist = interaction.options.getString('artist');
-            await database.Image.update({ artist: artist }, { where: { imageID: id } });
-            return interaction.reply({embeds: [embedS]});
-
-        case "sourcelink":
-            console.log("2.4");
-            const source = interaction.options.getString('source');
-            await database.Image.update({ source: source }, { where: { imageID: id } });
-            return interaction.reply({embeds: [embedS]});
-		
-		case "nsfw":
-			console.log("2.5");
-			const nsfw = interaction.options.getBoolean('nsfw');
-            SPOILER_
-			await database.Image.update({ nsfw: nsfw }, { where: { imageID: id } });
-            await database.Image.update({ nsfw: nsfw }, { where: { imageID: id } });
-			return interaction.reply({embeds: [embedS]});
-
-        default:
-            const embed = embedError(interaction);
-            embed.setDescription("Error has occured, try using the command with a subcommand.")
-            return interaction.reply({embeds: [embed]})
-
-    }
-}
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('idelete')
@@ -110,71 +15,19 @@ module.exports = {
          * seriesID
          * alias
          */
-        .addSubcommand(subcommand => subcommand
-            .setName("cid")
-            .setDescription("Edit the character assigned to image.")
-            .addIntegerOption(option => option
-                .setName("id")
-                .setDescription("The id of the image")
-                .setRequired(true))
-            .addIntegerOption(option => option
-                .setName("cid")
-                .setDescription("The id of the character")
-                .setRequired(true))
-            .addIntegerOption(option => option
-                .setName("imagenumber")
-                .setDescription("The id of the character")
-                .setRequired(true)))
-        .addSubcommand(subcommand =>subcommand
-            .setName("imagenumber")
-            .setDescription("Edit the image number")
-            .addIntegerOption(option => option
-                .setName("id")
-                .setDescription("The id of the image")
-                .setRequired(true))
-            .addIntegerOption(option => option
-                .setName("imagenumber")
-                .setDescription("New Image ID")
-                .setRequired(true)))
-        .addSubcommand(subcommand =>subcommand
-            .setName("artist")
-            .setDescription("Edit the artist of the image")
-            .addIntegerOption(option => option
-                .setName("id")
-                .setDescription("The id of the image")
-                .setRequired(true))
-            .addStringOption(option => option
-                .setName("artist")
-                .setDescription("The artist of the image")
-                .setRequired(true)))
-        .addSubcommand(subcommand =>subcommand
-            .setName("sourcelink")
-            .setDescription("Edit source link for the image")
-            .addIntegerOption(option => option
-                .setName("id")
-                .setDescription("The id of the image")
-                .setRequired(true))
-            .addStringOption(option => option
-                .setName("source")
-                .setDescription("The sauce")
-                .setRequired(true)))
-		.addSubcommand(subcommand =>subcommand
-			.setName("nsfw")
-			.setDescription("Edit the nsfw status of the image")
-			.addIntegerOption(option => option
-				.setName("id")
-				.setDescription("The id of the image")
-				.setRequired(true))
-			.addBooleanOption(option => option
-				.setName("nsfw")
-				.setDescription("nsfw")
-				.setRequired(true))),
+        
+        .addIntegerOption(option => option
+            .setName("id")
+            .setDescription("The id of the image")
+            .setRequired(true)),
 	async execute(interaction) {
 		try {
         	const id = interaction.options.getInteger('id');
-            console.log("1");
-            await selectOption(interaction)
-            console.log("1");
+            const cid = database.Image.findOne({where: {imageID: id}}).characterID;
+            database.Image.destroy({where: {imageID: id}});
+            database.Character.increment({imageCount: -1}, {where: {characterID: cid}})
+            console.log(`image ID ${id} was deleted. Don't do this often`)
+            interaction.reply(`image ID ${id} was deleted. Don't do this often`);
         } catch (error) {
             console.log("u fucked up");
             return interaction.reply({embeds: [embedError(interaction)]});

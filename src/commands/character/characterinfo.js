@@ -57,9 +57,8 @@ async function countImage(cid) {
     }
 }
 
-async function checkInumber(embed, interaction, direction, currentImage, totalImage){
+async function checkInumber(embed, interaction, direction, currentImage, totalImage, cid){
     try {
-        const cid = await interaction.options.getInteger("id");
         if (currentImage == 0 && direction == -1) {
             currentImage = totalImage;
         } else if (currentImage == totalImage && direction == 1) {
@@ -70,30 +69,30 @@ async function checkInumber(embed, interaction, direction, currentImage, totalIm
         const image = await currentImage;
         await viewImage(embed, interaction, image, cid);
         await updateEmbed(embed, interaction);
-        await buttonManager(embed, interaction, msg, currentImage, totalImage);
+        await buttonManager(embed, interaction, msg, currentImage, totalImage, cid);
     } catch(error) {
         console.log("Error has occured in checkInumber");
     }
 }
 
-async function buttonManager(embed, interaction, msg, currentImage, totalImage) {
+async function buttonManager(embed, interaction, msg, currentImage, totalImage, cid) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'prev':
-                    checkInumber(embed, interaction, -1, currentImage, totalImage);
+                    checkInumber(embed, interaction, -1, currentImage, totalImage, cid);
                     
                     break;
                 
                 case 'next':
-                    checkInumber(embed, interaction, 1, currentImage, totalImage);
+                    checkInumber(embed, interaction, 1, currentImage, totalImage, cid);
                     break;
                 
                 case 'search':
                     await interaction.followUp('search is not functional.');
-                    buttonManager(embed, interaction, msg, currentImage, totalImage);
+                    buttonManager(embed, interaction, msg, currentImage, totalImage, cid);
                     break;
             };
             i.deferUpdate();
@@ -225,16 +224,15 @@ async function cinfoID(embed, interaction) {
             .setDescription(`
 Character ID: ${char.characterID}
 Character Alias: ${char.alias}
-Character Link: ${char.infoLink}
 Simps: ${char.simps}
 Series: ${char.seriesID}| ${series.seriesName}
 Image Count: ${char.imageCount}
             `)
             .setTitle(`${char.characterName}`)
             .setColor("GREEN");
-            const row = await createButton();
+        const row = await createButton();
         msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
-        await buttonManager(embed, interaction, msg, 0, totalImage);
+        await buttonManager(embed, interaction, msg, 0, totalImage, cid);
     } catch(error) {
         console.log("error has occured in cinfoID.");
     }
@@ -260,7 +258,6 @@ async function sendEmbed(interaction, embed) {
             .setDescription(`
 Character ID: ${char.characterID}
 Character Alias: ${char.alias}
-Character Link: ${char.infoLink}
 Simps: ${char.simps}
 Series: ${char.seriesID}| ${series.seriesName}
 Image Count: ${char.imageCount}
@@ -269,7 +266,7 @@ Image Count: ${char.imageCount}
             .setColor("GREEN");
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
-        await buttonManager(embed, interaction, msg, 0, totalImage);
+        await buttonManager(embed, interaction, msg, 0, totalImage, cid);
     } catch(error){
         console.log("error has occured in sendEmbed.");
     }

@@ -31,7 +31,7 @@ module.exports = {
             .setColor("RED")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed] }, {ephemeral: true});
         try {
             const player = await database2.Player.findOne({ where: { playerID: userId } })
             if (player) {
@@ -49,9 +49,9 @@ module.exports = {
                 embedDone.setDescription('You must first create an account using /isekai.')
                         .setColor('RED');
             }
-            return interaction.editReply({ embeds: [embedDone] });
+            return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
         } catch (error) {
-            return interaction.editReply({ embeds: [embedError] });
+            return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});
         }
     }
 };
