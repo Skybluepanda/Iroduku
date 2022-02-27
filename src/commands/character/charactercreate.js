@@ -10,7 +10,6 @@ function embedNew(interaction) {
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Series is being created.`)
         .setColor("ORANGE")
-        .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
     return embedNew;
 };
 

@@ -65,7 +65,14 @@ const Character = sequelize.define('character', {
 		unique: false,
 		defaultValue: 0,
 		allowNull: false,
-	}
+	},
+	gifCount: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	
 });
 
 
@@ -131,12 +138,215 @@ const Image = sequelize.define('image', {
 	}
 });
 
-Series.hasMany(Character);
-Character.belongsTo(Series);
+const Gif = sequelize.define('gif', {
+	gifID: {
+		type: Sequelize.INTEGER,
+		autoIncrement: true,
+		primaryKey: true,
+	},
+	characterID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	gifNumber: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	gifURL: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	artist: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	source: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	nsfw: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
+	uploader: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	}
+});
+
+const Player = sequelize.define('player', {
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+	},
+	name: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+	level: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	xp: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	gems: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 200,
+		allowNull: false,
+	},
+	money: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	karma: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	inventory: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	permissions: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+	bans: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+		allowNull: false,
+	},
+});
+
+const Daily = sequelize.define('daily', { 
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+		allowNull: false,
+	},
+	lastDaily: {
+		type: Sequelize.DATE,
+		unique: false,
+		allowNull: false,
+	},
+	streak: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	}
+});
+
+const Wishlist = sequelize.define('wishlist', {
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+		allowNull: false,
+	},
+	characterID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+		allowNull: false,
+	}
+});
+
+const Card = sequelize.define('card', {
+	cardID: {
+		type: Sequelize.INTEGER,
+		autoIncrement: true,
+		primaryKey: true,
+	},
+	PlayerID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	inventoryID: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	characterID: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	imageNumber: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	imageID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	rarity: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	archived: {
+		type: Sequelize.BOOLEAN,
+		defaultValue: false,
+		unique: false,
+		allowNull: false,
+	}
+}); 
+
+const Rarity = sequelize.define('rarity', {
+	rarityID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+		allowNull: false,
+	},
+	rarityName: {
+		type: Sequelize.STRING,
+		unique: true,
+		allowNull: false,
+	},
+	color: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	reward: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+});
+
 
 
 
 exports.sequelize = sequelize;
 exports.Character = Character;
 exports.Image = Image;
+exports.Gif = Gif;
 exports.Series = Series;
+exports.Player = Player;
+exports.Daily = Daily;
+exports.Wishlist = Wishlist;
+exports.Card = Card;
+exports.Rarity = Rarity;

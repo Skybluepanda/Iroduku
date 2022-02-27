@@ -14,7 +14,6 @@ function createEmbed(interaction) {
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("No Info found")
         .setColor("AQUA")
-        .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
     
     return embed;
 }

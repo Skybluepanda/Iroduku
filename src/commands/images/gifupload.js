@@ -2,21 +2,20 @@ const { createCanvas, loadImage, Canvas } = require('canvas');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageAttachment, IntegrationApplication } = require('discord.js');
 const database = require('../../database.js');
-const database2 = require('../../database2.js');
 
 async function checkIDS(interaction) {
 	const cid = interaction.options.getInteger('cid');
-	const iNumber = interaction.options.getInteger('image_number')
+	const gNumber = interaction.options.getInteger('gif_number')
 	try {
-		if (0 <= iNumber < 25) {
-			const count = await database.Image.count({ where: {characterID: cid, imageNumber: iNumber}})
+		if (1 <= gNumber < 4) {
+			const count = await database.Gif.count({ where: {characterID: cid, gifNumber: gNumber}})
 			if (count != 0) {
-				await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 24.`)
+				await interaction.reply(`Character ${cid} already has an gif ${gNumber}, maximum is 2.`)
 			} else {
 				upload(interaction);
 			};
 		} else {
-			await interaction.reply("Range of image number is 0-24.")
+			await interaction.reply("Range of gif number is 0-2.")
 		}
 	} catch(error){
         console.log("failed in id check.")
@@ -45,7 +44,7 @@ async function check(interaction) {
             const attachment = await new MessageAttachment(url, imgName);
             console.log(imgName);
             if (attachment) {await interaction.reply({ files: [attachment] });} else {
-                interaction.reply("Image error.")
+                interaction.reply("Gif error.")
             }
             //add it to database
         } else {
@@ -71,7 +70,7 @@ async function check(interaction) {
 async function upload(interaction) {
     try {
         const cid = await interaction.options.getInteger('cid');
-        const iNumber = await interaction.options.getInteger('image_number');
+        const iNumber = await interaction.options.getInteger('gif_number');
         const art = await interaction.options.getString('artist_name');
         const sauce = await interaction.options.getString('source');
         const isnsfw = await interaction.options.getBoolean('nsfw');
@@ -84,10 +83,10 @@ async function upload(interaction) {
         // const link = await message.attachments.first().url;
         await console.log(url);
         if (url.endsWith(".gif")) {
-            await database.Image.create({
+            await database.Gif.create({
                 characterID: cid,
-                imageNumber: iNumber,
-                imageURL: url,
+                gifNumber: iNumber,
+                gifURL: url,
                 artist: art,
                 source: sauce,
                 nsfw: isnsfw, 
@@ -98,12 +97,12 @@ async function upload(interaction) {
         }
         await console.log("broke with this check?");
 	
-		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
+		await database.Character.increment({gifCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
-		await database2.Player.increment({gems: 75, karma: 5}, {where: {playerID: interaction.user.id}})
+		await database.Player.increment({gems: 75, karma: 5}, {where: {playerID: interaction.user.id}})
         await console.log("wait did we fail here because we never sent anything?");
-        return await interaction.reply(`Image added to the database.`)
+        return await interaction.reply(`Gif added to the database.`)
 	} catch(error) {
         console.log("upload failed.")
 	}
@@ -112,19 +111,19 @@ async function upload(interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('gifupload')
-		.setDescription('Adding image to the database for the character, image should be 225x350px in size.')
+		.setName('gupload')
+		.setDescription('Adding gif to the database for the character, gif should be 225x350px in size.')
 		.addIntegerOption(option => option
 			.setName('cid')
 			.setDescription('Id of the character')
 			.setRequired(true))
 		.addIntegerOption(option => option
-			.setName('image_number')
-			.setDescription('id number for characters image slot. Pick an empty one.')
+			.setName('gif_number')
+			.setDescription('id number for characters gif slot. Pick an empty one.')
 			.setRequired(true))
 		.addStringOption(option => option
 			.setName('gif_link')
-			.setDescription('link of the image or upload.')
+			.setDescription('link of the gif to upload.')
 			.setRequired(true))
 		.addStringOption(option => option
 			.setName('artist_name')
@@ -132,11 +131,11 @@ module.exports = {
 			.setRequired(true))
 		.addStringOption(option => option
 			.setName('source')
-			.setDescription('image source link.')
+			.setDescription('gif source link.')
 			.setRequired(true))
 		.addBooleanOption(option => option
 			.setName('nsfw')
-			.setDescription('is this an nsfw image or gif?')
+			.setDescription('is this an nsfw gif?')
 			.setRequired(true)),
 	async execute(interaction) {
 		//check if character exists, and image number is empty

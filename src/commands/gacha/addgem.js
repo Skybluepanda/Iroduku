@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database2 = require('../../database2.js');
+const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
@@ -18,22 +18,20 @@ module.exports = {
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
             .setColor("AQUA")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
         embedDone.setTitle("Added Gems")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setColor("GREEN")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
         embedError.setTitle("Unknown Error")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please report the error if it persists.`)
             .setColor("RED")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
         await interaction.reply({ embeds: [embed] }, {ephemeral: true});
         try {
-            const player = await database2.Player.findOne({ where: { playerID: userId } })
+            if (!interaction.member.roles.cache.has('947442920724787260')) return;
+            const player = await database.Player.findOne({ where: { playerID: userId } })
             if (player) {
                 var succeedChance = 0.1;
                 if (Math.random() < succeedChance) {

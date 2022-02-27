@@ -3,8 +3,6 @@ const database = require('../../database');
 const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
 const { Op } = require("sequelize");
 
-var currentImage;
-var totalImage;
 /**
  * Creates an embed for the command.
  * @param {*} interaction the interaction that the bot uses to reply.
@@ -51,48 +49,63 @@ async function createButton() {
 async function countImage(cid) {
     try {
         const char = await database.Character.findOne({where: {characterID: cid}});
-        return await (char.imageCount - 1);
+        return await (char.imageCount);
     } catch(error) {
         console.log("Error has occured in countImageg");
     }
 }
 
-async function checkInumber(embed, interaction, direction, currentImage, totalImage, cid){
+async function countGif(cid) {
     try {
-        if (currentImage == 0 && direction == -1) {
+        const char = await database.Character.findOne({where: {characterID: cid}});
+        return await (char.gifCount);
+    } catch(error) {
+        console.log("Error has occured in countImageg");
+    }
+}
+
+async function checkInumber(embed, interaction, direction, currentImage, totalImage, imageC, cid){
+    try {
+        if (currentImage == 1 && direction == -1){
             currentImage = totalImage;
-        } else if (currentImage == totalImage && direction == 1) {
-            currentImage = 0;
+            //going to end of page. If there is a gif view gif, else view image.
+        } else if (currentImage == totalImage && direction == 1){
+            currentImage = 1;
         } else {
             currentImage += direction;
         }
-        const image = await currentImage;
-        await viewImage(embed, interaction, image, cid);
+        await currentImage;
+        if (currentImage <= imageC) {
+            await viewImage(embed, interaction, currentImage, cid);
+        } else {
+            const image = currentImage - imageC
+            await viewGif(embed, interaction, image, cid);
+        }
         await updateEmbed(embed, interaction);
-        await buttonManager(embed, interaction, msg, currentImage, totalImage, cid);
+        await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid);
     } catch(error) {
         console.log("Error has occured in checkInumber");
     }
 }
 
-async function buttonManager(embed, interaction, msg, currentImage, totalImage, cid) {
+async function buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'prev':
-                    checkInumber(embed, interaction, -1, currentImage, totalImage, cid);
+                    checkInumber(embed, interaction, -1, currentImage, totalImage, imageC, cid);
                     
                     break;
                 
                 case 'next':
-                    checkInumber(embed, interaction, 1, currentImage, totalImage, cid);
+                    checkInumber(embed, interaction, 1, currentImage, totalImage, imageC, cid);
                     break;
                 
                 case 'search':
                     await interaction.followUp('search is not functional.');
-                    buttonManager(embed, interaction, msg, currentImage, totalImage, cid);
+                    buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid);
                     break;
             };
             i.deferUpdate();
@@ -177,18 +190,40 @@ async function charList(interaction, embed){
 async function viewImage(embed, interaction, imageNumber, cid) {
     try {
         var art = await database.Image.findOne({
-            offset: imageNumber, 
+            offset: imageNumber-1, 
             order: [['imageNumber', 'ASC']],
             where: {
                 characterID: cid,}
             })
-        currentImage = imageNumber;
         const url = art.imageURL;
         const artist = art.artist;
         const uploader = art.uploader;
         const footer = `
         #${art.imageNumber} Art by ${artist} | Uploaded by ${uploader}
 Image ID is ${art.imageID} report any errors using ID.
+        `;
+        await embed
+            .setImage(url)
+            .setFooter(`${footer}`)
+    } catch(error) {
+        console.log("error has occured with view image");
+    }
+}
+
+async function viewGif(embed, interaction, gifNumber, cid) {
+    try {
+        var art = await database.Gif.findOne({
+            offset: gifNumber-1, 
+            order: [['gifNumber', 'ASC']],
+            where: {
+                characterID: cid,}
+            })
+        const url = art.gifURL;
+        const artist = art.artist;
+        const uploader = art.uploader;
+        const footer = `
+        #${art.gifNumber} Gif from ${artist} | Uploaded by ${uploader}
+Gif ID is ${art.gifID} report any errors using ID.
         `;
         await embed
             .setImage(url)
@@ -213,12 +248,15 @@ async function cinfoID(embed, interaction) {
 
         if (char) {
             if (char.imageCount > 0){
-            await viewImage(embed, interaction, 0, cid);
+                await viewImage(embed, interaction, 1, cid);
+                } else if(char.gifCount > 0){
+                    await viewGif(embed, interaction, 1, cid)
+                } else {
+                embed.addField('No images found', 'add some', true);
             }
-        } else {
-            embed.addField('No images found', 'add some', true);
-        }
-        const totalImage = await countImage(cid);
+        const imageC = await countImage(cid);
+        const gifC = await countGif(cid);
+        const totalImage = imageC + gifC;
         const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
         await embed
             .setDescription(`
@@ -227,12 +265,14 @@ Character Alias: ${char.alias}
 Simps: ${char.simps}
 Series: ${char.seriesID}| ${series.seriesName}
 Image Count: ${char.imageCount}
+Gif Count: ${char.gifCount}
             `)
             .setTitle(`${char.characterName}`)
             .setColor("GREEN");
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
-        await buttonManager(embed, interaction, msg, 0, totalImage, cid);
+        await buttonManager(embed, interaction, msg, 1, totalImage, imageC, cid);
+        }
     } catch(error) {
         console.log("error has occured in cinfoID.");
     }
@@ -246,12 +286,15 @@ async function sendEmbed(interaction, embed) {
             });
         const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
         const cid = await char.characterID;
-        const totalImage = await countImage(cid);
+        const imageC = await countImage(cid);
+        const gifC = await countGif(cid);
+        const totalImage = imageC + gifC;
         if (char) {
             if (char.imageCount > 0){
-            await viewImage(embed, interaction, 0, cid);
-            }
-        } else {
+            await viewImage(embed, interaction, 1, cid);
+            } else if(char.gifCount > 0){
+                await viewGif(embed, interaction, 1, cid)
+            } else {
             embed.addField('No images found', 'add some', true);
         }
         await embed
@@ -261,12 +304,14 @@ Character Alias: ${char.alias}
 Simps: ${char.simps}
 Series: ${char.seriesID}| ${series.seriesName}
 Image Count: ${char.imageCount}
+Gif Count: ${char.gifCount}
             `)
             .setTitle(`${char.characterName}`)
             .setColor("GREEN");
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
-        await buttonManager(embed, interaction, msg, 0, totalImage, cid);
+        await buttonManager(embed, interaction, msg, 1, totalImage, imageC, cid);
+        }
     } catch(error){
         console.log("error has occured in sendEmbed.");
     }

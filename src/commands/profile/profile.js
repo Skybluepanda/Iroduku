@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database2 = require('../../database2.js');
+const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
@@ -32,16 +32,14 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
         try {
-            const player = await database2.Player.findOne({ where: { playerID: userId } });
+            const player = await database.Player.findOne({ where: { playerID: userId } });
             if (player) {
                 embedDone.setDescription(`
-                Name: ${player.name}
-                Level: ${player.level} (${player.xp}/10)
-                Gems: ${player.gems}
-                Money: ${player.money}
-                Karma: ${player.karma}
-                Inventory: ${player.inventory}
-                Permissions: Weeblet
+                **Level:** ${player.level} (${player.xp}/10)
+                **Gems:** ${player.gems} <:waifugem:947388797916700672>
+                **Money:** ${player.money} <:datacoin:947388797828612127>
+                **Karma:** ${player.karma} <:karma:947388797627281409>
+                **Inventory:** ${player.inventory}
                 `)
             } else {
                 embedDone.setDescription('Character does not exist.')

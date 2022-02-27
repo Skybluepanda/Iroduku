@@ -1,11 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database2 = require('../../database2.js');
-const database3 = require('../../database3.js');
+const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
 // const { dayjs } = require('dayjs');
 var dayjs = require('dayjs')
+var duration = require('dayjs/plugin/duration')
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
+dayjs.extend(duration)
 
 
 function embedC(interaction) {
@@ -15,7 +16,6 @@ function embedC(interaction) {
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
             .setColor("AQUA")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
     return embed;
 };
 
@@ -25,7 +25,6 @@ function embedD(interaction) {
     embedDone.setTitle("Daily claimed!")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setColor("GREEN")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
     return embedDone;
 };
 
@@ -36,7 +35,6 @@ function embedL(interaction) {
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please wait for the cooldown.`)
             .setColor("ORANGE")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
     return embedCool;
 };
 
@@ -47,14 +45,13 @@ function embedE(interaction) {
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please report the error if it persists.`)
             .setColor("RED")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
     return embedError;
 }
 
 async function checkDaily(interaction, player){
     console.log("start")
     const userId = interaction.user.id;
-    const daily = await database3.Daily.findOne({where : { playerID: userId}});
+    const daily = await database.Daily.findOne({where : { playerID: userId}});
     if (daily) {
         console.log("Has a daily")
         const lastCheck = daily.lastDaily;
@@ -67,8 +64,8 @@ async function checkDaily(interaction, player){
         if (172800000 >= timeDiff >= 79200000) {
             console.log("Perfect daily")
             await streakDaily(interaction, player, daily);
-            await database3.Daily.update({lastDaily: timeNow}, {where: {playerID: userId}});
-            await database3.Daily.increment({streak: 1}, {where: {playerID: userId}});
+            await database.Daily.update({lastDaily: timeNow}, {where: {playerID: userId}});
+            await database.Daily.increment({streak: 1}, {where: {playerID: userId}});
             console.log("Time diff checked and rewarded")
         } else if (timeDiff <= 79200000) {
             console.log("Too early")
@@ -77,7 +74,7 @@ async function checkDaily(interaction, player){
         } else {
             console.log("Too late")
             await resetDaily(interaction, player);
-            await database3.Daily.update({lastDaily: timeNow, streak: 1}, {where: {playerID: userId}});
+            await database.Daily.update({lastDaily: timeNow, streak: 1}, {where: {playerID: userId}});
             console.log("Done")
         }
     } else {
@@ -91,7 +88,7 @@ async function newDaily(interaction, player){
     const embedDone = await embedD(interaction);
     const userId = interaction.user.id;
     const timeNow = dayjs();
-    await database3.Daily.create({
+    await database.Daily.create({
         playerID: userId,
         lastDaily: timeNow,
         streak: 1,
@@ -130,8 +127,9 @@ Streak: (reset) 1\nGems: ${player.gems+50}\nUse daily again within two days to c
 
 async function cooldownDaily(interaction, timeDiff){
     const embedCool = embedL(interaction);
-    const remain = dayjs(79200000 - timeDiff).format('HH[hr: ]MM[m : ]ss[s]');
-    await embedCool.setDescription(`Please wait for the cooldown.\nTime Remining: ${remain}`);
+    const timeLeft = 79200000 - timeDiff;
+    const remain = dayjs.duration(timeLeft).format('HH[hr: ]mm[m : ]ss[s]');
+    await embedCool.setDescription(`Please wait for the cooldown.\nTime Remaining: ${remain}`);
     await interaction.editReply({ embeds: [embedCool] }, {ephemeral: true});
 }
 
@@ -149,7 +147,7 @@ module.exports = {
         try {
             const userId = await interaction.user.id;
             console.log("4")
-            const player = await database2.Player.findOne({ where: { playerID: userId } })
+            const player = await database.Player.findOne({ where: { playerID: userId } })
             console.log("5")
             if (player) {
                 console.log("6")

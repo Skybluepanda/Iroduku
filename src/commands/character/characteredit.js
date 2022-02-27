@@ -11,7 +11,6 @@ async function embedSuccess(interaction) {
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Character ${char.characterName} has been edited`)
         .setColor("GREEN")
-        .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
     console.log("embed s dies")
     return embedSuccess;
 };

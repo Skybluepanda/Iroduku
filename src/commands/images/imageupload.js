@@ -2,21 +2,20 @@ const { createCanvas, loadImage, Canvas } = require('canvas');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageAttachment, IntegrationApplication } = require('discord.js');
 const database = require('../../database.js');
-const database2 = require('../../database2.js');
 
 async function checkIDS(interaction) {
 	const cid = interaction.options.getInteger('cid');
 	const iNumber = interaction.options.getInteger('image_number')
 	try {
-		if (0 <= iNumber < 25) {
+		if (1 <= iNumber < 10) {
 			const count = await database.Image.count({ where: {characterID: cid, imageNumber: iNumber}})
 			if (count != 0) {
-				await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 24.`)
+				await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 9.`)
 			} else {
 				upload(interaction);
 			};
 		} else {
-			await interaction.reply("Range of image number is 0-24.")
+			await interaction.reply("Range of image number is 0-9.")
 		}
 	} catch(error){
 		await interaction.reply("Error has occured");
@@ -103,7 +102,7 @@ async function upload(interaction) {
 		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
-		await database2.Player.increment({gems: 45, karma: 3}, {where: {playerID: interaction.user.id}})
+		await database.Player.increment({gems: 45, karma: 3}, {where: {playerID: interaction.user.id}})
 		
 		return await interaction.followUp("Image added to the database.")
 	} catch(error) {

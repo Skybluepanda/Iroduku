@@ -32,7 +32,6 @@ module.exports = {
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Series ${name} was created.`)
             .setColor("GREEN")
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
 
         embedError.setTitle("Unknown Error")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))

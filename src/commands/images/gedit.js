@@ -7,9 +7,9 @@ async function embedSuccess(interaction) {
     const embedSuccess = new MessageEmbed();
     const id = await interaction.options.getInteger("id")
     const image = await database.Image.findOne({where: {imageID: id}});
-    embedSuccess.setTitle(`Image ${id} edited`)
+    embedSuccess.setTitle(`Gif ${id} edited`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Image ${id} has been edited`)
+        .setDescription(`Gif ${id} has been edited`)
         .setColor("GREEN")
     return embedSuccess;
 };
@@ -27,20 +27,20 @@ async function cidedit(interaction) {
     console.log("3.1");
     const id = await interaction.options.getInteger('id');
     const cid = await interaction.options.getInteger('cid');
-    const inumber = await interaction.options.getInteger('inumber');
-    const image = await database.Image.findOne({where: {imageID: id}});
-    const oid = await image.characterID;
+    const gnumber = await interaction.options.getInteger('gnumber');
+    const gif = await database.Gif.findOne({where: {gifID: id}});
+    const oid = await gif.characterID;
     // const charold = await database.Character.findOne({ where: {characterID: oid}});
     // const charnew = await database.Character.findOne({ where: {characterID: cid}});
-    const check = await database.Image.findOne({ where: {characterID: cid, imageNumber: inumber}});
+    const check = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gnumber}});
     console.log("3.2");
-    await database.Character.increment({imageCount: -1}, {where: {characterID: oid}});
-    await database.Character.increment({imageCount: 1}, {where: {characterID: cid}});
+    await database.Character.increment({gifCount: -1}, {where: {characterID: oid}});
+    await database.Character.increment({gifCount: 1}, {where: {characterID: cid}});
     // charold.increment('imageCount', {by: -1})
     // await charnew.increment('imageCount', {by: 1})
     console.log("3.3");
     console.log("3.4");
-    await image.update({characterID: cid, imageNumber: inumber});
+    await image.update({characterID: cid, gifNumber: gnumber});
     console.log("3.5");
 }
 
@@ -58,18 +58,18 @@ async function selectOption(interaction) {
             await cidedit(interaction);
             return await interaction.reply({embeds: [embedS]});
 
-        case "imagenumber":
+        case "gifnumber":
             console.log("2.2");
-            const imageNumber = await interaction.options.getInteger('imagenumber');
+            const gNumber = await interaction.options.getInteger('gnumber');
             console.log("2.2.1");
-            const cid = await database.Image.findOne({attributes: ['characterID']}, {where: {imageID: id}});
+            const cid = await database.Gif.findOne({attributes: ['characterID']}, {where: {gifID: id}});
             console.log("2.2.2");
-            const check = await database.Image.findOne({where: { imageNumber: imageNumber, characterID: cid}});
+            const check = await database.Gif.findOne({where: { gifNumber: gNumber, characterID: cid}});
             console.log("2.2.3");
             if (check) {
                 return await interaction.reply({embeds: [embedE]});
             } else {
-                await database.Image.update({ imageNumber: imageNumber }, { where: { imageID: id } })
+                await database.Gif.update({ gifNumber: gNumber }, { where: { gifID: id } })
             }
             console.log("2.2.4");
             return await interaction.reply({embeds: [embedS]});
@@ -77,21 +77,19 @@ async function selectOption(interaction) {
         case "artist":
             console.log("2.3");
             const artist = interaction.options.getString('artist');
-            await database.Image.update({ artist: artist }, { where: { imageID: id } });
+            await database.Gif.update({ artist: artist }, { where: { gifID: id } });
             return interaction.reply({embeds: [embedS]});
 
         case "sourcelink":
             console.log("2.4");
             const source = interaction.options.getString('source');
-            await database.Image.update({ source: source }, { where: { imageID: id } });
+            await database.Gif.update({ source: source }, { where: { gifID: id } });
             return interaction.reply({embeds: [embedS]});
 		
 		case "nsfw":
 			console.log("2.5");
 			const nsfw = interaction.options.getBoolean('nsfw');
-            SPOILER_
-			await database.Image.update({ nsfw: nsfw }, { where: { imageID: id } });
-            await database.Image.update({ nsfw: nsfw }, { where: { imageID: id } });
+			await database.Gif.update({ nsfw: nsfw }, { where: { imageID: id } });
 			return interaction.reply({embeds: [embedS]});
 
         default:
@@ -104,8 +102,8 @@ async function selectOption(interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('iedit')
-		.setDescription('Edits image Details')
+		.setName('gedit')
+		.setDescription('Edits gif Details')
         //cid is constant
         //subcommands for
         /** 
@@ -116,47 +114,47 @@ module.exports = {
          */
         .addSubcommand(subcommand => subcommand
             .setName("cid")
-            .setDescription("Edit the character assigned to image.")
+            .setDescription("Edit the character assigned to gif.")
             .addIntegerOption(option => option
                 .setName("id")
-                .setDescription("The id of the image")
+                .setDescription("The id of the gif")
                 .setRequired(true))
             .addIntegerOption(option => option
                 .setName("cid")
                 .setDescription("The id of the character")
                 .setRequired(true))
             .addIntegerOption(option => option
-                .setName("imagenumber")
-                .setDescription("The id of the character")
+                .setName("gnumber")
+                .setDescription("An empty gif number on the character.")
                 .setRequired(true)))
         .addSubcommand(subcommand =>subcommand
-            .setName("imagenumber")
-            .setDescription("Edit the image number")
+            .setName("gifnumber")
+            .setDescription("Edit the gif number")
             .addIntegerOption(option => option
                 .setName("id")
-                .setDescription("The id of the image")
+                .setDescription("The id of the gif")
                 .setRequired(true))
             .addIntegerOption(option => option
-                .setName("imagenumber")
-                .setDescription("New Image ID")
+                .setName("gnumber")
+                .setDescription("New gif number")
                 .setRequired(true)))
         .addSubcommand(subcommand =>subcommand
             .setName("artist")
-            .setDescription("Edit the artist of the image")
+            .setDescription("Edit the artist of the gif")
             .addIntegerOption(option => option
                 .setName("id")
-                .setDescription("The id of the image")
+                .setDescription("The id of the gif")
                 .setRequired(true))
             .addStringOption(option => option
                 .setName("artist")
-                .setDescription("The artist of the image")
+                .setDescription("The artist of the gif")
                 .setRequired(true)))
         .addSubcommand(subcommand =>subcommand
             .setName("sourcelink")
-            .setDescription("Edit source link for the image")
+            .setDescription("Edit source link for the gif")
             .addIntegerOption(option => option
                 .setName("id")
-                .setDescription("The id of the image")
+                .setDescription("The id of the gif")
                 .setRequired(true))
             .addStringOption(option => option
                 .setName("source")
@@ -164,10 +162,10 @@ module.exports = {
                 .setRequired(true)))
 		.addSubcommand(subcommand =>subcommand
 			.setName("nsfw")
-			.setDescription("Edit the nsfw status of the image")
+			.setDescription("Edit the nsfw status of the gif")
 			.addIntegerOption(option => option
 				.setName("id")
-				.setDescription("The id of the image")
+				.setDescription("The id of the gif")
 				.setRequired(true))
 			.addBooleanOption(option => option
 				.setName("nsfw")
@@ -185,7 +183,7 @@ module.exports = {
                 return interaction.reply({embeds: [embedError(interaction)]});
             }
         } else {
-			interaction.reply("use #send-image to edit images please.")
+			interaction.reply("use #send-image to edit gif please.")
 		}
 	},
 };
