@@ -198,7 +198,9 @@ module.exports = {
 		//then select by name
 		//then lets embed.
         try {
+            
             await interaction.reply({embeds: [embed]});
+            
             if (interaction.options.getSubcommand() === "name") {
                 const name = await interaction.options.getString('name')
                 nameList(embed, interaction, name, 1);
@@ -221,7 +223,7 @@ module.exports = {
                 }
             }
         } catch (error) {
-            return interaction.reply("Error has occured");
+            return interaction.editReply("Error has occured");
         }
 	},
 };

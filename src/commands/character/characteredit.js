@@ -2,6 +2,16 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database');
 const { MessageEmbed } = require('discord.js');
 
+async function embedProcess(interaction) {
+    const embedC = new MessageEmbed();
+    const cid = await interaction.options.getInteger("id")
+    const char = await database.Character.findOne({where: {characterID: cid}});
+    embedC.setTitle(`Character ${cid} is being edited`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Processing...`)
+        .setColor("ORANGE")
+    return embedC;
+};
 
 async function embedSuccess(interaction) {
     const embedSuccess = new MessageEmbed();
@@ -11,7 +21,6 @@ async function embedSuccess(interaction) {
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Character ${char.characterName} has been edited`)
         .setColor("GREEN")
-    console.log("embed s dies")
     return embedSuccess;
 };
 
@@ -31,32 +40,32 @@ async function selectOption(interaction) {
         case "name":
             const name = interaction.options.getString('name');
             await database.Character.update({ characterName: name }, { where: { characterID: id } });
-            return interaction.reply({embeds: [embedS]});
+            return interaction.editReply({embeds: [embedS]});
 
         case "link":
             const link = interaction.options.getString('link');
             await database.Character.update({ infoLink: link }, { where: { characterID: id } });
-            return interaction.reply({embeds: [embedS]});
+            return interaction.editReply({embeds: [embedS]});
 
         case "sid":
             const sid = interaction.options.getInteger('sid');
             await database.Character.update({ seriesID: sid }, { where: { characterID: id } });
-            return interaction.reply({embeds: [embedS]});
+            return interaction.editReply({embeds: [embedS]});
 
         case "alias":
             const aname = interaction.options.getString('alias');
             await database.Character.update({ alias: aname }, { where: { characterID: id } });
-            return interaction.reply({embeds: [embedS]});
+            return interaction.editReply({embeds: [embedS]});
 
         case "imagecount":
             const icount = interaction.options.getString('imagecount');
             await database.Character.update({ imageCount: icount }, { where: { characterID: id } });
-            return interaction.reply({embeds: [embedS]});
+            return interaction.editReply({embeds: [embedS]});
 
         default:
             const embed = embedError(interaction);
             embed.setDescription("Error has occured, try using the command with a subcommand.")
-            return interaction.reply({embeds: [embed]})
+            return interaction.editReply({embeds: [embed]})
 
     }
 }
@@ -130,7 +139,15 @@ module.exports = {
                 .setRequired(true))),
 	async execute(interaction) {
         const id = interaction.options.getInteger('id');
+        const embedE = embedError(interaction);
+        const embedP = embedProcess(interaction);
         try {
+            await interaction.reply({ embeds: [embedP] });
+            if (!interaction.member.roles.cache.has('947640601564819516')) {
+                embedE.setTitle("Insufficient Permissions")
+                    .setDescription("You don't have the librarian role!");
+                return interaction.editReply({ embeds: [embedE] }, {ephemeral: true});
+            };
             if (interaction.channel.id === '947136227126177872') {
                 await selectOption(interaction)
             
@@ -139,7 +156,7 @@ module.exports = {
             }
             
         } catch (error) {
-            return interaction.reply({embeds: [embedError(interaction)]});
+            return interaction.editReply({embeds: [embedE]});
         }
 	},
 };

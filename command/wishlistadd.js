@@ -23,20 +23,15 @@ module.exports = {
     async execute(interaction) {
         try {
             const uid = interaction.user.id;
+            const cid = interaction.options.getInteger('cid')
             const wishlist = database3.Wishlist.findOne({where: {playerID: uid}});
             const slotNo = interaction.options.getInteger('slot')
-            const slot = 'slot' + slotNo;
-            console.log(slot);
             if (wishlist) {
-                if (checkSlots(cid)){
-                    //add to wishlist
-                } else {
-                    return interaction.reply(`${cid} is already in your wishlist.`)
-                }
                 //add to wishlist
             } else {
                 const wishlist = database3.Wishlist.create({
                     playerID: uid,
+                    characterID: cid,
                 });
 
 

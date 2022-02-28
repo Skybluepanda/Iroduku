@@ -42,9 +42,6 @@ async function clistSwitch(embed, interaction, page){
             sidList(embed, interaction, page);
             break;
         
-        case "seriesname":
-            snameList(embed, interaction, page);
-            break;
 
         case "page":
             console.log(`listing page ${page}`);
@@ -67,10 +64,6 @@ async function clistSwitch2(embed, interaction, page){
         
         case "seriesid":
             sidList(embed, interaction, page);
-            break;
-        
-        case "seriesname":
-            snameList(embed, interaction, page);
             break;
 
         case "page":
@@ -220,32 +213,6 @@ async function sidList(embed, interaction, page){
     await buttonManager(embed, interaction, msg, page, maxPage)
 };
 
-async function snameList(embed, interaction, page){
-    const name = await interaction.options.getString('sname');
-    const maxPage =  Math.floor(await database.Character.count(
-        {where: {
-        seriesName: {[Op.like]: '%' + name + '%'}
-    }}
-        )%20);
-    const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName'],
-        order: ['characterID'],
-        limit: 20,
-        offset: page*20,
-    where: {
-        seriesName: {[Op.like]: '%' + name + '%'}
-    }}
-        );
-    if (maxPage > 0) {
-        deployButton(interaction, embed);
-    }
-    const listString = await list.map(joinBar).join(`\n`);
-    await embed.setDescription(`${listString}`);
-    await embed.setFooter(`page ${page+1} of ${maxPage+1}`);
-    const msg = await updateReply(interaction, embed);
-    await buttonManager(embed, interaction, msg, page, maxPage)
-};
-
 
 
 /**
@@ -288,16 +255,6 @@ module.exports = {
                     option
                         .setName("sid")
                         .setDescription("The series ID you want to search with")
-                        .setRequired(true)
-                        ))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName("seriesname")
-                .setDescription("Search by series name. ")
-                .addStringOption(option => 
-                    option
-                        .setName("sname")
-                        .setDescription("The series name you want to search with")
                         .setRequired(true)
                         )),
 	async execute(interaction) {

@@ -8,7 +8,7 @@ function embedNew(interaction) {
     const embedNew = new MessageEmbed();
     embedNew.setTitle("Character Created")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Series is being created.`)
+        .setDescription(`Character is being created.`)
         .setColor("ORANGE")
     return embedNew;
 };
@@ -61,8 +61,13 @@ module.exports = {
         
         
         try {
+            await interaction.reply({ embeds: [embedN] });
+            if (!interaction.member.roles.cache.has('947640601564819516')) {
+                embedE.setTitle("Insufficient Permissions")
+                    .setDescription("You don't have the librarian role!");
+                return interaction.editReply({ embeds: [embedE] }, {ephemeral: true});
+            };
             if (interaction.channel.id === '947136227126177872') {
-                await interaction.reply({ embeds: [embedN] });
                 const character = await database.Character.create({
                     characterName: name,
                     infoLink: link,

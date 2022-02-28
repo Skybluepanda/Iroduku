@@ -5,7 +5,27 @@ const { MessageEmbed } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('addgem')
-        .setDescription('adds gem to your profile.'),
+        .setDescription('adds gem to a profile.')
+        .addUserOption(option => 
+            option
+                .setName("target")
+                .setDescription("The user account")
+                .setRequired(true)
+                )
+        .addIntegerOption(option => 
+            option
+                .setName("quantity")
+                .setDescription("Quantity of the gem")
+                .setRequired(true)
+                )
+        .addStringOption(option => 
+            option
+                .setName("reason")
+                .setDescription("Reason?")
+                .setRequired(true)
+                ),
+
+
     async execute(interaction) {
         const username = interaction.user.username;
         const userId = interaction.user.id;
@@ -30,24 +50,23 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] }, {ephemeral: true});
         try {
-            if (!interaction.member.roles.cache.has('947442920724787260')) return;
-            const player = await database.Player.findOne({ where: { playerID: userId } })
-            if (player) {
-                var succeedChance = 0.1;
-                if (Math.random() < succeedChance) {
-                    await player.increment('gems', {by: 1});
-                    await embedDone.setDescription(`
-                    Gems: ${player.gems+1}`);
-                } else {
-                    await embedDone.setDescription(`Failed to mine a gem. 10% chance as of current patch.`)
-                        .setColor("ORANGE");
-                    // TODO: maybe randomize the failed message
-                }
-            } else {
-                embedDone.setDescription('You must first create an account using /isekai.')
-                        .setColor('RED');
-            }
-            return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
+            if (!interaction.member.roles.cache.has('947442920724787260')) {
+                embedError.setDescription("You don't have the gemmod role!")
+
+                return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});
+
+            };
+            console.log("you have gemmod role");
+            const target = await interaction.options.getUser('target');
+            const quantity = await interaction.options.getInteger('quantity');
+            const reason = await interaction.options.getString('reason');
+            console.log(target);
+            console.log(target.username);
+            console.log(target.id);
+            embedDone.setDescription(`${target.username} recieved ${quantity} gems!
+            Reason: ${reason}`);
+            await database.Player.increment({gems: quantity}, {where: {playerID: target.id}})
+            await interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
         } catch (error) {
             return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});
         }

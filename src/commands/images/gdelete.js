@@ -22,6 +22,9 @@ module.exports = {
             .setRequired(true)),
 	async execute(interaction) {
 		try {
+            if (!interaction.member.roles.cache.has('947640668031975465')) {
+                return interaction.reply("You don't have the photoshopper role!", {ephemeral: true});
+            };
         	const id = interaction.options.getInteger('id');
             const cid = database.Gif.findOne({where: {gifID: id}}).characterID;
             database.Gif.destroy({where: {gifID: id}});

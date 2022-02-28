@@ -140,6 +140,9 @@ module.exports = {
 	async execute(interaction) {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.
+		if (!interaction.member.roles.cache.has('947640668031975465')) {
+			return interaction.reply("You don't have the photoshopper role!", {ephemeral: true});
+		};
 		if (interaction.channel.id === '947123054570512395') {
 			try {
             // interaction.reply("Uploading gif.");

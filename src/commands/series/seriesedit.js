@@ -54,6 +54,11 @@ module.exports = {
                         )),
 	async execute(interaction) {
         try {
+            if (!interaction.member.roles.cache.has('947640601564819516')) {
+                embedError.setTitle("Insufficient Permissions")
+                    .setDescription("You don't have the librarian role!");
+                return interaction.reply({ embeds: [embedError] }, {ephemeral: true});
+            };
             if (interaction.channel.id === '947136227126177872') {
                 await selectOption(interaction, database)
             } else {

@@ -7,6 +7,7 @@ async function checkIDS(interaction) {
 	const cid = interaction.options.getInteger('cid');
 	const iNumber = interaction.options.getInteger('image_number')
 	try {
+		
 		if (1 <= iNumber < 10) {
 			const count = await database.Image.count({ where: {characterID: cid, imageNumber: iNumber}})
 			if (count != 0) {
@@ -144,6 +145,9 @@ module.exports = {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.
 		if (interaction.channel.id === '947123054570512395') {
+            if (!interaction.member.roles.cache.has('947640668031975465')) {
+                return interaction.reply("You don't have the photoshopper role!", {ephemeral: true});
+            };
 			try {
 				checkIDS(interaction);
 				// if (checkNSFW(interaction)){

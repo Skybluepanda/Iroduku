@@ -174,6 +174,9 @@ module.exports = {
 				.setDescription("nsfw")
 				.setRequired(true))),
 	async execute(interaction) {
+        if (!interaction.member.roles.cache.has('947640668031975465')) {
+            return interaction.reply("You don't have the photoshopper role!", {ephemeral: true});
+        };
         if (interaction.channel.id === '947123054570512395') {
             try {
                 const id = interaction.options.getInteger('id');
