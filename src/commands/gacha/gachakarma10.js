@@ -15,7 +15,7 @@ dayjs().format()
 async function embedError(interaction) {
     const embed = new MessageEmbed();
 
-    embed.setTitle("Creation failed.")
+    embed.setTitle("Gacha failed.")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("Remember to set description.")
         .setColor(color.failred);
@@ -26,9 +26,9 @@ async function embedError(interaction) {
 async function embedSucess(interaction) {
     const embed = new MessageEmbed();
 
-    embed.setTitle(`${interaction.user.username}'s 10 Gacha results`)
+    embed.setTitle("Card created")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription("Description will reset if successful.")
+        .setDescription("Followup should be the card embed.")
         .setColor(color.successgreen);
     
     return embed;
@@ -48,64 +48,6 @@ async function inventorycheck(uid) {
     return i;
 }
 
-//White card zone
-//White card zone
-//White card zone
-
-
-async function createWhiteCard(cid, interaction) {
-    const user = await interaction.user.id;
-    const dupe = await database.Card.findOne({where: {playerID: user, characterID: cid, rarity: 1}});
-    if (dupe) {
-        dupe.increment({quantity: 1});
-        const char = await database.Character.findOne({where: {characterID: cid}});
-        const gachaString = `:green_square:` + dupe.inventoryID + ` | ` + char.characterName +" **duplicate**";
-        return gachaString;
-    } else {
-        const inumber = await inventorycheck(user)
-        const newcard = await database.Card.create({
-            playerID: user,
-            characterID: cid,
-            inventoryID: inumber,
-            quantity: 1,
-            rarity: 1,
-        });
-        const char = await database.Character.findOne({where: {characterID: cid}});
-        const gachaString = `:white_large_square:` +  inumber + ` | `+ char.characterName;
-        return gachaString;
-    }
-}
-
-
-//Green card zone
-//Green card zone
-//Green card zone
-
-async function createGreenCard(cid, interaction) {
-    const uid = await interaction.user.id;
-    const dupe = await database.Card.findOne({where: {playerID: uid, characterID: cid, rarity: 2}});
-    if (dupe) {
-        dupe.increment({quantity: 1});
-        const char = await database.Character.findOne({where: {characterID: cid}});
-        const gachaString = `:green_square:` + dupe.inventoryID + ` | ` + char.characterName +" **duplicate**";
-        return gachaString;
-    } else {
-        const inumber = await inventorycheck(uid)
-        const newcard = await database.Card.create({
-            playerID: uid,
-            characterID: cid,
-            inventoryID: inumber,
-            quantity: 1,
-            rarity: 2,
-        });
-        const char = await database.Character.findOne({where: {characterID: cid}});
-        const gachaString = `:green_square:` + inumber + ` | ` + char.characterName;
-        return gachaString;
-    }
-    
-    
-}
-
 //Blue Card Zone
 //Blue Card Zone
 //Blue Card Zone
@@ -120,7 +62,7 @@ async function createBlueCard(cid, interaction) {
     } else {
         imageRng = ((Math.floor(Math.random() * 100))%total)+1;
         if (imageRng > char.imageCount) {
-            imageRng = -(imageRng - char.imageCount);
+            imageRng = -(imageRng-char.imageCount);
         }
     }
 
@@ -128,7 +70,6 @@ async function createBlueCard(cid, interaction) {
     let newcard;
     if (dupe) {
         dupe.increment({quantity: 1});
-        await viewBCard(dupe, interaction);
         const gachaString = `:blue_square:` + dupe.inventoryID + ` | ` + char.characterName + `(#${dupe.imageNumber})` + " **duplicate**";
         return gachaString;
     } else {
@@ -143,47 +84,10 @@ async function createBlueCard(cid, interaction) {
         });
         
     }
-    await viewBCard(newcard, interaction);
     const gachaString = `:blue_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
     return gachaString;
 }
 
-async function viewBCard(card, interaction) { 
-    const embedCard = new MessageEmbed();
-    const cid = await card.characterID
-    const char = await database.Character.findOne({where: {characterID: cid}});
-    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
-    let image;
-    let url;
-    if (card.imageNumber > 0) {
-        image = await database.Image.findOne({where: {characterID: cid, imageNumber: card.imageNumber}});
-        if (image) {
-            url = await image.imageURL;
-            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
-        } else {
-            embedCard.addField("no image found", "Send an official image for this character.");
-        }
-    } else {
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageNumber)}});
-        if (image){
-        url = await image.gifURL;
-        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
-        } else {
-            embedCard.addField("no image found", "Send an official image for this character.");
-        }
-    }
-    embedCard.setTitle(`${char.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Card Info
-**LID:** ${card.inventoryID} | **CID:** ${cid}
-**Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity:** Lapis
-**Quantity:** ${card.quantity}`)
-        .setColor(color.blue);
-    return await interaction.followUp({embeds: [embedCard]});
-}
 
 ///Purple Zone
 ///Purple Zone
@@ -267,6 +171,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
     return await interaction.followUp({embeds: [embedCard]});
+    
 }
 
 
@@ -361,58 +266,56 @@ Gif ID is ${image.gifID} report any errors using ID.
 async function raritySwitch(cid, rngRarity, interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
-    const pity = Math.floor(player.pity/10);
-    if ((rngRarity + pity) >= 993) {
-        player.update({pity: 0});
+    if ((rngRarity) >= 950) {
         return await createRedCard(cid, interaction);
-    } else if (rngRarity >= 960) {
-        player.increment({pity: 1});
+    } else if (rngRarity >= 700) {
+        await player.increment({pity: 10});
         return await createPurpleCard(cid, interaction);
-    } else if (rngRarity >= 810) {
-        player.increment({pity: 1});
+    } else {
+        await player.increment({pity: 10});
         return await createBlueCard(cid, interaction);
-    } else if (rngRarity >= 600) {
-        player.increment({pity: 1});
-        return await createGreenCard(cid, interaction);
-    } else if (rngRarity) {;
-        player.increment({pity: 1});
-        return await createWhiteCard(cid, interaction);
     }
 }
 
 async function gacha(interaction) {
-    const totalChar = await database.Character.count();
-    const rngChar = Math.floor(Math.random() * 100000);
+    const user = interaction.user.id;
+    const rngChar = Math.floor(Math.random() * 10);
     const rngRarity = Math.floor(Math.random() * 1000);
-    const cid = (rngChar%totalChar)+1
+    const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+    const cid = await wlist[rngChar].characterID;
     return await raritySwitch(cid, rngRarity, interaction);
 }
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('gtenroll')
-		.setDescription('Spend 10 times the gems to do 10 gacha'),
+		.setName('gktenroll')
+		.setDescription('Spend karma to do gacha!!!'),
 	async execute(interaction) {
         try {
             const user = interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: user}});
             const embedE = await embedError(interaction);
             const embedS = await embedSucess(interaction);
-            
             if(player) {
-                if (player.gems >= 100){
-                    await interaction.reply({embeds: [embedS]});
-                    const list = [];
-                    for (let i = 0; i < 10; i++) {
-                        const card = await gacha(interaction);
-                        list[i] = card;
-                        const listString = list.join(`\n`);
-                        embedS.setDescription(`${listString}`)
-                        await interaction.editReply({embeds: [embedS]});
+                if (player.karma >= 100){
+                    const wlist = await database.Wishlist.count({where: {playerID: user}})
+                    if (wlist == 10) {
+                        await interaction.reply({embeds: [embedS]});
+                        const list = [];
+                        for (let i = 0; i < 10; i++) {
+                            const card = await gacha(interaction);
+                            list[i] = card;
+                            const listString = list.join(`\n`);
+                            embedS.setDescription(`${listString}`)
+                            await interaction.editReply({embeds: [embedS]});
+                        }
+                    }else {
+                        (await embedE).setDescription("You need 10 waifus in wishlist to use karma gacha. use /wadd to add to your wishlist!")
+                        return await interaction.reply({embeds: [embedE]});
                     }
                 } else {
                     //not enough gems embed.
-                    (await embedE).setDescription("You need 100 gems to gacha.\nDo dailies, add new series, characters or send images to gain more gems")
+                    (await embedE).setDescription("You need 100 karma to gacha.\nThe only way to get karma is by sending images at the moment.")
                     return await interaction.reply({embeds: [embedE]});
                 }
                 
@@ -422,7 +325,7 @@ module.exports = {
                 return await interaction.reply({embeds: [embedE]});
             }
         } catch(error) {
-            await interaction.channel.send("Error has occured while performing the command.")
+            await  interaction.channel.send("Error has occured while performing the command.")
         }        
     }
 }

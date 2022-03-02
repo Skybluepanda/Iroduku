@@ -117,7 +117,7 @@ async function upload(interaction) {
 ImageID: ${iNumber}
 Artist: ${art}
 source: ${sauce}
-.You've been rewarded 75 gems and karma, thanks for your hard work!`)
+You've been rewarded 75 gems and karma, thanks for your hard work!`)
 	} catch(error) {
 		interaction.channel.send("You are not a registered player");
 	}

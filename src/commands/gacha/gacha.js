@@ -89,9 +89,7 @@ Image ID is ${image1.imageID} report any errors using ID.`).setImage(image1.imag
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID: **${cid}
-
 **Series: **${char.seriesID} | ${series.seriesName}
-
 **Rarity: Quartz**
 **Quantity:** ${card.quantity}`)
         .setColor(color.white);
@@ -141,9 +139,7 @@ async function viewGCard(card, interaction) {
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
-
 **Series:** ${char.seriesID} | ${series.seriesName}
-
 **Rarity:** Jade
 **Quantity:** ${card.quantity}`)
         .setColor(color.green);
@@ -164,7 +160,7 @@ async function createBlueCard(cid, interaction) {
     } else {
         imageRng = ((Math.floor(Math.random() * 100))%total)+1;
         if (imageRng > char.imageCount) {
-            imageRng = -imageRng;
+            imageRng = -(imageRng-char.imageCount);
         }
     }
 
@@ -218,9 +214,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
-
 **Series:** ${char.seriesID} | ${series.seriesName}
-
 **Rarity:** Lapis
 **Quantity:** ${card.quantity}`)
         .setColor(color.blue);
@@ -241,7 +235,7 @@ async function createPurpleCard(cid, interaction) {
     } else {
         imageRng = ((Math.floor(Math.random() * 100))%total)+1;
         if (imageRng > char.imageCount) {
-            imageRng = -imageRng;
+            imageRng = -(imageRng-char.imageCount);
         }
     }
     
@@ -302,9 +296,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
-
 **Series:** ${char.seriesID} | ${series.seriesName}
-
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
@@ -326,7 +318,7 @@ async function createRedCard(cid, interaction) {
     } else {
         imageRng = ((Math.floor(Math.random() * 100))%total)+1;
         if (imageRng > char.imageCount) {
-            imageRng = -imageRng;
+            imageRng = -(imageRng-char.imageCount);
         }
     }
     let image;
@@ -390,9 +382,7 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
-
 **Series:** ${char.seriesID} | ${series.seriesName}
-
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
@@ -401,49 +391,25 @@ Gif ID is ${image.gifID} report any errors using ID.
 
 
 async function raritySwitch(cid, rngRarity, interaction) {
-    if (rngRarity >= 993) {
-        createRedCard(cid, interaction);
-    } else if (rngRarity >= 970) {
+    const user = interaction.user.id;
+    const player = await database.Player.findOne({where: {playerID: user}});
+    const pity = Math.floor(player.pity/10);
+    if ((rngRarity + pity) >= 993) {
+        await player.update({pity: 0});
+        await createRedCard(cid, interaction);
+    } else if (rngRarity >= 960) {
+        await player.increment({pity: 1});
         await createPurpleCard(cid, interaction);
-    } else if (rngRarity >= 850) {
+    } else if (rngRarity >= 810) {
+        await player.increment({pity: 1});
         await createBlueCard(cid, interaction);
     } else if (rngRarity >= 600) {
+        await player.increment({pity: 1});
         await createGreenCard(cid, interaction);
     } else if (rngRarity) {;
+        await player.increment({pity: 1});
         await createWhiteCard(cid, interaction);
     }
-
-    // switch (await rngRarity) {
-    //     case (rngRarity >= 993):
-    //         console.log("1");
-    //         return createRedCard(cid, interaction);
-    //         //red .7% rate
-    //         break;
-    //     case (993 > rngRarity >= 970):
-    //         console.log("2");
-    //         await createPurpleCard(cid, interaction);
-    //         //purple 23% rate
-    //         break;
-    //     case (970 > rngRarity >= 850):
-    //         console.log("3");
-    //         await createBlueCard(cid, interaction);
-    //         //blue 12% reate
-    //         break;
-    //     case (850 > rngRarity >= 600):
-    //         console.log("4");
-    //         await createGreenCard(cid, interaction);
-    //         //green 25% rate
-    //         break;
-    //     case (600 > rngRarity):
-    //         console.log("5");
-    //         await createWhiteCard(cid, interaction);
-    //         //white 60% rate
-    //         break;
-    //     default:
-    //         console.log("6");
-    //         break;
-    // }
-
 }
 
 async function gacha(interaction) {

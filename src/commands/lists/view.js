@@ -38,9 +38,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageU
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID: **${cid}
-
 **Series: **${char.seriesID} | ${series.seriesName}
-
 **Rarity: Quartz**
 **Quantity:** ${card.quantity}`)
         .setColor(color.white);
@@ -78,9 +76,7 @@ async function viewGreenCard(card, interaction) {
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
-
 **Series:** ${char.seriesID} | ${series.seriesName}
-
 **Rarity:** Jade
 **Quantity:** ${card.quantity}`)
         .setColor(color.green);
@@ -106,10 +102,11 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else {
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageNumber)}});
+        console.log(-(card.imageNumber));
+        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(card.imageNumber)}});
         if (image){
-        url = await image.gifURL;
-        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+            url = await image.gifURL;
+            embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         } else {
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -119,9 +116,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
-
 **Series:** ${char.seriesID} | ${series.seriesName}
-
 **Rarity:** Lapis
 **Quantity:** ${card.quantity}`)
         .setColor(color.blue);
@@ -147,7 +142,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: card.imageID}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(card.imageID)}});
         if (image){
             url = await image.gifURL;
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -162,9 +157,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
-
 **Series:** ${char.seriesID} | ${series.seriesName}
-
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
@@ -191,7 +184,7 @@ Image ID is ${image.imageID} report any errors using ID.
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: card.imageID}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(card.imageID)}});
         if (image){
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -207,9 +200,7 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
-
 **Series:** ${char.seriesID} | ${series.seriesName}
-
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);

@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../database.js');
+const database = require('../../src/database.js');
 const { MessageEmbed, Guild } = require('discord.js');
 const { Op } = require("sequelize");
-const color = require('../../color.json');
+const color = require('../../src/color.json');
 const { MessageActionRow, MessageButton } = require('discord.js');
 
 
@@ -266,6 +266,15 @@ async function list(embed, interaction, page){
     await buttonManager(embed, interaction, msg, page, maxPage);
 };
 
+/**
+ * cname
+ * cid
+ * sname
+ * sid
+ * rarity choice
+ * tags
+ * 
+ */
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('list2')

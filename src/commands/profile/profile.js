@@ -39,7 +39,7 @@ module.exports = {
 **Gems:** ${player.gems} <:waifugem:947388797916700672>
 **Money:** ${player.money} <:datacoin:947388797828612127>
 **Karma:** ${player.karma} <:karma:947388797627281409>
-**Inventory:** ${player.inventory}
+**Pity:** ${player.pity}
                 `)
             } else {
                 embedDone.setDescription('Character does not exist.')

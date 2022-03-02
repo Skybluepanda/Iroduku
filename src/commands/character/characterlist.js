@@ -34,7 +34,6 @@ async function clistSwitch(embed, interaction, page){
     const subCommand = await interaction.options.getSubcommand();
     switch (subCommand) {
         case "name":
-            console.log(`name listing page ${page}`);
             nameList(embed, interaction, page);
             break;
         
@@ -44,17 +43,15 @@ async function clistSwitch(embed, interaction, page){
         
 
         case "page":
-            console.log(`listing page ${page}`);
             pageSearch(embed, interaction);
             break;
 
         case "sname":
-            console.log(`listing page ${page}`);
             snameList(embed, interaction, page);
             break;
-            
-        default:
-            interaction.reply("Please use the subcommands");
+
+        case "nopics":
+            nopicList(embed, interaction, page);
             break;
     }
 }
@@ -63,7 +60,6 @@ async function clistSwitch2(embed, interaction, page){
     const subCommand = await interaction.options.getSubcommand();
     switch (subCommand) {
         case "name":
-            console.log(`name listing page ${page}`);
             nameList(embed, interaction, page);
             break;
         
@@ -72,17 +68,15 @@ async function clistSwitch2(embed, interaction, page){
             break;
 
         case "page":
-            console.log(`listing page ${page}`);
             pageList(embed, interaction, page);
             break;
 
         case "sname":
-            console.log(`listing page ${page}`);
             snameList(embed, interaction, page);
             break;
-            
-        default:
-            interaction.reply("Please use the subcommands");
+
+        case "nopics":
+            nopicList(embed, interaction, page);
             break;
     }
 }
@@ -114,13 +108,11 @@ async function buttonManager(embed, interaction, msg, page, maxPage) {
             switch (i.customId){
                 case 'prev':
                     const prevPage = await checkPage(-1, page, maxPage);
-                    console.log(prevPage);
                     await clistSwitch2(embed, interaction, prevPage);
                     break;
                 
                 case 'next':
                     const nextPage = await checkPage(1, page, maxPage);
-                    console.log(nextPage);
                     await clistSwitch2(embed, interaction, nextPage);
                     break;
                 
@@ -131,26 +123,11 @@ async function buttonManager(embed, interaction, msg, page, maxPage) {
         }
         );
     } catch(error) {
-        console.log("Error has occured in button Manager");
     }
 }
 
 function joinBar(character){
     return [character.characterID, character.characterName].join(" | ");
-    // const cid = character.characterID;
-    // console.log(cid);
-    // const sid = database.Character.findOne(
-    //     {attributes: ['seriesID']},
-    //     {where: {characterID: cid}}
-    // );
-    // console.log(sid);
-    // const series = database.Series.findOne({where: {seriesID: sid.seriesID}})
-    // console.log(series);
-    // if (series) {
-    //     return [character.characterID, character.characterName, series.seriesName].join(" - ");
-    // } else {
-        
-    // }
 }
 
 async function nameList(embed, interaction, page){
@@ -160,7 +137,6 @@ async function nameList(embed, interaction, page){
             characterName: {[Op.like]: '%' + name + '%'}
     }}
         )/20);
-    console.log(maxPage);
     if (maxPage > 1) {
         deployButton(interaction, embed);
     }
@@ -198,7 +174,6 @@ async function pageSearch(embed, interaction, page) {
 async function pageList(embed, interaction, page){
     //use page for pages
     const maxPage =  Math.ceil(await database.Character.count()/20);
-    await console.log(maxPage);
     const list = await database.Character.findAll(
         {attributes: ['characterID', 'characterName', 'seriesID'],
         order: ['characterID'],
@@ -211,6 +186,27 @@ async function pageList(embed, interaction, page){
     const listString = await list.map(joinBar).join(`\n`);
     await embed.setDescription(`${listString}`);
     const total = await database.Character.count();
+    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    const msg = await updateReply(interaction, embed);
+    await buttonManager(embed, interaction, msg, page, maxPage)
+};
+
+async function nopicList(embed, interaction, page){
+    //use page for pages
+    const maxPage =  Math.ceil(await database.Character.count({where: {imageCount: 0}})/20);
+    const list = await database.Character.findAll(
+        {attributes: ['characterID', 'characterName', 'seriesID'],
+        order: ['characterID'],
+        limit: 20,
+        offset: (page-1)*20,
+        where: {imageCount: 0}},
+        );
+    if (maxPage > 0) {
+        deployButton(interaction, embed);
+    }
+    const listString = await list.map(joinBar).join(`\n`);
+    await embed.setDescription(`Characters without any images\n${listString}`);
+    const total = await database.Character.count({where: {imageCount: 0}});
     await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
@@ -264,11 +260,15 @@ async function snameList(embed, interaction, page){
         seriesID: {[Op.or]: sidList}
     }}
     );
+    
     const total = await database.Character.count({
         where: {
             seriesID: {[Op.or]: sidList}
     }});
     const maxPage = Math.ceil(total/20);
+    if (maxPage > 0) {
+        deployButton(interaction, embed);
+    }
     const listString = await list.map(joinBar).join(`\n`);
     
     await embed.setDescription(`${listString}`);
@@ -330,7 +330,11 @@ module.exports = {
                         .setName("sname")
                         .setDescription("The series name you want to search with")
                         .setRequired(true)
-                        )),
+                        ))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("nopics")
+                .setDescription("Shows characters with 0 images.")),
 	async execute(interaction) {
         if (!interaction.options.getSubcommand()) {
             return interaction.reply("Error use subcommands.");
