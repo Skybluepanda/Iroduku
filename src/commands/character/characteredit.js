@@ -3,14 +3,13 @@ const database = require('../../database');
 const { MessageEmbed } = require('discord.js');
 
 async function embedProcess(interaction) {
-    const embedC = new MessageEmbed();
+    const embedProcess = new MessageEmbed();
     const cid = await interaction.options.getInteger("id")
-    const char = await database.Character.findOne({where: {characterID: cid}});
-    embedC.setTitle(`Character ${cid} is being edited`)
+    embedProcess.setTitle(`Character ${cid} is being edited`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Processing...`)
-        .setColor("ORANGE")
-    return embedC;
+        .setColor("#ffb400")
+    return embedProcess;
 };
 
 async function embedSuccess(interaction) {
@@ -20,7 +19,7 @@ async function embedSuccess(interaction) {
     embedSuccess.setTitle(`Character ${cid} edited`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Character ${char.characterName} has been edited`)
-        .setColor("GREEN")
+        .setColor("#7cff00")
     return embedSuccess;
 };
 
@@ -29,7 +28,7 @@ function embedError(interaction) {
     embedError.setTitle("Unknown Error")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Please report the error if it persists.`)
-        .setColor("RED");
+        .setColor("#ff0000");
     return embedError;
 };
 
@@ -74,14 +73,6 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('cedit')
 		.setDescription('Edits Character Details')
-        //cid is constant
-        //subcommands for
-        /** 
-         * characterName
-         * infoLink
-         * seriesID
-         * alias
-         */
         .addSubcommand(subcommand => subcommand
             .setName("name")
             .setDescription("Edit the name of the character.")
@@ -139,10 +130,11 @@ module.exports = {
                 .setRequired(true))),
 	async execute(interaction) {
         const id = interaction.options.getInteger('id');
-        const embedE = embedError(interaction);
-        const embedP = embedProcess(interaction);
+        const embedE = await embedError(interaction);
+        const embedP = await embedProcess(interaction);
+        
+        await interaction.reply({ embeds: [embedP]});
         try {
-            await interaction.reply({ embeds: [embedP] });
             if (!interaction.member.roles.cache.has('947640601564819516')) {
                 embedE.setTitle("Insufficient Permissions")
                     .setDescription("You don't have the librarian role!");
@@ -152,11 +144,11 @@ module.exports = {
                 await selectOption(interaction)
             
             } else {
-                interaction.reply("Please use #series and characters channel for this command.")
+                interaction.editReply("Please use #series and characters channel for this command.")
             }
             
         } catch (error) {
-            return interaction.editReply({embeds: [embedE]});
+            return interaction.channel.send({embeds: [embedE]});
         }
 	},
 };

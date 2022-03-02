@@ -15,15 +15,15 @@ function createEmbed(interaction) {
     embed.setTitle("Listing Characters")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("List of Characters")
-        .setColor("AQUA")
+        .setColor("#00ecff")
     
     return embed;
 }
 
 async function checkPage(direction, page, maxPage) {
     if (direction == 1 && page == maxPage) {
-        return 0;
-    } else if (direction == -1 && page == 0) {
+        return 1;
+    } else if (direction == -1 && page == 1) {
         return maxPage;
     } else {
         return page + direction;
@@ -47,6 +47,11 @@ async function clistSwitch(embed, interaction, page){
             console.log(`listing page ${page}`);
             pageSearch(embed, interaction);
             break;
+
+        case "sname":
+            console.log(`listing page ${page}`);
+            snameList(embed, interaction, page);
+            break;
             
         default:
             interaction.reply("Please use the subcommands");
@@ -69,6 +74,11 @@ async function clistSwitch2(embed, interaction, page){
         case "page":
             console.log(`listing page ${page}`);
             pageList(embed, interaction, page);
+            break;
+
+        case "sname":
+            console.log(`listing page ${page}`);
+            snameList(embed, interaction, page);
             break;
             
         default:
@@ -126,32 +136,50 @@ async function buttonManager(embed, interaction, msg, page, maxPage) {
 }
 
 function joinBar(character){
-    return [character.characterID, character.characterName].join("| ");
+    return [character.characterID, character.characterName].join(" | ");
+    // const cid = character.characterID;
+    // console.log(cid);
+    // const sid = database.Character.findOne(
+    //     {attributes: ['seriesID']},
+    //     {where: {characterID: cid}}
+    // );
+    // console.log(sid);
+    // const series = database.Series.findOne({where: {seriesID: sid.seriesID}})
+    // console.log(series);
+    // if (series) {
+    //     return [character.characterID, character.characterName, series.seriesName].join(" - ");
+    // } else {
+        
+    // }
 }
 
 async function nameList(embed, interaction, page){
     const name = await interaction.options.getString('name');
-    const maxPage =  Math.floor(await database.Character.count({
+    const maxPage =  Math.ceil(await database.Character.count({
         where: {
             characterName: {[Op.like]: '%' + name + '%'}
     }}
         )/20);
     console.log(maxPage);
-    if (maxPage > 0) {
+    if (maxPage > 1) {
         deployButton(interaction, embed);
     }
     const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName'],
+        {attributes: ['characterID', 'characterName', 'seriesID'],
             order: ['characterID'],
             limit: 20,
-            offset: page*20,
+            offset: (page-1)*20,
         where: {
             characterName: {[Op.like]: '%' + name + '%'}
         }}
         );
+    
     const listString = await list.map(joinBar).join(`\n`);
     await embed.setDescription(`${listString}`);
-    await embed.setFooter(`page ${page+1} of ${maxPage+1}`);
+    const total = await database.Character.count({where: {
+        characterName: {[Op.like]: '%' + name + '%'}
+    }});
+    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
 };
@@ -163,42 +191,43 @@ async function pageSearch(embed, interaction, page) {
         
     } else {
         //Show page 1
-        pageList(embed, interaction, 0)
+        pageList(embed, interaction, 1)
     }
 }
 
 async function pageList(embed, interaction, page){
     //use page for pages
-    const maxPage =  Math.floor(await database.Character.count()/20);
+    const maxPage =  Math.ceil(await database.Character.count()/20);
     await console.log(maxPage);
     const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName'],
+        {attributes: ['characterID', 'characterName', 'seriesID'],
         order: ['characterID'],
         limit: 20,
-        offset: page*20,}
+        offset: (page-1)*20,}
         );
     if (maxPage > 0) {
         deployButton(interaction, embed);
     }
     const listString = await list.map(joinBar).join(`\n`);
     await embed.setDescription(`${listString}`);
-    await embed.setFooter(`page ${page+1} of ${maxPage+1}`);
+    const total = await database.Character.count();
+    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
 };
 
 async function sidList(embed, interaction, page){
     const series = await interaction.options.getInteger('sid');
-    const maxPage =  Math.floor(await database.Character.count(
+    const maxPage =  Math.ceil(await database.Character.count(
         {where: {
         seriesID: series,
     }}
         )/20);
     const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName'],
+        {attributes: ['characterID', 'characterName', 'seriesID'],
         order: ['characterID'],
         limit: 20,
-        offset: page*20,
+        offset: (page-1)*20,
     where: {
         seriesID: series,
     }}
@@ -208,9 +237,44 @@ async function sidList(embed, interaction, page){
     }
     const listString = await list.map(joinBar).join(`\n`);
     await embed.setDescription(`${listString}`);
-    await embed.setFooter(`page ${page+1} of ${maxPage+1}`);
+    const total = await database.Character.count({where: { seriesID: series}});
+    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
+};
+
+async function snameList(embed, interaction, page){
+    const name = await interaction.options.getString('sname');
+    const seriesList = await database.Series.findAll({
+    where: {
+        seriesName: {[Op.like]: '%' + name + '%'},
+    }}
+        );
+    var sidList = [];
+    for (let i = 0; i < seriesList.length; i++) {
+        const sid = seriesList[i].seriesID;
+        sidList[i] = sid;
+    }
+    const list = await database.Character.findAll(
+        {attributes: ['characterID', 'characterName', 'seriesID'],
+        order: ['characterID'],
+        limit: 20,
+        offset: (page-1)*20,
+    where: {
+        seriesID: {[Op.or]: sidList}
+    }}
+    );
+    const total = await database.Character.count({
+        where: {
+            seriesID: {[Op.or]: sidList}
+    }});
+    const maxPage = Math.ceil(total/20);
+    const listString = await list.map(joinBar).join(`\n`);
+    
+    await embed.setDescription(`${listString}`);
+    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    const msg = await updateReply(interaction, embed);
+    await buttonManager(embed, interaction, msg, page, maxPage);
 };
 
 
@@ -256,6 +320,16 @@ module.exports = {
                         .setName("sid")
                         .setDescription("The series ID you want to search with")
                         .setRequired(true)
+                        ))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("sname")
+                .setDescription("Search by series name. ")
+                .addStringOption(option => 
+                    option
+                        .setName("sname")
+                        .setDescription("The series name you want to search with")
+                        .setRequired(true)
                         )),
 	async execute(interaction) {
         if (!interaction.options.getSubcommand()) {
@@ -265,7 +339,7 @@ module.exports = {
         
         try {
             await interaction.reply({embeds: [embed]});
-            clistSwitch(embed, interaction, 0);            
+            clistSwitch(embed, interaction, 1);            
         } catch(error) {
             return interaction.reply("Error has occured");
         }

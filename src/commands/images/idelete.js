@@ -25,12 +25,13 @@ module.exports = {
             if (!interaction.member.roles.cache.has('947640668031975465')) {
                 return interaction.reply("You don't have the photoshopper role!", {ephemeral: true});
             };
-        	const id = interaction.options.getInteger('id');
-            const cid = database.Image.findOne({where: {imageID: id}}).characterID;
-            database.Image.destroy({where: {imageID: id}});
-            database.Character.increment({imageCount: -1}, {where: {characterID: cid}})
+        	const id = await interaction.options.getInteger('id');
+            image = await database.Image.findOne({where: {imageID: id}})
+            const cid = await image.characterID;
+            await image.destroy();
+            await database.Character.increment({imageCount: -1}, {where: {characterID: cid}})
             console.log(`image ID ${id} was deleted. Don't do this often`)
-            interaction.reply(`image ID ${id} was deleted. Don't do this often`);
+            await interaction.reply(`image ID ${id} was deleted. Don't do this often`);
         } catch (error) {
             console.log("u fucked up");
         }

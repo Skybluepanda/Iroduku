@@ -13,10 +13,18 @@ module.exports = {
         .addStringOption(option => option
             .setName('link')
             .setDescription('Enter the mal link for the series or a game link.')
-            .setRequired(true)),
+            .setRequired(true))
+        .addStringOption(option =>
+            option.setName('category')
+                .setDescription('category of the series')
+                .setRequired(true)
+                .addChoice('Anime', 'Anime')
+                .addChoice('Game', 'Game')
+                .addChoice('Others', 'Others')),
 	async execute(interaction) {
 		const name = interaction.options.getString('sname');
         const mlink = interaction.options.getString('link');
+        const category = interaction.options.getString('category');
 
 		const embed = new MessageEmbed();
         const embedNew = new MessageEmbed();
@@ -26,23 +34,23 @@ module.exports = {
         embed.setTitle("Creating Series")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Creating series`)
-            .setColor("AQUA");
+            .setColor("#00ecff");
 
         embedNew.setTitle("Series Created")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Series ${name} was created.`)
-            .setColor("GREEN")
+            .setColor("#7cff00")
 
         embedError.setTitle("Unknown Error")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please report the error if it persists.`)
-            .setColor("RED");
+            .setColor("#ff0000");
 
 		embedDupe.setTitle("Series with same name Exists")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Series with same name exists, make sure they are not same 
 			series and edit either series name to allow coexistence`)
-            .setColor("RED");
+            .setColor("#ff0000");
 		
 		
 		
@@ -58,8 +66,11 @@ module.exports = {
                 const series = await database.Series.create({
                     seriesName: name,
                     malLink: mlink,
+                    category: category
                 });
-                embedNew.setDescription(`Series ${name} was created with id ${series.seriesID}`)
+                embedNew.setDescription(`Series ${name} was created with id ${series.seriesID}
+                20 gems rewarded. Thank you for your hard work!`)
+                await database.Player.increment({gems: 20}, {where: {playerID: interaction.user.id}})
                 return interaction.editReply({ embeds: [embedNew] });
             } else {
                 interaction.editReply("Please use #series and characters channel for this command.")

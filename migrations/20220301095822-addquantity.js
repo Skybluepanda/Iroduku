@@ -2,13 +2,16 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.removeColumn('wishlists', 'created_at');
-    await queryInterface.removeColumn('wishlists', 'updated_at');
+    await queryInterface.addColumn('cards', 'quantity', {
+      type: Sequelize.INTEGER,
+		  unique: false,
+      allowNull: true,
+    });
     /**
      * Add altering commands here.
      *
      * Example:
-     * 
+     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
   },
 

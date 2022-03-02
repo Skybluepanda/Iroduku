@@ -43,49 +43,12 @@ module.exports = {
             .setColor("#ffd700")
             .addField("BBot Version", "1.0.0", true);
         var off = 0;
-        await interaction.reply({ embeds: [embedl] });
-        while (off < 20) {
-            setTimeout(function(){
-                embedl.setColor("#ffdf00")
-                interaction.editReply({ embeds: [embedl] });
-                off+=1;
-            }, 500);
-            setTimeout(function(){
-                embedl.setColor("#ffe32d")
-                interaction.editReply({ embeds: [embedl] });
-                off+=1;
-            }, 500);
-            setTimeout(function(){
-                embedl.setColor("#ffe135")
-                interaction.editReply({ embeds: [embedl] });
-                off+=1;
-            }, 500);
-            setTimeout(function(){
-                embedl.setColor("#ffee00")
-                interaction.editReply({ embeds: [embedl] });
-                off+=1;
-            }, 500);
-            setTimeout(function(){
-                embedl.setColor("#ffe135")
-                interaction.editReply({ embeds: [embedl] });
-                off+=1;
-            }, 500);
-            setTimeout(function(){
-                embedl.setColor("#ffe32d")
-                interaction.editReply({ embeds: [embedl] });
-                off+=1;
-            }, 500);
-            setTimeout(function(){
-                embedl.setColor("#ffdf00")
-                interaction.editReply({ embeds: [embedl] });
-                off+=1;
-            }, 500);
-            setTimeout(function(){
-                embedl.setColor("#ffd700")
-                interaction.editReply({ embeds: [embedl] });
-                off+=1;
-            }, 500);
-        }
+        await interaction.reply({ embeds: [embed] });
+        await interaction.followUp({ embeds: [embedg] });
+        await interaction.followUp({ embeds: [embedb] });
+        await interaction.followUp({ embeds: [embedp] });
+        await interaction.followUp({ embeds: [embedl] });
+        
 
     }
 };

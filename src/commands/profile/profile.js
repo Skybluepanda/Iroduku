@@ -16,18 +16,18 @@ module.exports = {
         embed.setTitle("Checking Stats")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
-            .setColor("AQUA")
+            .setColor("#00ecff")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
         embedDone.setTitle("Stats")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setColor("GREEN")
+            .setColor("#7cff00")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
         embedError.setTitle("Unknown Error")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please report the error if it persists.`)
-            .setColor("RED")
+            .setColor("#ff0000")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
         await interaction.reply({ embeds: [embed] });
@@ -35,15 +35,15 @@ module.exports = {
             const player = await database.Player.findOne({ where: { playerID: userId } });
             if (player) {
                 embedDone.setDescription(`
-                **Level:** ${player.level} (${player.xp}/10)
-                **Gems:** ${player.gems} <:waifugem:947388797916700672>
-                **Money:** ${player.money} <:datacoin:947388797828612127>
-                **Karma:** ${player.karma} <:karma:947388797627281409>
-                **Inventory:** ${player.inventory}
+**Level:** ${player.level} (${player.xp}/10)
+**Gems:** ${player.gems} <:waifugem:947388797916700672>
+**Money:** ${player.money} <:datacoin:947388797828612127>
+**Karma:** ${player.karma} <:karma:947388797627281409>
+**Inventory:** ${player.inventory}
                 `)
             } else {
                 embedDone.setDescription('Character does not exist.')
-                        .setColor('RED');
+                        .setColor('#ff0000');
             }
             return interaction.editReply({ embeds: [embedDone] });
         } catch (error) {

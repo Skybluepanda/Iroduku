@@ -9,7 +9,7 @@ function embedNew(interaction) {
     embedNew.setTitle("Character Created")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Character is being created.`)
-        .setColor("ORANGE")
+        .setColor("#ffb400")
     return embedNew;
 };
 
@@ -18,7 +18,7 @@ function embedError(interaction) {
     embedError.setTitle("Unknown Error")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Please report the error if it persists.`)
-        .setColor("RED");
+        .setColor("#ff0000");
     return embedError;
 };
 
@@ -28,7 +28,7 @@ function embedDupe(interaction) {
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Character with same name exists, make sure they are not same 
         Character and edit either Character name to allow coexistence`)
-        .setColor("RED");
+        .setColor("#ff0000");
     return embedDupe;
 };
 
@@ -74,8 +74,10 @@ module.exports = {
                     seriesID: sid,
                 });
                 const series = await database.Series.findOne({ where: {seriesID: sid}});
-                embedN.setDescription(`Character ${name} was created with id ${character.characterID} in series ${series.seriesName}`);
-                embedN.setColor('GREEN');
+                embedN.setDescription(`Character ${name} was created with id ${character.characterID} in series ${series.seriesName}
+                25 gems rewarded, thank you for your hard work!`);
+                embedN.setColor('#7cff00');
+                await database.Player.increment({gems: 25}, {where: {playerID: interaction.user.id}})
                 return interaction.editReply({ embeds: [embedN] });
             } else {
                 interaction.reply("Please use #series and characters channel for this command.")

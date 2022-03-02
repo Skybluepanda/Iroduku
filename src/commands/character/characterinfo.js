@@ -14,7 +14,7 @@ function createEmbed(interaction) {
     embed.setTitle("Char Search")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("Character Not Found. It's possible that the character doesn't exist.")
-        .setColor("RED");
+        .setColor("#ff0000");
     
     return embed;
 }
@@ -180,7 +180,7 @@ async function charList(interaction, embed){
             .setDescription(`
             ${listString}
             If there are 20 listed characters and you don't see yours, try /clist!`)
-            .setColor("GREEN");
+            .setColor("#7cff00");
         return await interaction.reply({embeds: [embed]});
     } catch(error) {
         console.log("Error has occured with charList");
@@ -199,8 +199,7 @@ async function viewImage(embed, interaction, imageNumber, cid) {
         const artist = art.artist;
         const uploader = art.uploader;
         const footer = `
-        #${art.imageNumber} Art by ${artist} | Uploaded by ${uploader}
-Image ID is ${art.imageID} report any errors using ID.
+        #${art.imageNumber} Art by ${artist} | Uploaded by ${uploader}\nImage ID is ${art.imageID} report any errors using ID.
         `;
         await embed
             .setImage(url)
@@ -258,17 +257,18 @@ async function cinfoID(embed, interaction) {
         const gifC = await countGif(cid);
         const totalImage = imageC + gifC;
         const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
+        const simps = await database.Wishlist.count({where: {characterID: cid}});
         await embed
             .setDescription(`
 Character ID: ${char.characterID}
 Character Alias: ${char.alias}
-Simps: ${char.simps}
-Series: ${char.seriesID}| ${series.seriesName}
+Simps: ${simps}
+Series: ${char.seriesID} | ${series.seriesName}
 Image Count: ${char.imageCount}
 Gif Count: ${char.gifCount}
             `)
             .setTitle(`${char.characterName}`)
-            .setColor("GREEN");
+            .setColor("#7cff00");
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
         await buttonManager(embed, interaction, msg, 1, totalImage, imageC, cid);
@@ -297,17 +297,18 @@ async function sendEmbed(interaction, embed) {
             } else {
             embed.addField('No images found', 'add some', true);
         }
+        const simps = await database.Wishlist.count({where: {characterID: cid}});
         await embed
             .setDescription(`
 Character ID: ${char.characterID}
 Character Alias: ${char.alias}
-Simps: ${char.simps}
-Series: ${char.seriesID}| ${series.seriesName}
+Simps: ${simps}
+Series: ${char.seriesID} | ${series.seriesName}
 Image Count: ${char.imageCount}
 Gif Count: ${char.gifCount}
             `)
             .setTitle(`${char.characterName}`)
-            .setColor("GREEN");
+            .setColor("#7cff00");
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
         await buttonManager(embed, interaction, msg, 1, totalImage, imageC, cid);

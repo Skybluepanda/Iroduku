@@ -13,7 +13,7 @@ function createEmbed(interaction) {
     embed.setTitle("Series Info")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("No Info found")
-        .setColor("AQUA")
+        .setColor("#00ecff")
     
     return embed;
 }

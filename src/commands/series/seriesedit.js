@@ -11,7 +11,11 @@ async function selectOption(interaction) {
     } else if (interaction.options.getSubcommand() === "link") {
         const mal = interaction.options.getString('link');
         await database.Series.update({ malLink: mal }, { where: { seriesID: id } });
-        return interaction.reply(`Series ${id} name was edited to ${link}. Check to see if it worked.`);
+        return interaction.reply(`Series ${id} link was edited to ${mal}. Check to see if it worked.`);
+    } else if (interaction.options.getSubcommand() === "category") {
+        const category = interaction.options.getString('category');
+        await database.Series.update({ category: category }, { where: { seriesID: id } });
+        return interaction.reply(`Series ${id} category was edited to ${category}. Check to see if it worked.`);
     }
     return await interaction.reply(`Could not find series with id ${id}`);
 }
@@ -51,7 +55,24 @@ module.exports = {
                         .setName("link")
                         .setDescription("The link of the series")
                         .setRequired(true)
-                        )),
+                        ))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("category")
+                .setDescription("Edit the category of the series")
+                .addIntegerOption(option => 
+                    option
+                        .setName("id")
+                        .setDescription("The id of the series")
+                        .setRequired(true)
+                        )
+                .addStringOption(option =>
+                    option.setName('category')
+                        .setDescription('category of the series')
+                        .setRequired(true)
+                        .addChoice('Anime', 'Anime')
+                        .addChoice('Game', 'Game')
+                        .addChoice('Others', 'Others'))),
 	async execute(interaction) {
         try {
             if (!interaction.member.roles.cache.has('947640601564819516')) {

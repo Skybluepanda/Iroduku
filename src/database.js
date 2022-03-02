@@ -92,6 +92,11 @@ const Series = sequelize.define('series', {
 		unique: true,
 		allowNull: false,
 	},
+	category: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: true,
+	},
 });
 
 
@@ -219,19 +224,7 @@ const Player = sequelize.define('player', {
 		defaultValue: 0,
 		allowNull: false,
 	},
-	inventory: {
-		type: Sequelize.INTEGER,
-		unique: false,
-		defaultValue: 0,
-		allowNull: false,
-	},
-	permissions: {
-		type: Sequelize.INTEGER,
-		unique: false,
-		defaultValue: 0,
-		allowNull: false,
-	},
-	bans: {
+	pity: {
 		type: Sequelize.INTEGER,
 		unique: false,
 		defaultValue: 0,
@@ -260,12 +253,12 @@ const Daily = sequelize.define('daily', {
 const Wishlist = sequelize.define('wishlist', {
 	playerID: {
 		type: Sequelize.INTEGER,
-		unique: true,
+		unique: false,
 		allowNull: false,
 	},
 	characterID: {
 		type: Sequelize.INTEGER,
-		unique: true,
+		unique: false,
 		allowNull: false,
 	}
 });
@@ -276,27 +269,17 @@ const Card = sequelize.define('card', {
 		autoIncrement: true,
 		primaryKey: true,
 	},
-	PlayerID: {
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	characterID: {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
 	},
 	inventoryID: {
-		type: Sequelize.STRING,
-		unique: false,
-		allowNull: false,
-	},
-	characterID: {
-		type: Sequelize.STRING,
-		unique: false,
-		allowNull: false,
-	},
-	imageNumber: {
-		type: Sequelize.INTEGER,
-		unique: false,
-		allowNull: false,
-	},
-	imageID: {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
@@ -306,38 +289,27 @@ const Card = sequelize.define('card', {
 		unique: false,
 		allowNull: false,
 	},
-	archived: {
-		type: Sequelize.BOOLEAN,
-		defaultValue: false,
-		unique: false,
-		allowNull: false,
-	}
-}); 
-
-const Rarity = sequelize.define('rarity', {
-	rarityID: {
-		type: Sequelize.INTEGER,
-		unique: true,
-		allowNull: false,
-	},
-	rarityName: {
-		type: Sequelize.STRING,
-		unique: true,
-		allowNull: false,
-	},
-	color: {
+	tag: {
 		type: Sequelize.STRING,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	reward: {
+	imageNumber: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
+	imageID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: true,
+	},
+	quantity: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: true,
+	  }
 });
-
-
 
 
 exports.sequelize = sequelize;
@@ -349,4 +321,3 @@ exports.Player = Player;
 exports.Daily = Daily;
 exports.Wishlist = Wishlist;
 exports.Card = Card;
-exports.Rarity = Rarity;

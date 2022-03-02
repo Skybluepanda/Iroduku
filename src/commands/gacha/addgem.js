@@ -37,16 +37,16 @@ module.exports = {
         embed.setTitle("Adding Gem")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
-            .setColor("AQUA")
+            .setColor("#00ecff")
 
         embedDone.setTitle("Added Gems")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setColor("GREEN")
+            .setColor("#7cff00")
 
         embedError.setTitle("Unknown Error")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please report the error if it persists.`)
-            .setColor("RED")
+            .setColor("#ff0000")
 
         await interaction.reply({ embeds: [embed] }, {ephemeral: true});
         try {

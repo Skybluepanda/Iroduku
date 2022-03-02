@@ -15,7 +15,7 @@ function embedC(interaction) {
     embed.setTitle("Checking in")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
-            .setColor("AQUA")
+            .setColor("#00fff4")
     return embed;
 };
 
@@ -24,7 +24,7 @@ function embedD(interaction) {
     const embedDone = new MessageEmbed();
     embedDone.setTitle("Daily claimed!")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
-            .setColor("GREEN")
+            .setColor("#7cff00")
     return embedDone;
 };
 
@@ -34,7 +34,7 @@ function embedL(interaction) {
     embedCool.setTitle("Daily on cooldown.")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please wait for the cooldown.`)
-            .setColor("ORANGE")
+            .setColor("#ff00bf")
     return embedCool;
 };
 
@@ -44,7 +44,7 @@ function embedE(interaction) {
     embedError.setTitle("Unknown Error")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please report the error if it persists.`)
-            .setColor("RED")
+            .setColor("#ff0000")
     return embedError;
 }
 
@@ -55,13 +55,13 @@ async function checkDaily(interaction, player){
     if (daily) {
         console.log("Has a daily")
         const lastCheck = daily.lastDaily;
-        const timeNow = dayjs();
+        const timeNow = Date.now();
         const timeDiff = await timeNow - lastCheck;
         console.log(timeNow + "timenow");
         console.log(lastCheck + "lastCheck");
         console.log(timeDiff + "Time diff");
         console.log("Checking time diff")
-        if (172800000 >= timeDiff >= 79200000) {
+        if (259200000 > timeDiff && timeDiff>= 79200000) {
             console.log("Perfect daily")
             await streakDaily(interaction, player, daily);
             await database.Daily.update({lastDaily: timeNow}, {where: {playerID: userId}});
@@ -87,7 +87,7 @@ async function checkDaily(interaction, player){
 async function newDaily(interaction, player){
     const embedDone = await embedD(interaction);
     const userId = interaction.user.id;
-    const timeNow = dayjs();
+    const timeNow = Date.now();
     await database.Daily.create({
         playerID: userId,
         lastDaily: timeNow,
@@ -96,7 +96,7 @@ async function newDaily(interaction, player){
     });
     await player.increment('gems', {by: 200});
     await embedDone.setDescription(`
-    Streak: 1\nGems: (first time bonus!) ${player.gems+200}\nUse daily again within two days to continue the streak.`);
+    Streak: 1\nGems: (first time bonus!) ${player.gems+200} (+200)\nUse daily again within two days to continue the streak.`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
 }
 
@@ -106,13 +106,13 @@ async function streakDaily(interaction, player, daily){
     if (streak > 10) {
         await player.increment('gems', {by: 100});
         await embedDone.setDescription(`
-    Streak: (max) ${streak}\nGems: ${player.gems+100}\nUse daily again within two days to continue the streak.`);
+    Streak: (max) ${streak+1}\nGems: ${player.gems+100} (+100)\nUse daily again within two days to continue the streak.`);
         return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
     } else {
         const reward = 50 + streak*5;
         await player.increment('gems', {by: reward});
         await embedDone.setDescription(`
-    Streak: ${streak}\nGems: ${player.gems+reward}\nUse daily again within two days to continue the streak.`);
+    Streak: ${streak+1}\nGems: ${player.gems+reward} (+${reward})\nUse daily again within two days to continue the streak.`);
         return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
     }
 }
@@ -121,7 +121,7 @@ async function resetDaily(interaction, player){
     const embedDone = await embedD(interaction);
     await player.increment('gems', {by: 50});
     await embedDone.setDescription(`
-Streak: (reset) 1\nGems: ${player.gems+50}\nUse daily again within two days to continue the streak.`);
+Streak: (reset) 1\nGems: ${player.gems+50} (+50)\nUse daily again within two days to continue the streak.`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
 }
 

@@ -15,15 +15,15 @@ function createEmbed(interaction) {
     embed.setTitle("Listing Series")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("List of Series")
-        .setColor("AQUA")
+        .setColor("#00ecff")
     
     return embed;
 }
 
 async function checkPage(direction, page, maxPage) {
     if (direction == 1 && page == maxPage) {
-        return 0;
-    } else if (direction == -1 && page == 0) {
+        return 1;
+    } else if (direction == -1 && page == 1) {
         return maxPage;
     } else {
         return page + direction;
@@ -31,7 +31,7 @@ async function checkPage(direction, page, maxPage) {
 }
 
 function joinBar(series){
-    return [series.seriesID, series.seriesName].join("| ");
+    return [series.seriesID, series.seriesName].join(" | ");
 }
 
 
@@ -115,12 +115,12 @@ async function nameList(embed, interaction, name, page){
         {attributes: ['seriesID', 'seriesName'],
         order: ['seriesID'],
         limit: 20,
-        offset: page*20,
+        offset: (page-1)*20,
     where: {
         seriesName: {[Op.like]: '%' + name + '%'},
     }}
         );
-    const maxPage = Math.floor(await database.Series.count(
+    const maxPage = Math.ceil(await database.Series.count(
         {attributes: ['seriesID', 'seriesName'],
         order: ['seriesID'],
     where: {
@@ -132,7 +132,7 @@ async function nameList(embed, interaction, name, page){
     }
     const listString = await list.map(joinBar).join(`\n`);
     await embed.setDescription(`${listString}`);
-    await embed.setFooter(`page ${page+1} of ${maxPage+1}`);
+    await embed.setFooter(`page ${page} of ${maxPage}`);
     const msg = await updateReply(interaction, embed);
     await buttonManager1(embed, interaction, msg, page, maxPage);
 };
@@ -143,9 +143,9 @@ async function pageList(embed, interaction, page){
         {attributes: ['seriesID', 'seriesName'],
         order: ['seriesID'],
         limit: 20,
-        offset: page*20}
+        offset: (page-1)*20}
         );
-    const maxPage = Math.floor(await database.Series.count(
+    const maxPage = Math.ceil(await database.Series.count(
         {attributes: ['seriesID', 'seriesName'],
         order: ['seriesID'],}
         )/20);
@@ -154,7 +154,7 @@ async function pageList(embed, interaction, page){
     }
     const listString = await list.map(joinBar).join(`\n`);
     await embed.setDescription(`${listString}`);
-    await embed.setFooter(`page ${page+1} of ${maxPage+1}`);
+    await embed.setFooter(`page ${page} of ${maxPage}`);
     const msg = await updateReply(interaction, embed);
     await buttonManager2(embed, interaction, msg, page, maxPage);
 };
@@ -217,7 +217,7 @@ module.exports = {
                     
                 } else {
                     //Show page 1
-                    pageList(embed, interaction, 0);
+                    pageList(embed, interaction, 1);
                     
                     
                 }

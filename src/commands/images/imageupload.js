@@ -58,8 +58,12 @@ async function border(interaction) {
 		const imgName = await imageFilename(interaction);
 		
 		const attachment = await new MessageAttachment(canvas.toBuffer(), imgName);
-		if (attachment) {await interaction.reply({ files: [attachment] });} else {
-			interaction.reply("Image error.")
+		if (attachment) {
+			await interaction.reply({ files: [attachment] });
+			return true;
+	} else {
+			await interaction.reply("Image error.")
+			return false;
 		}
 	} catch(error) {
 		console.log("Error with border funciton");
@@ -80,13 +84,17 @@ async function border(interaction) {
 async function upload(interaction) {
 	try {
 		const cid = await interaction.options.getInteger('cid');
+		const char = await database.Character.findOne({where: {characterID: cid}})
 		const iNumber = await interaction.options.getInteger('image_number');
 		const art = await interaction.options.getString('artist_name');
 		const sauce = await interaction.options.getString('source');
 		const isnsfw = await interaction.options.getBoolean('nsfw');
 		const uploader = await interaction.user.username;
 		
-		await border(interaction);
+		const bordered = await border(interaction);
+		if (!bordered) {
+			return interaction.channel.send("image failed.")
+		}
 		const message = await interaction.fetchReply();
 			
 
@@ -103,9 +111,13 @@ async function upload(interaction) {
 		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
-		await database.Player.increment({gems: 45, karma: 3}, {where: {playerID: interaction.user.id}})
+		await database.Player.increment({gems: 75, karma: 3}, {where: {playerID: interaction.user.id}})
 		
-		return await interaction.followUp("Image added to the database.")
+		return await interaction.channel.send(`Image for ${char.characterName} added!
+ImageID: ${iNumber}
+Artist: ${art}
+source: ${sauce}
+.You've been rewarded 75 gems and karma, thanks for your hard work!`)
 	} catch(error) {
 		interaction.channel.send("You are not a registered player");
 	}
