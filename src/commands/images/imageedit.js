@@ -80,18 +80,10 @@ async function selectOption(interaction) {
             await database.Image.update({ artist: artist }, { where: { imageID: id } });
             return interaction.reply({embeds: [embedS]});
 
-        case "sourcelink":
-            console.log("2.4");
-            const source = interaction.options.getString('source');
-            await database.Image.update({ source: source }, { where: { imageID: id } });
-            return interaction.reply({embeds: [embedS]});
-		
 		case "nsfw":
 			console.log("2.5");
 			const nsfw = interaction.options.getBoolean('nsfw');
-            SPOILER_
 			await database.Image.update({ nsfw: nsfw }, { where: { imageID: id } });
-            await database.Image.update({ nsfw: nsfw }, { where: { imageID: id } });
 			return interaction.reply({embeds: [embedS]});
 
         default:
@@ -150,17 +142,6 @@ module.exports = {
             .addStringOption(option => option
                 .setName("artist")
                 .setDescription("The artist of the image")
-                .setRequired(true)))
-        .addSubcommand(subcommand =>subcommand
-            .setName("sourcelink")
-            .setDescription("Edit source link for the image")
-            .addIntegerOption(option => option
-                .setName("id")
-                .setDescription("The id of the image")
-                .setRequired(true))
-            .addStringOption(option => option
-                .setName("source")
-                .setDescription("The sauce")
                 .setRequired(true)))
 		.addSubcommand(subcommand =>subcommand
 			.setName("nsfw")

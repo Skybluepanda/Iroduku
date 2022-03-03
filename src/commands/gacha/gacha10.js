@@ -59,7 +59,7 @@ async function createWhiteCard(cid, interaction) {
     if (dupe) {
         dupe.increment({quantity: 1});
         const char = await database.Character.findOne({where: {characterID: cid}});
-        const gachaString = `:green_square:` + dupe.inventoryID + ` | ` + char.characterName +" **duplicate**";
+        const gachaString = `:white_large_square:` + dupe.inventoryID + ` | ` + char.characterName +" **duplicate**";
         return gachaString;
     } else {
         const inumber = await inventorycheck(user)
@@ -209,7 +209,7 @@ async function createPurpleCard(cid, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: imageRng}});
         if (image) {imgID = await image.imageID;} 
     } else {
-        image = await database.Gif.findOne({where: {characterID: cid, imageNumber: -(imageRng)}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(imageRng)}});
         if (image) {imgID = -(await image.gifID);}
     }
     if (!imgID) {
@@ -247,7 +247,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: card.imageID}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
             url = await image.gifURL;
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -293,7 +293,7 @@ async function createRedCard(cid, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: imageRng}});
         if (image) {imgID = await image.imageID;} 
     } else {
-        image = await database.Gif.findOne({where: {characterID: cid, imageNumber: -(imageRng)}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(imageRng)}});
         if (image) {imgID = -(await image.gifID);}
     }
     if (!imgID) {
@@ -334,7 +334,7 @@ Image ID is ${image.imageID} report any errors using ID.
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: card.imageID}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -361,8 +361,9 @@ Gif ID is ${image.gifID} report any errors using ID.
 async function raritySwitch(cid, rngRarity, interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
+    await player.increment({gems: -10});
     const pity = Math.floor(player.pity/10);
-    if ((rngRarity + pity) >= 993) {
+    if (rngRarity + pity >= 993) {
         player.update({pity: 0});
         return await createRedCard(cid, interaction);
     } else if (rngRarity >= 960) {
@@ -374,18 +375,30 @@ async function raritySwitch(cid, rngRarity, interaction) {
     } else if (rngRarity >= 600) {
         player.increment({pity: 1});
         return await createGreenCard(cid, interaction);
-    } else if (rngRarity) {;
+    } else {;
         player.increment({pity: 1});
         return await createWhiteCard(cid, interaction);
     }
 }
 
 async function gacha(interaction) {
-    const totalChar = await database.Character.count();
-    const rngChar = Math.floor(Math.random() * 100000);
-    const rngRarity = Math.floor(Math.random() * 1000);
-    const cid = (rngChar%totalChar)+1
-    return await raritySwitch(cid, rngRarity, interaction);
+    const user = interaction.user.id;
+    const sideson = await database.Sideson.findOne({where: {playerID: user}});
+    if (sideson) {
+        const totalChar = await database.Character.count();
+        const rngChar = Math.floor(Math.random() * 100000);
+        const rngRarity = Math.floor(Math.random() * 1000);
+        const cid = (rngChar%totalChar)+1;
+        return await raritySwitch(cid, rngRarity, interaction);
+    } else {
+        const totalChar = await database.Character.count({where: {seriesID: {[Op.ne]: 37}}});
+        const rngChar = Math.floor(Math.random() * 100000);
+        const rngRarity = Math.floor(Math.random() * 1000);
+        const offset = (rngChar%totalChar);
+        const char = await database.Character.findOne({offset: offset, where: {seriesID: {[Op.ne]: 37}}});
+        const cid = await char.characterID;
+        return await raritySwitch(cid, rngRarity, interaction);
+    }
 }
 
 module.exports = {
@@ -401,6 +414,10 @@ module.exports = {
             
             if(player) {
                 if (player.gems >= 100){
+                    const inventory = await database.Card.count({where: {playerID: user}});
+                    if (inventory > 1000) {
+                        return interaction.reply("you have more than 1000 cards. Burn some before doing more gacha.")
+                    }
                     await interaction.reply({embeds: [embedS]});
                     const list = [];
                     for (let i = 0; i < 10; i++) {

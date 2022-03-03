@@ -80,12 +80,6 @@ async function selectOption(interaction) {
             await database.Gif.update({ artist: artist }, { where: { gifID: id } });
             return interaction.reply({embeds: [embedS]});
 
-        case "sourcelink":
-            console.log("2.4");
-            const source = interaction.options.getString('source');
-            await database.Gif.update({ source: source }, { where: { gifID: id } });
-            return interaction.reply({embeds: [embedS]});
-		
 		case "nsfw":
 			console.log("2.5");
 			const nsfw = interaction.options.getBoolean('nsfw');
@@ -148,17 +142,6 @@ module.exports = {
             .addStringOption(option => option
                 .setName("artist")
                 .setDescription("The artist of the gif")
-                .setRequired(true)))
-        .addSubcommand(subcommand =>subcommand
-            .setName("sourcelink")
-            .setDescription("Edit source link for the gif")
-            .addIntegerOption(option => option
-                .setName("id")
-                .setDescription("The id of the gif")
-                .setRequired(true))
-            .addStringOption(option => option
-                .setName("source")
-                .setDescription("The sauce")
                 .setRequired(true)))
 		.addSubcommand(subcommand =>subcommand
 			.setName("nsfw")

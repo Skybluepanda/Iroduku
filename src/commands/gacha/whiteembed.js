@@ -48,7 +48,5 @@ module.exports = {
         await interaction.followUp({ embeds: [embedb] });
         await interaction.followUp({ embeds: [embedp] });
         await interaction.followUp({ embeds: [embedl] });
-        
-
     }
 };

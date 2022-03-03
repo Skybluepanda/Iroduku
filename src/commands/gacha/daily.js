@@ -49,38 +49,25 @@ function embedE(interaction) {
 }
 
 async function checkDaily(interaction, player){
-    console.log("start")
     const userId = interaction.user.id;
     const daily = await database.Daily.findOne({where : { playerID: userId}});
     if (daily) {
-        console.log("Has a daily")
         const lastCheck = daily.lastDaily;
         const timeNow = Date.now();
         const timeDiff = await timeNow - lastCheck;
-        console.log(timeNow + "timenow");
-        console.log(lastCheck + "lastCheck");
-        console.log(timeDiff + "Time diff");
-        console.log("Checking time diff")
         if (259200000 > timeDiff && timeDiff>= 79200000) {
             console.log("Perfect daily")
             await streakDaily(interaction, player, daily);
             await database.Daily.update({lastDaily: timeNow}, {where: {playerID: userId}});
             await database.Daily.increment({streak: 1}, {where: {playerID: userId}});
-            console.log("Time diff checked and rewarded")
         } else if (timeDiff <= 79200000) {
-            console.log("Too early")
             await cooldownDaily(interaction, timeDiff);
-            console.log("Done")
         } else {
-            console.log("Too late")
             await resetDaily(interaction, player);
             await database.Daily.update({lastDaily: timeNow, streak: 1}, {where: {playerID: userId}});
-            console.log("Done")
         }
     } else {
-        console.log("welcome")
         newDaily(interaction, player);
-        console.log("Done")
     }
 }
 
@@ -138,26 +125,18 @@ module.exports = {
         .setName('daily')
         .setDescription('adds gem to your profile, can be used once a day.'),
     async execute(interaction) {
-        console.log("1")
         const embed = embedC(interaction);
         const embedError = embedE(interaction);
-        console.log("2")
         await interaction.reply({ embeds: [embed] }, {ephemeral: true});
-        console.log("3")
         try {
             const userId = await interaction.user.id;
-            console.log("4")
             const player = await database.Player.findOne({ where: { playerID: userId } })
-            console.log("5")
             if (player) {
-                console.log("6")
                 checkDaily(interaction, player);
-                console.log("done")
             } else {
                 embedError.setDescription('You must first create an account using /isekai.')
             }
         } catch (error) {
-            console.log("Reply")
             return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});
         }
     }

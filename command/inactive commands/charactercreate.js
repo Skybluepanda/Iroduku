@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../database.js');
+const database = require('../../src/database.js');
 const { MessageEmbed } = require('discord.js');
 
 
@@ -65,7 +65,7 @@ module.exports = {
             if (!interaction.member.roles.cache.has('947640601564819516')) {
                 embedE.setTitle("Insufficient Permissions")
                     .setDescription("You don't have the librarian role!");
-                return interaction.editReply({ embeds: [embedE] }, {ephemeral: true});
+                return interaction.reply({ embeds: [embedE] }, {ephemeral: true});
             };
             if (interaction.channel.id === '947136227126177872') {
                 const character = await database.Character.create({

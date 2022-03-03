@@ -18,7 +18,8 @@ module.exports = {
         database.Series.sync();
         database.Daily.sync();
         database.Wishlist.sync();
-        database.Card.sync();
+        database.Card.sync({force: true});
+        database.Sideson.sync();
         console.log('database sync complete!');
     },
 };

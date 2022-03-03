@@ -11,12 +11,12 @@ async function checkIDS(interaction) {
 		if (1 <= iNumber < 10) {
 			const count = await database.Image.count({ where: {characterID: cid, imageNumber: iNumber}})
 			if (count != 0) {
-				await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 9.`)
+				await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 10.`)
 			} else {
 				upload(interaction);
 			};
 		} else {
-			await interaction.reply("Range of image number is 0-9.")
+			await interaction.reply("Range of image number is 1-10.")
 		}
 	} catch(error){
 		await interaction.reply("Error has occured");
@@ -87,10 +87,8 @@ async function upload(interaction) {
 		const char = await database.Character.findOne({where: {characterID: cid}})
 		const iNumber = await interaction.options.getInteger('image_number');
 		const art = await interaction.options.getString('artist_name');
-		const sauce = await interaction.options.getString('source');
 		const isnsfw = await interaction.options.getBoolean('nsfw');
 		const uploader = await interaction.user.username;
-		
 		const bordered = await border(interaction);
 		if (!bordered) {
 			return interaction.channel.send("image failed.")
@@ -99,12 +97,11 @@ async function upload(interaction) {
 			
 
 		const link = await message.attachments.first().url;
-		await database.Image.create({
+		const image = await database.Image.create({
 			characterID: cid,
 			imageNumber: iNumber,
 			imageURL: link,
 			artist: art,
-			source: sauce,
 			nsfw: isnsfw, 
 			uploader: uploader,
 		});
@@ -114,12 +111,12 @@ async function upload(interaction) {
 		await database.Player.increment({gems: 75, karma: 3}, {where: {playerID: interaction.user.id}})
 		
 		return await interaction.channel.send(`Image for ${char.characterName} added!
-ImageID: ${iNumber}
+Image ID (One u use for delete and edit): ${image.imageID}
+Image Number: ${iNumber}
 Artist: ${art}
-source: ${sauce}
 You've been rewarded 75 gems and karma, thanks for your hard work!`)
 	} catch(error) {
-		interaction.channel.send("You are not a registered player");
+		interaction.channel.send("Something went wrong. Dw if image got uploaded u got the rewards.");
 	}
 	
 	
@@ -144,10 +141,6 @@ module.exports = {
 		.addStringOption(option => option
 			.setName('artist_name')
 			.setDescription('name of the artist')
-			.setRequired(true))
-		.addStringOption(option => option
-			.setName('source')
-			.setDescription('image source link.')
 			.setRequired(true))
 		.addBooleanOption(option => option
 			.setName('nsfw')

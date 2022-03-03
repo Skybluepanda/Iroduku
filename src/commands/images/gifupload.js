@@ -5,36 +5,23 @@ const database = require('../../database.js');
 
 async function checkIDS(interaction) {
 	const cid = await interaction.options.getInteger('cid');
-	const gNumber = await interaction.options.getInteger('gif_number')
+	const gNumber = await interaction.options.getInteger('gifnumber')
 	try {
 		if (1 <= gNumber < 4) {
-			const count = await database.Gif.count({ where: {characterID: cid, gifNumber: gNumber}})
-			if (count != 0) {
-				await interaction.reply(`Character ${cid} already has an gif ${gNumber}, maximum is 2.`)
+			const count = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gNumber}})
+			if (count) {
+				return await interaction.reply(`Character ${cid} already has an gif ${gNumber}, maximum is 3.`)
 			} else {
-				upload(interaction);
+				return await upload(interaction);
 			};
 		} else {
-			await interaction.reply("Range of gif number is 0-2.")
+			return await interaction.reply("Range of gif number is 1-3.")
 		}
 	} catch(error){
         console.log("failed in id check.")
 	}
 }
 
-function imageFilename(interaction) {
-	const nsfw = interaction.options.getBoolean('nsfw');
-    const cid = interaction.options.getInteger('cid');
-    const char = database.Character.findOne({where: {characterID: cid}});
-    const charname = char.characterName
-	if (nsfw) {
-		const imgName = 'SPOILER_'+ charname + '.gif';
-		return imgName;
-	} else {
-		const imgName = charname + '.gif';
-		return imgName;
-	}
-}
 
 async function check(interaction) {
     try {
@@ -42,7 +29,6 @@ async function check(interaction) {
         if (url.endsWith(".gif")) {
             const imgName = await imageFilename(interaction);
             const attachment = await new MessageAttachment(url, imgName);
-            console.log(imgName);
             if (attachment) {await interaction.reply({ files: [attachment] });} else {
                 interaction.reply("Gif error.")
             }
@@ -71,24 +57,21 @@ async function upload(interaction) {
     try {
         const cid = await interaction.options.getInteger('cid');
 		const char = await database.Character.findOne({where: {characterID: cid}})
-        const iNumber = await interaction.options.getInteger('gif_number');
+        const iNumber = await interaction.options.getInteger('gifnumber');
         const art = await interaction.options.getString('artist_name');
-        const sauce = await interaction.options.getString('source');
         const isnsfw = await interaction.options.getBoolean('nsfw');
         const uploader = await interaction.user.username;
         // await check(interaction);
         const url = await interaction.options.getString('gif_link');
-
         // const message = await interaction.fetchReply();
-
+		let gif;
         // const link = await message.attachments.first().url;
         if (url.endsWith(".gif")) {
-            await database.Gif.create({
+            gif = await database.Gif.create({
                 characterID: cid,
                 gifNumber: iNumber,
                 gifURL: url,
                 artist: art,
-                source: sauce,
                 nsfw: isnsfw, 
                 uploader: uploader,
             });
@@ -101,7 +84,9 @@ async function upload(interaction) {
 		// await char.increment('imageCount', {by: 1});
 		await database.Player.increment({gems: 125, karma: 5}, {where: {playerID: interaction.user.id}})
         return await interaction.reply(`Gif for ${char.characterName} has been added!
-GifID: ${iNumber}. You've been rewarded 125 gems and karma, thanks for your hard work!`)
+Gif ID (for deleteing and editing): ${gif.gifID}
+Gif Number: ${iNumber}. 
+You've been rewarded 125 gems and karma, thanks for your hard work!`)
 	} catch(error) {
         console.log("upload failed.")
 	}
@@ -117,7 +102,7 @@ module.exports = {
 			.setDescription('Id of the character')
 			.setRequired(true))
 		.addIntegerOption(option => option
-			.setName('gif_number')
+			.setName('gifnumber')
 			.setDescription('id number for characters gif slot. Pick an empty one.')
 			.setRequired(true))
 		.addStringOption(option => option
@@ -127,10 +112,6 @@ module.exports = {
 		.addStringOption(option => option
 			.setName('artist_name')
 			.setDescription('name of the artist')
-			.setRequired(true))
-		.addStringOption(option => option
-			.setName('source')
-			.setDescription('gif source link.')
 			.setRequired(true))
 		.addBooleanOption(option => option
 			.setName('nsfw')
@@ -145,7 +126,7 @@ module.exports = {
 		if (interaction.channel.id === '947123054570512395') {
 			try {
             // interaction.reply("Uploading gif.");
-			checkIDS(interaction);
+			await checkIDS(interaction);
 			// if (checkNSFW(interaction)){
 			// 	checkIDS(interaction);
 			// } else {

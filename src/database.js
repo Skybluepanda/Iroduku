@@ -127,11 +127,6 @@ const Image = sequelize.define('image', {
 		unique: false,
 		allowNull: false,
 	},
-	source: {
-		type: Sequelize.STRING,
-		unique: false,
-		allowNull: false,
-	},
 	nsfw: {
 		type: Sequelize.BOOLEAN,
 		allowNull: false,
@@ -165,11 +160,6 @@ const Gif = sequelize.define('gif', {
 		allowNull: false,
 	},
 	artist: {
-		type: Sequelize.STRING,
-		unique: false,
-		allowNull: false,
-	},
-	source: {
 		type: Sequelize.STRING,
 		unique: false,
 		allowNull: false,
@@ -263,6 +253,14 @@ const Wishlist = sequelize.define('wishlist', {
 	}
 });
 
+const Sideson = sequelize.define('sideson', {
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	}
+});
+
 const Card = sequelize.define('card', {
 	cardID: {
 		type: Sequelize.INTEGER,
@@ -320,4 +318,5 @@ exports.Series = Series;
 exports.Player = Player;
 exports.Daily = Daily;
 exports.Wishlist = Wishlist;
+exports.Sideson = Sideson;
 exports.Card = Card;

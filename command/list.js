@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../src/database.js');
+const database = require('../src/database.js');
 const { MessageEmbed, Guild } = require('discord.js');
 const { Op } = require("sequelize");
-const color = require('../../src/color.json');
+const color = require('../src/color.json');
 const { MessageActionRow, MessageButton } = require('discord.js');
 
 
@@ -238,17 +238,7 @@ async function makeList(list) {
 
 async function list(embed, interaction, page){
     const uid = await interaction.user.id;
-    const list = await database.Card.findAll(
-        {
-            order: ['inventoryID'],
-            limit: 20,
-            offset: (page-1)*20,
-            where: {
-                playerID: uid,
-                
-            }
-        }
-        );
+    
     const maxPage = Math.ceil(await database.Card.count(
         {
             where: {
@@ -266,59 +256,10 @@ async function list(embed, interaction, page){
     await buttonManager(embed, interaction, msg, page, maxPage);
 };
 
-/**
- * cname
- * cid
- * sname
- * sid
- * rarity choice
- * tags
- * 
- */
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('list2')
-		.setDescription('The most basic list command, it shows your inventory in inventory order.')
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName("cname")
-                .setDescription("Searches for a character with the name and displays info if they are unique.")
-                .addStringOption(option => 
-                    option
-                        .setName("name")
-                        .setDescription("The name you want find")
-                        .setRequired(true)
-                        ))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName("cid")
-                .setDescription("Finds info of a character")
-                .addIntegerOption(option => 
-                    option
-                        .setName("id")
-                        .setDescription("The id of the character")
-                        .setRequired(true)
-                        ))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName("sname")
-                .setDescription("Searches for a character with the name and displays info if they are unique.")
-                .addStringOption(option => 
-                    option
-                        .setName("name")
-                        .setDescription("The name you want find")
-                        .setRequired(true)
-                        ))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName("sid")
-                .setDescription("Finds info of a character")
-                .addIntegerOption(option => 
-                    option
-                        .setName("id")
-                        .setDescription("The id of the character")
-                        .setRequired(true)
-                        )),
+		.setName('list1')
+		.setDescription('The most basic list command, it shows your inventory in inventory order.'),
 	async execute(interaction) {
 		const embed = embedSucess(interaction);
 		//first bring up list from 1 for default call.

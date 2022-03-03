@@ -82,7 +82,6 @@ async function createBlueCard(cid, interaction) {
             quantity: 1,
             rarity: 3,
         });
-        
     }
     const gachaString = `:blue_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
     return gachaString;
@@ -111,10 +110,14 @@ async function createPurpleCard(cid, interaction) {
     let imgID;
     if (imageRng > 0) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: imageRng}});
-        if (image) {imgID = await image.imageID;} 
+        if (image) {
+            imgID = await image.imageID;
+        } 
     } else {
-        image = await database.Gif.findOne({where: {characterID: cid, imageNumber: -(imageRng)}});
-        if (image) {imgID = -(await image.gifID);}
+        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: (-imageRng)}});
+        if (image) {
+            imgID = -image.gifID;
+        }
     }
     if (!imgID) {
         imgID = 0;
@@ -134,7 +137,7 @@ async function createPurpleCard(cid, interaction) {
     return gachaString;
 }
 
-async function viewPCard(card, interaction) { 
+async function viewPCard(card, interaction) {
     const embedCard = new MessageEmbed();
     const cid = await card.characterID
     const char = await database.Character.findOne({where: {characterID: cid}});
@@ -151,11 +154,11 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: card.imageID}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
             url = await image.gifURL;
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
+Gif ID is ${image.gifID} report any errors using ID.`).setImage(url);
         } else {
             embedCard.addField("no image found", "Send an official image for this character.");
         }
@@ -198,7 +201,7 @@ async function createRedCard(cid, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: imageRng}});
         if (image) {imgID = await image.imageID;} 
     } else {
-        image = await database.Gif.findOne({where: {characterID: cid, imageNumber: -(imageRng)}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(imageRng)}});
         if (image) {imgID = -(await image.gifID);}
     }
     if (!imgID) {
@@ -239,10 +242,10 @@ Image ID is ${image.imageID} report any errors using ID.
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: card.imageID}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
-        url = await image.gifURL;
-        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+            url = await image.gifURL;
+            embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
 *Set image with /rubyset*`).setImage(url)
         } else {
@@ -266,6 +269,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 async function raritySwitch(cid, rngRarity, interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
+    await player.increment({karma: -10});
     if ((rngRarity) >= 950) {
         return await createRedCard(cid, interaction);
     } else if (rngRarity >= 700) {
@@ -298,6 +302,10 @@ module.exports = {
             const embedS = await embedSucess(interaction);
             if(player) {
                 if (player.karma >= 100){
+                    const inventory = await database.Card.count({where: {playerID: user}});
+                    if (inventory > 1000) {
+                        return interaction.reply("you have more than 1000 cards. Burn some before doing more gacha.")
+                    }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
                     if (wlist == 10) {
                         await interaction.reply({embeds: [embedS]});
