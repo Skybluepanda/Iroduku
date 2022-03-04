@@ -40,7 +40,7 @@ module.exports = {
                     if (iNumber > 0) {
                         const image = await database.Image.findOne({where: {characterID: card.characterID, imageNumber: iNumber}});
                         if (image) {
-                            card.update({imageID: image.imageID});
+                            card.update({imageNumber: iNumber, imageID: image.imageID});
                             return interaction.reply(`Card ${lid} has updated image to image ${iNumber}`)
                         }
                         return interaction.reply(`Image not found make sure the image number exists.`)
@@ -48,7 +48,7 @@ module.exports = {
                     } else if (iNumber < 0) {
                         const gif = await database.Image.findOne({where: {characterID: card.characterID, gifNumber: -iNumber}});
                         if (gif) {
-                            card.update({imageID: -gif.gifID});
+                            card.update({imageNumber: iNumber, imageID: -gif.gifID});
                             return interaction.reply(`Card ${lid} has updated image to gif ${-iNumber}`)
                         }
                         return interaction.reply(`Gif not found make sure the image number exists.`)

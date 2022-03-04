@@ -72,6 +72,10 @@ async function buttonManager1(embed, interaction, msg, page, maxPage, name) {
                     await nameList(embed, interaction, name,nextPage);
                     break;
                 
+                case 'empty':
+                    await emptyList(embed, interaction);
+                    break;
+                
                 default:
                     break;
             };
@@ -159,6 +163,25 @@ async function pageList(embed, interaction, page){
     await buttonManager2(embed, interaction, msg, page, maxPage);
 };
 
+
+//SHIT DOESN"T FUCKING WORK
+// async function emptyList(embed, interaction){
+//     //use page for pages
+//     const allSeries = await database.Series.findAll();
+//     let emptySeries;
+//     for (let i = 0; i < allSeries.length; i++) {
+//         const charCount = await database.Character.count({
+//             where: {seriesID: allSeries[i].seriesID}
+//         })
+//         if (charCount == 0) {
+//             emptySeries.push(allSeries[i]);
+//         }
+//     }
+//     const listString = await emptySeries.map(joinBar).join(`\n`);
+//     await embed.setDescription(`${listString}`);
+//     const msg = await updateReply(interaction, embed);
+// };
+
 /**
  * Listing series
  * Options
@@ -190,7 +213,11 @@ module.exports = {
                     option
                         .setName("page")
                         .setDescription("The page you want to open.")
-                        )),
+                        ))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("empty")
+                .setDescription("Lists empty series. ")),
 	async execute(interaction) {
 		const embed = createEmbed(interaction);
 		//first bring up list from 1 for default call.

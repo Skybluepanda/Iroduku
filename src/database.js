@@ -240,6 +240,19 @@ const Daily = sequelize.define('daily', {
 	}
 });
 
+const Collect = sequelize.define('collect', { 
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+		allowNull: false,
+	},
+	lastcollect: {
+		type: Sequelize.DATE,
+		unique: false,
+		allowNull: false,
+	},
+});
+
 const Wishlist = sequelize.define('wishlist', {
 	playerID: {
 		type: Sequelize.INTEGER,
@@ -320,3 +333,4 @@ exports.Daily = Daily;
 exports.Wishlist = Wishlist;
 exports.Sideson = Sideson;
 exports.Card = Card;
+exports.Collect = Collect;

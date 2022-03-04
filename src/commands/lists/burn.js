@@ -228,9 +228,17 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 BURNING THIS CARD WILL YIELD 50 COINS AND 10 GEMS PER COPY
 ${quantity} copies being burnt for ${coins} coins and ${gem} gems`)
         .setColor(color.blue);
-        const row = await createButton();
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    const row = await createButton();
+    const nsfw = await image.nsfw;
+    if (nsfw) {
+        await interaction.reply(`||${image.imageURL}||`);
+        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
         await buttonManager(interaction, msg, coins, gem);
+        return await interaction.followUp("**Above embed may contain explicit content.**")
+    } else {
+        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg, coins, gem);
+    }
 }
 
 async function viewPurpleCard(card, interaction) { 
@@ -273,9 +281,17 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 
 BURNING THIS CARD WILL YIELD 200 COINS AND 10 GEMS`)
         .setColor(color.purple);
-        const row = await createButton();
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    const row = await createButton();
+    const nsfw = await image.nsfw;
+    if (nsfw) {
+        await interaction.reply(`||${image.imageURL}||`);
+        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
         await buttonManager(interaction, msg, 200, 10);
+        await interaction.followUp("**Above embed may contain explicit content.**")
+    } else {
+        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg, 200, 10);
+    }
 }
 
 async function switchRarity(card, rarity, interaction) {
@@ -409,9 +425,7 @@ async function burnList(embed, interaction, page){
 
     
     const totalPage = Math.ceil(maxPage/20);
-    if (totalPage > 1) {
-        await deployButton2(interaction, embed);
-    }
+    await deployButton2(interaction, embed);
     for (let i = 0; i < totalList.length; i++) {
 
     }

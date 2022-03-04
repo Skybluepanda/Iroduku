@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../database.js');
-const color = require('../../color.json');
+const database = require('../../src/database.js');
+const color = require('../../src/color.json');
 const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
 const { Op } = require("sequelize");
 var dayjs = require('dayjs')
@@ -42,7 +42,15 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageU
 **Rarity: Quartz**
 **Quantity:** ${card.quantity}`)
         .setColor(color.white);
-    return await interaction.reply({embeds: [embedCard]});
+    const nsfw = await image.nsfw;
+    
+    if (nsfw) {
+        await interaction.reply(`||${image.imageURL}||`)
+        await interaction.editReply({embeds: [embedCard]});
+        return await interaction.followUp("**Above embed may contain explicit content.**")
+    } else {
+        return await interaction.reply({embeds: [embedCard]});
+    }
 }
 
 async function viewGreenCard(card, interaction) { 
@@ -80,7 +88,14 @@ async function viewGreenCard(card, interaction) {
 **Rarity:** Jade
 **Quantity:** ${card.quantity}`)
         .setColor(color.green);
-    return await interaction.reply({embeds: [embedCard]});
+    const nsfw = await image.nsfw;
+    if (nsfw) {
+        await interaction.reply(`||${image.imageURL}||`)
+        await interaction.editReply({embeds: [embedCard]});
+        return await interaction.followUp("**Above embed may contain explicit content.**")
+    } else {
+        return await interaction.reply({embeds: [embedCard]});
+    }
 }
 
 async function viewBlueCard(card, interaction) { 
@@ -99,7 +114,6 @@ async function viewBlueCard(card, interaction) {
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         } else {
-            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else {
@@ -110,7 +124,6 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         } else {
-            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     }
@@ -150,7 +163,6 @@ async function viewPurpleCard(card, interaction) {
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         } else {
-            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
@@ -160,11 +172,9 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         } else {
-            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else {
-        image = database.Image.findOne({where: {imageID: 1}})
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
     embedCard.setTitle(`${char.characterName}`)
@@ -202,7 +212,6 @@ async function viewRedCard(card, interaction) {
 Image ID is ${image.imageID} report any errors using ID.
 *Set image with /rubyset*`).setImage(url)
         } else {
-            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
@@ -213,11 +222,9 @@ Image ID is ${image.imageID} report any errors using ID.
 Gif ID is ${image.gifID} report any errors using ID.
 *Set image with /rubyset*`).setImage(url)
         } else {
-            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else {
-        image = database.Image.findOne({where: {imageID: 1}})
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
     embedCard.setTitle(`${char.characterName}`)
@@ -263,7 +270,7 @@ async function switchRarity(card, rarity, interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('view')
+		.setName('viewnsfw')
 		.setDescription('views a card')
         .addIntegerOption(option => 
             option

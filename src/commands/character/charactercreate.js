@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../src/database.js');
+const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
 
 
