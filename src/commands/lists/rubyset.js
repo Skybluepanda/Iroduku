@@ -46,7 +46,7 @@ module.exports = {
                         return interaction.reply(`Image not found make sure the image number exists.`)
                         
                     } else if (iNumber < 0) {
-                        const gif = await database.Image.findOne({where: {characterID: card.characterID, gifNumber: -iNumber}});
+                        const gif = await database.Gif.findOne({where: {characterID: card.characterID, gifNumber: -iNumber}});
                         if (gif) {
                             card.update({imageNumber: iNumber, imageID: -gif.gifID});
                             return interaction.reply(`Card ${lid} has updated image to gif ${-iNumber}`)

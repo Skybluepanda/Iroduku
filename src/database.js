@@ -274,6 +274,38 @@ const Sideson = sequelize.define('sideson', {
 	}
 });
 
+const Trade = sequelize.define('trade', {
+	player1ID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	player2ID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	type: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	value: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	quantity: {
+		type: Sequelize.INTEGER,
+		allowNull: true,
+	},
+	locked: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+		defaultValue: false,
+	},
+});
+
 const Card = sequelize.define('card', {
 	cardID: {
 		type: Sequelize.INTEGER,
@@ -334,3 +366,4 @@ exports.Wishlist = Wishlist;
 exports.Sideson = Sideson;
 exports.Card = Card;
 exports.Collect = Collect;
+exports.Trade = Trade;

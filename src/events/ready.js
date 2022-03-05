@@ -21,6 +21,7 @@ module.exports = {
         database.Card.sync();
         database.Sideson.sync();
         database.Collect.sync();
+        database.Trade.sync();
         console.log('database sync complete!');
     },
 };

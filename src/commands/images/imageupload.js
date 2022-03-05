@@ -61,7 +61,7 @@ async function border(interaction) {
 		if (attachment) {
 			await interaction.reply({ files: [attachment] });
 			return true;
-	} else {
+		} else {
 			await interaction.reply("Image error.")
 			return false;
 		}

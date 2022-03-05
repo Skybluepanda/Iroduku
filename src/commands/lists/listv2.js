@@ -674,7 +674,7 @@ async function sidList(embed, interaction, page){
                 order: [orderOpt],
                 limit: 20,
                 offset: (page-1)*20,
-                here: {
+                where: {
                 rarity: rarity,
                 playerID: uid,
                 characterID: {[Op.or]: cidList}

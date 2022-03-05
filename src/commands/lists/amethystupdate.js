@@ -14,7 +14,7 @@ module.exports = {
         .addIntegerOption(option => 
             option
                 .setName("lid")
-                .setDescription("The inventory id of the ruby Amethyst.")
+                .setDescription("The inventory id of the Amethyst card.")
                 .setRequired(true)
                 ),
 	async execute(interaction) {

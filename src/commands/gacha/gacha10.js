@@ -188,7 +188,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
     if (nsfw) {
         msg = await interaction.followUp(`||${image.imageURL}||`);
         await msg.edit({embeds: [embedCard]});
-        await interaction.followUp("**Above embed may contain explicit content.**")
+        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
         await interaction.followUp({embeds: [embedCard]});
     }
@@ -282,7 +282,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
     if (nsfw) {
         msg = await interaction.followUp(`||${image.imageURL}||`);
         await msg.edit({embeds: [embedCard]});
-        await interaction.followUp("**Above embed may contain explicit content.**")
+        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
         await interaction.followUp({embeds: [embedCard]});
     }
@@ -380,7 +380,7 @@ Gif ID is ${image.gifID} report any errors using ID.
     if (nsfw) {
         msg = await interaction.followUp(`||${image.imageURL}||`);
         await msg.edit({embeds: [embedCard]});
-        await interaction.followUp("**Above embed may contain explicit content.**")
+        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
         await interaction.followUp({embeds: [embedCard]});
     }
@@ -391,7 +391,7 @@ async function raritySwitch(cid, rngRarity, interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
     await player.increment({gems: -10});
-    const pity = Math.floor(player.pity/10);
+    const pity = Math.floor(player.pity/50);
     if (rngRarity + pity >= 993) {
         player.update({pity: 0});
         return await createRedCard(cid, interaction);

@@ -70,7 +70,10 @@ async function buttonManager(interaction, msg, coins, gems) {
                 case 'confirm':
                     const uid = await interaction.user.id;
                     const lid = await interaction.options.getInteger('lid');
-                    const quantity = await interaction.options.getInteger('quantity');
+                    let quantity = await interaction.options.getInteger('quantity');
+                    if (!quantity) {
+                        quantity = 1;
+                    }
                     const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}});
                     if (card.quantity == quantity) {
                         card.destroy();
@@ -94,7 +97,10 @@ async function buttonManager(interaction, msg, coins, gems) {
 }
 
 async function viewWhiteCard(card, interaction) { 
-    const quantity = await interaction.options.getInteger('quantity');
+    let quantity = await interaction.options.getInteger('quantity');
+    if (!quantity) {
+        quantity = 1;
+    }
     const embedCard = new MessageEmbed();
     const coins = quantity * 10;
     const gem = quantity * 1;
@@ -140,7 +146,10 @@ ${quantity} copies being burnt for ${coins} coins and ${gem} gems`)
 }
 
 async function viewGreenCard(card, interaction) { 
-    const quantity = await interaction.options.getInteger('quantity');
+    let quantity = await interaction.options.getInteger('quantity');
+    if (!quantity) {
+        quantity = 1;
+    }
     const coins = quantity * 20;
     const gem = quantity * 5;
     const embedCard = new MessageEmbed();
@@ -186,7 +195,10 @@ ${quantity} copies being burnt for ${coins} coins and ${gem} gems`)
 }
 
 async function viewBlueCard(card, interaction) {
-    const quantity = await interaction.options.getInteger('quantity');
+    let quantity = await interaction.options.getInteger('quantity');
+    if (!quantity) {
+        quantity = 1;
+    }
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
     const player = await interaction.user.id;
@@ -296,7 +308,7 @@ BURNING THIS CARD WILL YIELD 200 COINS AND 10 GEMS`)
 
 async function switchRarity(card, rarity, interaction) {
     
-    const quantity = await interaction.options.getInteger('quantity');
+    let quantity = await interaction.options.getInteger('quantity');
     switch (rarity) {
         case 1:
             if (card.quantity < quantity) {
@@ -540,7 +552,7 @@ async function whitecard(card) {
     const char = await database.Character.findOne({where: {characterID: card.characterID}});
     const charname = char.characterName;
     //check quantity
-    const quantity = card.quantity;
+    let quantity = card.quantity;
     
     if (tag) {
         const cardString =`:white_large_square:` + ID + ` | ${tag}` + charname + ` ×${quantity}`;
@@ -565,7 +577,7 @@ async function greencard(card) {
     const char = await database.Character.findOne({where: {characterID: card.characterID}});
     const charname = char.characterName;
     //check quantity
-    const quantity = card.quantity;
+    let quantity = card.quantity;
     
     if (tag) {
         const cardString = `:green_square:`+ ID + ` | ${tag}` + charname + ` ×${quantity}`;
@@ -592,7 +604,7 @@ async function bluecard(card) {
     //image number of card
     const inumber = card.imageNumber;
     //check quantity
-    const quantity = card.quantity;
+    let quantity = card.quantity;
     
     if (tag) {
         const cardString = `:blue_square:` +ID + ` | ${tag}` + charname + ` (#${inumber})×${quantity}`;

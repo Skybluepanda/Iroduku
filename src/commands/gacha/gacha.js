@@ -224,7 +224,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
     if (nsfw) {
         await interaction.reply(`||${image.imageURL}||`)
         await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp("**Above embed may contain explicit content.**")
+        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
         return await interaction.reply({embeds: [embedCard]});
     }
@@ -316,7 +316,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
     if (nsfw) {
         await interaction.reply(`||${image.imageURL}||`)
         await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp("**Above embed may contain explicit content.**")
+        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
         return await interaction.reply({embeds: [embedCard]});
     }
@@ -408,7 +408,14 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
-    return await interaction.reply({embeds: [embedCard]});
+    const nsfw = await image.nsfw;
+    if (nsfw) {
+        await interaction.reply(`||${image.imageURL}||`)
+        await interaction.editReply({embeds: [embedCard]});
+        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
+    } else {
+        return await interaction.reply({embeds: [embedCard]});
+    }
 }
 
 
@@ -416,7 +423,7 @@ async function raritySwitch(cid, rngRarity, interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
     await player.increment({gems: -10});
-    const pity = Math.floor(player.pity/10);
+    const pity = Math.floor(player.pity/50);
     if ((rngRarity + pity) >= 993) {
         await player.update({pity: 0});
         await createRedCard(cid, interaction);

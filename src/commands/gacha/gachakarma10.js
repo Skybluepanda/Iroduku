@@ -180,7 +180,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url);
     if (nsfw) {
         msg = await interaction.followUp(`||${image.imageURL}||`);
         await msg.edit({embeds: [embedCard]});
-        return await interaction.followUp("**Above embed may contain explicit content.**")
+        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
         return await interaction.followUp({embeds: [embedCard]});
     }
@@ -279,7 +279,7 @@ Gif ID is ${image.gifID} report any errors using ID.
     if (nsfw) {
         msg = await interaction.followUp(`||${image.imageURL}||`);
         await msg.edit({embeds: [embedCard]});
-        return await interaction.followUp("**Above embed may contain explicit content.**")
+        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
         return await interaction.followUp({embeds: [embedCard]});
     }

@@ -1,11 +1,106 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const color = require('../../color.json');
-const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
+const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton, IntegrationApplication } = require('discord.js');
 const { Op } = require("sequelize");
 var dayjs = require('dayjs')
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
+
+
+async function inventorycheck(uid) {
+    var notfound = true;
+    var i = 1;
+    while (notfound) {
+        const number = await database.Card.findOne({where: {playerID: uid, inventoryID: i}})
+        if (number) {
+            i += 1;
+        } else {
+            notfound = false;
+        }
+    }
+    return i;
+}
+
+async function createButton() {
+    try {
+        const row = await new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setCustomId('accept')
+                    .setLabel('accept')
+                    .setStyle('SUCCESS')
+            )
+            .addComponents(
+                new MessageButton()
+                    .setCustomId('cancel')
+                    .setLabel('cancel')
+                    .setStyle('DANGER')
+            )
+            // .addComponents(
+            //     new MessageButton()
+            //         .setCustomId('search')
+            //         .setLabel('search')
+            //         .setStyle('PRIMARY')
+            // )
+        return row;
+    } catch(error) {
+        console.log("error has occured in crearteButton");
+    }
+}
+
+async function buttonManager(interaction, msg) {
+    try {
+        const target = await interaction.options.getUser('targetuser');
+        const filter = i => i.user.id === interaction.user.id;
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        collector.on('collect', async i => {
+            switch (i.customId){
+                case 'accept':
+                    await buttonManager2(interaction, msg);
+                    await interaction.channel.send(`${target.toString()} come get your gift from ${interaction.user.toString()}`)
+                    break;
+                
+                case 'cancel':
+                    await interaction.channel.send("Gift Cancelled");
+                    break;
+            };
+            i.deferUpdate();
+        }
+        );
+    } catch(error) {
+        console.log("Error has occured in button Manager");
+    }
+}
+
+async function buttonManager2(interaction, msg) {
+    try {   
+        const target = await interaction.options.getUser('targetuser');
+        const filter = i => i.user.id === target.id;
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        collector.on('collect', async i => {
+            switch (i.customId){
+                case 'accept':
+                    const uid = await interaction.user.id;
+                    const lid = await interaction.options.getInteger('lid');
+                    const slot = await inventorycheck(target.id);
+                    await database.Card.update({playerID: target.id, inventoryID: slot}, {where: {playerID: uid, inventoryID: lid}});
+                    await interaction.channel.send(`Gift accepted. Card ${lid} added to ${target.id}'s as card ${slot}`);
+                    let logchannel = interaction.guild.channels.cache.get('948507565577367563');
+                    await logchannel.send(`player ${interaction.user.toString()} gave ${target.toString()} a Rarity ${card.rarity}, CID ${card.characterID}.`);
+                    break;
+                
+                case 'cancel':
+                    await interaction.channel.send("Gift Rejected");
+                    break;
+            };
+            i.deferUpdate();
+        }
+        );
+    } catch(error) {
+        console.log("Error has occured in button Manager");
+    }
+}
 
 async function viewWhiteCard(card, interaction) { 
     const embedCard = new MessageEmbed();
@@ -42,7 +137,9 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageU
 **Rarity: Quartz**
 **Quantity:** ${card.quantity}`)
         .setColor(color.white);
-    return await interaction.reply({embeds: [embedCard]});
+    const row = await createButton();
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewGreenCard(card, interaction) { 
@@ -80,7 +177,9 @@ async function viewGreenCard(card, interaction) {
 **Rarity:** Jade
 **Quantity:** ${card.quantity}`)
         .setColor(color.green);
-    return await interaction.reply({embeds: [embedCard]});
+    const row = await createButton();
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewBlueCard(card, interaction) { 
@@ -123,14 +222,16 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Quantity:** ${card.quantity}`)
         .setColor(color.blue);
     
-
+    const row = await createButton();
     const nsfw = await image.nsfw;
     if (nsfw) {
         await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
+        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg);
         return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
-        return await interaction.reply({embeds: [embedCard]});
+        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg);
     }
 }
 
@@ -176,12 +277,15 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
     const nsfw = await image.nsfw;
+    const row = await createButton();
     if (nsfw) {
         await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
+        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg);
         return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
-        return await interaction.reply({embeds: [embedCard]});
+        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg);
     }
 }
 
@@ -229,12 +333,15 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
     const nsfw = await image.nsfw;
+    const row = await createButton();
     if (nsfw) {
         await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
+        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg);
         return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
-        return await interaction.reply({embeds: [embedCard]});
+        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg);
     }
 }
 
@@ -263,12 +370,18 @@ async function switchRarity(card, rarity, interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('view')
-		.setDescription('views a card')
+		.setName('gift')
+		.setDescription('gifts a card to a user.')
         .addIntegerOption(option => 
             option
                 .setName("lid")
                 .setDescription("The list id for the card you want to view")
+                .setRequired(true)
+                )
+        .addUserOption(option => 
+            option
+                .setName("targetuser")
+                .setDescription("The person you want to gift it to")
                 .setRequired(true)
                 ),
 	async execute(interaction) {
@@ -276,10 +389,16 @@ module.exports = {
             const user = await interaction.user.id
             const lid = await interaction.options.getInteger('lid');
             const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
-            if (card) {
+            const target = await interaction.options.getUser('targetuser');
+            console.log(target);
+            console.log(target.id);
+            const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
+            if (card && targetplayer) {
                 switchRarity(card, card.rarity, interaction);
-            } else {
+            } else if (!card) {
                 interaction.reply("Error Invalid list ID");
+            } else if (!targetplayer) {
+                interaction.reply("Invalid user");
             }
         } catch(error) {
             await  interaction.reply("Error has occured while performing the command.")
