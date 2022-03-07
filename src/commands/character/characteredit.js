@@ -23,7 +23,7 @@ async function embedSuccess(interaction) {
     return embedSuccess;
 };
 
-function embedError(interaction) {
+async function embedError(interaction) {
     const embedError = new MessageEmbed();
     embedError.setTitle("Unknown Error")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
@@ -66,11 +66,32 @@ async function selectOption(interaction) {
             await database.Character.update({ gifCount: gcount }, { where: { characterID: id } });
             return interaction.editReply({embeds: [embedS]});
 
+        case "side":
+            const char = await database.Character.findOne({where: {characterID: id}});
+            if (char.side) {
+                await database.Character.update({ side: false}, { where: { characterID: id } });
+                embedS.setDescription(`Character ${id} | ${char.characterName}  is now a main character.`)
+            } else {
+                await database.Character.update({ side: true}, { where: { characterID: id } });
+                embedS.setDescription(`Character ${id} | ${char.characterName}  is now a side character.`)
+            }
+            return interaction.editReply({embeds: [embedS]});
+
         default:
             const embed = embedError(interaction);
             embed.setDescription("Error has occured, try using the command with a subcommand.")
             return interaction.editReply({embeds: [embed]})
 
+    }
+}
+
+async function togglesides(interaction) {
+    const id = interaction.options.getInteger('id');
+    const char = database.Character.findOne({where: {characterID: id}});
+    if (char.side) {
+        await database.Character.update({ side: false}, { where: { characterID: id } });
+    } else {
+        await database.Character.update({ side: true}, { where: { characterID: id } });
     }
 }
 
@@ -143,6 +164,13 @@ module.exports = {
             .addStringOption(option => option
                 .setName("gifcount")
                 .setDescription("The gifcount")
+                .setRequired(true)))
+        .addSubcommand(subcommand =>subcommand
+            .setName("side")
+            .setDescription("Toggle them as sides.")
+            .addIntegerOption(option => option
+                .setName("id")
+                .setDescription("The id of the character")
                 .setRequired(true))),
 	async execute(interaction) {
         const id = interaction.options.getInteger('id');
@@ -157,7 +185,15 @@ module.exports = {
                 return interaction.editReply({ embeds: [embedE] }, {ephemeral: true});
             };
             if (interaction.channel.id === '947136227126177872') {
-                await selectOption(interaction)
+                const char = database.Character.findOne({where: {characterID: id}});
+                if (char) {
+                    await selectOption(interaction)
+                } else {
+                    embedE.setTitle("Character doesn't exist")
+                    .setDescription(`Character ${id} is not a valid id in the database.`);
+                    return interaction.editReply({ embeds: [embedE] }, {ephemeral: true});
+                }
+                
             
             } else {
                 interaction.editReply("Please use #series and characters channel for this command.")

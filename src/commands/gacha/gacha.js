@@ -568,7 +568,7 @@ async function raritySwitch(cid, rngRarity, interaction) {
 
 async function gacha(interaction) {
     const user = interaction.user.id;
-    const sideson = await database.Sideson.findOne({where: {playerID: user}});
+    const sideson = await database.Character.findOne({where: {playerID: user}});
     if (sideson) {
         const totalChar = await database.Character.count();
         const rngChar = Math.floor(Math.random() * 100000);
@@ -576,11 +576,11 @@ async function gacha(interaction) {
         const cid = (rngChar%totalChar)+1;
         await raritySwitch(cid, rngRarity, interaction);
     } else {
-        const totalChar = await database.Character.count({where: {seriesID: {[Op.ne]: 37}}});
+        const totalChar = await database.Character.count({where: {side: false}});
         const rngChar = Math.floor(Math.random() * 100000);
         const rngRarity = Math.floor(Math.random() * 10000);
         const offset = (rngChar%totalChar);
-        const char = await database.Character.findOne({offset: offset, where: {seriesID: {[Op.ne]: 37}}});
+        const char = await database.Character.findOne({offset: offset, where: {side: false}});
         const cid = await char.characterID;
         await raritySwitch(cid, rngRarity, interaction);
     }

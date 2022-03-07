@@ -214,20 +214,42 @@ async function nopicList(embed, interaction, page){
 
 async function sidList(embed, interaction, page){
     const series = await interaction.options.getInteger('sid');
-    const maxPage =  Math.ceil(await database.Character.count(
-        {where: {
-        seriesID: series,
-    }}
-        )/20);
-    const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName', 'seriesID'],
-        order: ['characterID'],
-        limit: 20,
-        offset: (page-1)*20,
-    where: {
-        seriesID: series,
-    }}
+    const side = await interaction.options.getBoolean('side');
+    let maxPage;
+    let list;
+    if (side) {
+        maxPage =  Math.ceil(await database.Character.count(
+            {where: {
+            seriesID: series,
+        }}
+            )/20);
+        list = await database.Character.findAll(
+            {attributes: ['characterID', 'characterName', 'seriesID'],
+            order: ['characterID'],
+            limit: 20,
+            offset: (page-1)*20,
+        where: {
+            seriesID: series
+        }}
         );
+    } else {
+        maxPage =  Math.ceil(await database.Character.count(
+            {where: {
+            seriesID: series,
+        }}
+            )/20);
+        list = await database.Character.findAll(
+            {attributes: ['characterID', 'characterName', 'seriesID'],
+            order: ['characterID'],
+            limit: 20,
+            offset: (page-1)*20,
+        where: {
+            seriesID: series,
+            side: false
+        }}
+        );
+    }
+    
     if (maxPage > 0) {
         deployButton(interaction, embed);
     }
@@ -319,6 +341,12 @@ module.exports = {
                     option
                         .setName("sid")
                         .setDescription("The series ID you want to search with")
+                        .setRequired(true)
+                        )
+                .addBooleanOption(option => 
+                    option
+                        .setName("side")
+                        .setDescription("Show sides or not")
                         .setRequired(true)
                         ))
         .addSubcommand(subcommand =>

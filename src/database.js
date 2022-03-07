@@ -72,6 +72,11 @@ const Character = sequelize.define('character', {
 		defaultValue: 0,
 		allowNull: false,
 	},
+	side : {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+		defaultValue: false,
+	}
 	
 });
 

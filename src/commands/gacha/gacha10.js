@@ -547,11 +547,11 @@ async function gacha(interaction) {
         const cid = (rngChar%totalChar)+1;
         return await raritySwitch(cid, rngRarity, interaction);
     } else {
-        const totalChar = await database.Character.count({where: {seriesID: {[Op.ne]: 37}}});
+        const totalChar = await database.Character.count({where: {side: false}});
         const rngChar = Math.floor(Math.random() * 100000);
         const rngRarity = Math.floor(Math.random() * 10000);
         const offset = (rngChar%totalChar);
-        const char = await database.Character.findOne({offset: offset, where: {seriesID: {[Op.ne]: 37}}});
+        const char = await database.Character.findOne({offset: offset, where: {side: false}});
         const cid = await char.characterID;
         return await raritySwitch(cid, rngRarity, interaction);
     }

@@ -266,6 +266,7 @@ Simps: ${simps}
 Series: ${char.seriesID} | ${series.seriesName}
 Image Count: ${char.imageCount}
 Gif Count: ${char.gifCount}
+Side: ${char.side}
             `)
             .setTitle(`${char.characterName}`)
             .setColor("#7cff00");
@@ -306,6 +307,7 @@ Simps: ${simps}
 Series: ${char.seriesID} | ${series.seriesName}
 Image Count: ${char.imageCount}
 Gif Count: ${char.gifCount}
+Side: ${char.side}
             `)
             .setTitle(`${char.characterName}`)
             .setColor("#7cff00");
