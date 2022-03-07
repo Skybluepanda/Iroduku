@@ -6,17 +6,23 @@ const database = require('../../database.js');
 async function checkIDS(interaction) {
 	const cid = interaction.options.getInteger('cid');
 	const iNumber = interaction.options.getInteger('image_number')
+	const char = database.Character.findOne({where: {characterID:cid}});
 	try {
-		
-		if (1 <= iNumber < 10) {
-			const count = await database.Image.count({ where: {characterID: cid, imageNumber: iNumber}})
-			if (count != 0) {
-				await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 10.`)
+		if (char) {
+			console.log(iNumber);
+			console.log(1 <= iNumber && iNumber <= 10);
+			if (1 <= iNumber && iNumber <= 10) {
+				const count = await database.Image.findOne({ where: {characterID: cid, imageNumber: iNumber}})
+				if (count) {
+					await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 10.`)
+				} else {
+					upload(interaction);
+				};
 			} else {
-				upload(interaction);
-			};
+				await interaction.reply("Range of image number is 1-10.")
+			}
 		} else {
-			await interaction.reply("Range of image number is 1-10.")
+			await interaction.reply("Cid doesn't exist.");
 		}
 	} catch(error){
 		await interaction.reply("Error has occured");
@@ -89,6 +95,7 @@ async function upload(interaction) {
 		const art = await interaction.options.getString('artist_name');
 		const isnsfw = await interaction.options.getBoolean('nsfw');
 		const uploader = await interaction.user.username;
+		const uploaderid = await interaction.user.id;
 		const bordered = await border(interaction);
 		if (!bordered) {
 			return interaction.channel.send("image failed.")
@@ -104,6 +111,7 @@ async function upload(interaction) {
 			artist: art,
 			nsfw: isnsfw, 
 			uploader: uploader,
+			uploaderid: uploaderid
 		});
 		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
@@ -114,12 +122,21 @@ async function upload(interaction) {
 Image ID (One u use for delete and edit): ${image.imageID}
 Image Number: ${iNumber}
 Artist: ${art}
-You've been rewarded 75 gems and karma, thanks for your hard work!`)
+You've been rewarded 75 gems and karma, thanks for your hard work!`);
 	} catch(error) {
 		interaction.channel.send("Something went wrong. Dw if image got uploaded u got the rewards.");
 	}
-	
-	
+}
+
+async function embedSucess(interaction) {
+    const embed = new MessageEmbed();
+
+    embed.setTitle("Art Archived")
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription("Followup should be the card embed.")
+        .setColor(color.successgreen);
+    
+    return embed;
 }
 
 module.exports = {

@@ -40,7 +40,10 @@ async function cidedit(interaction) {
     // await charnew.increment('imageCount', {by: 1})
     console.log("3.3");
     console.log("3.4");
-    await image.update({characterID: cid, imageNumber: inumber});
+    if (check) {
+        await database.Image.update({characterID: cid, imageNumber: inumber}, {where: {imageID: id}});
+    }
+    
     console.log("3.5");
 }
 

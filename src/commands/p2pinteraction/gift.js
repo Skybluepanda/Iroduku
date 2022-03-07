@@ -86,8 +86,6 @@ async function buttonManager2(interaction, msg) {
                     const slot = await inventorycheck(target.id);
                     await database.Card.update({playerID: target.id, inventoryID: slot}, {where: {playerID: uid, inventoryID: lid}});
                     await interaction.channel.send(`Gift accepted. Card ${lid} added to ${target.id}'s as card ${slot}`);
-                    let logchannel = interaction.guild.channels.cache.get('948507565577367563');
-                    await logchannel.send(`player ${interaction.user.toString()} gave ${target.toString()} a Rarity ${card.rarity}, CID ${card.characterID}.`);
                     break;
                 
                 case 'cancel':
@@ -255,7 +253,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(card.imageID)}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
             url = await image.gifURL;
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -310,7 +308,7 @@ Image ID is ${image.imageID} report any errors using ID.
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(card.imageID)}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -345,6 +343,62 @@ Gif ID is ${image.gifID} report any errors using ID.
     }
 }
 
+async function viewDiaCard(card, interaction) { 
+    const embedCard = new MessageEmbed();
+    //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const cid = await card.characterID;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    let image;
+    let url;
+    if (card.imageID > 0) {
+        image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
+        if (image) {
+            url = await image.imageURL;
+            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+Image ID is ${image.imageID} report any errors using ID.
+*Set image with /rubyset*`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
+    } else if (card.imageID < 0){
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
+        if (image){
+        url = await image.gifURL;
+        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+Gif ID is ${image.gifID} report any errors using ID.
+*Set image with /rubyset*`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
+    } else {
+        image = database.Image.findOne({where: {imageID: 1}})
+        embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
+    }
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity: Diamond**
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+        .setColor(color.diamond);
+    const nsfw = await image.nsfw;
+    const row = await createButton();
+    if (nsfw) {
+        await interaction.reply(`||${image.imageURL}||`)
+        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg);
+        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
+    } else {
+        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg);
+    }
+}
+
 async function switchRarity(card, rarity, interaction) {
     switch (rarity) {
         case 1:
@@ -361,7 +415,9 @@ async function switchRarity(card, rarity, interaction) {
             //Purple
         case 5:
             return viewRedCard(card, interaction);
-            //red
+        //red
+        case 6:
+            return viewDiaCard(card, interaction);
         default:
             return "error";
             //wtf?
@@ -394,7 +450,7 @@ module.exports = {
             console.log(target.id);
             const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
             if (card && targetplayer) {
-                switchRarity(card, card.rarity, interaction);
+                await switchRarity(card, card.rarity, interaction);
             } else if (!card) {
                 interaction.reply("Error Invalid list ID");
             } else if (!targetplayer) {

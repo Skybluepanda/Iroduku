@@ -4,7 +4,8 @@
     "blue": "#5674e5",
     "purple": "#9314ff",
     "red": "#fb0b0b",
-    "aqua": "#00ffff",
-    "failred": "#272727",
-    "successgreen": "#00ff00"
+    "diamond": "#00dfff",
+    "aqua": "#ccff99",
+    "failred": "#ffbdbd",
+    "successgreen": "#aaff77"
 }

@@ -41,6 +41,10 @@ async function listSwitch(interaction){
             justTag(interaction);
             break;
 
+        case "tag":
+            tagTag(interaction);
+            break;
+
         case "lid":
             singleTag(interaction);
     }
@@ -97,7 +101,7 @@ async function cnameTag(interaction){
 async function cidTag(interaction){
     const uid = await interaction.user.id;
     const cid = await interaction.options.getInteger('id');
-    const char = await database.findOne({where: {characterID: cid}})
+    const char = await database.Character.findOne({where: {characterID: cid}})
     let rarity = await interaction.options.getInteger("rarity");
     let tag = await interaction.options.getString("tag");
     if (tag) {
@@ -209,7 +213,7 @@ async function sidTag(interaction){
         const cid = charList[i].characterID;
         cidList[i] = cid;
     }
-    let cardList
+    let cardList;
     console.log(cidList);
     if (rarity && tag) {
         cardList = await database.Card.update({tag :tag},
@@ -263,6 +267,47 @@ async function justTag(interaction){
         
     }
     return interaction.reply(`Cards have been tagged with ${tag}`);
+}
+
+async function tagTag(interaction){
+    const uid = await interaction.user.id;
+    let searchtag = await interaction.options.getString("searchtag");
+    let rarity = await interaction.options.getInteger("rarity");
+    let tag = await interaction.options.getString("settag");
+    if (tag) {
+        console.log(tag.length);
+        if (tag.length > 35) {
+            return interaction.reply(`Tag length is too large pick a different tag.`);
+        }
+    } else {
+        tag = null;
+    }
+
+    if (!searchtag) {
+        searchtag = null;
+    }
+
+    let cardList;
+    if (rarity) {
+        cardList = await database.Card.update({tag :tag},
+            {
+                where: {
+                rarity: rarity,
+                playerID: uid,
+                tag: searchtag
+            }}
+        );
+    } else {
+        cardList = await database.Card.update({tag :tag},
+            {
+                where: {
+                playerID: uid,
+                tag: searchtag
+            }}
+        );
+        
+    }
+    return interaction.reply(`Cards with tag ${searchtag}have been tagged with ${tag}`);
 }
 
 async function singleTag(interaction){
@@ -414,6 +459,34 @@ module.exports = {
                 .addStringOption(option => 
                     option
                         .setName("tag")
+                        .setDescription("Tag you want to apply, leave empty if you want to remove tags")
+                        .setRequired(false)
+                        )
+                .addIntegerOption(option => 
+                    option
+                        .setName("rarity")
+                        .setDescription("Filters cards with certain rarity")
+                        .setRequired(false)
+                        .addChoice('quartz',1)
+                        .addChoice('jade',2)
+                        .addChoice('lapis',3)
+                        .addChoice('amethyst',4)
+                        .addChoice('ruby',5)
+                        )
+                )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("tag")
+                .setDescription("Tag cards with the chosen tags, or cards with no tags if empty")
+                .addStringOption(option => 
+                    option
+                        .setName("searchtag")
+                        .setDescription("Tag you want to filter, leave empty to tag all nontag cards.")
+                        .setRequired(false)
+                        )
+                .addStringOption(option => 
+                    option
+                        .setName("settag")
                         .setDescription("Tag you want to apply, leave empty if you want to remove tags")
                         .setRequired(false)
                         )

@@ -6,16 +6,21 @@ const database = require('../../database.js');
 async function checkIDS(interaction) {
 	const cid = await interaction.options.getInteger('cid');
 	const gNumber = await interaction.options.getInteger('gifnumber')
+	const char = database.Character.findOne({where: {characterID:cid}});
 	try {
-		if (1 <= gNumber < 4) {
-			const count = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gNumber}})
-			if (count) {
-				return await interaction.reply(`Character ${cid} already has an gif ${gNumber}, maximum is 3.`)
+		if (char) {
+			if (1 <= gNumber && gNumber < 6) {
+				const count = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gNumber}})
+				if (count) {
+					return await interaction.reply(`Character ${cid} already has an gif ${gNumber}, maximum is 5.`)
+				} else {
+					return await upload(interaction);
+				};
 			} else {
-				return await upload(interaction);
-			};
+				return await interaction.reply("Range of gif number is 1-5.")
+			}
 		} else {
-			return await interaction.reply("Range of gif number is 1-3.")
+			await interaction.reply("Cid doesn't exist.");
 		}
 	} catch(error){
         console.log("failed in id check.")
@@ -83,6 +88,7 @@ async function upload(interaction) {
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
 		await database.Player.increment({gems: 125, karma: 5}, {where: {playerID: interaction.user.id}})
+		
         return await interaction.reply(`Gif for ${char.characterName} has been added!
 Gif ID (for deleteing and editing): ${gif.gifID}
 Gif Number: ${iNumber}. 
@@ -90,8 +96,32 @@ You've been rewarded 125 gems and karma, thanks for your hard work!`)
 	} catch(error) {
         console.log("upload failed.")
 	}
+
+	async function post(gif, interaction){
+		const cid = await interaction.options.getInteger('cid');
+		const char = await database.Character.findOne({where: {characterID: cid}})
+		const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
+		const embed = await embedSucess(interaction);
+		await embed.setDescription(`${char.characterName} from ${char.seriesID}| ${series.seriesName}`)
+			.setImage(gif.gifURL)
+			.setFooter(`#${gif.gifNumber} Art by ${gif.artist} | Uploaded by ${gif.uploader}
+Image ID is ${gif.gifID} report any errors using ID.`);
+		const channel = await interaction.guild.channels.cache.get('949952119052578877');
+		await channel.send({embeds: [embed]});
+	}
 	
-}
+
+	async function embedSucess(interaction) {
+		const embed = new MessageEmbed();
+	
+		embed.setTitle("Art Archived")
+			.setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+			.setDescription("Followup should be the card embed.")
+			.setColor(color.successgreen);
+		
+		return embed;
+	}}
+
 
 module.exports = {
 	data: new SlashCommandBuilder()

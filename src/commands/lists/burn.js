@@ -248,7 +248,7 @@ ${quantity} copies being burnt for ${coins} coins and ${gem} gems`)
         await buttonManager(interaction, msg, coins, gem);
         return await interaction.followUp("**Above embed may contain explicit content.**")
     } else {
-        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
+        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
         await buttonManager(interaction, msg, coins, gem);
     }
 }
@@ -272,7 +272,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(card.imageID)}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
             url = await image.gifURL;
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -301,7 +301,7 @@ BURNING THIS CARD WILL YIELD 200 COINS AND 10 GEMS`)
         await buttonManager(interaction, msg, 200, 10);
         await interaction.followUp("**Above embed may contain explicit content.**")
     } else {
-        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
+        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
         await buttonManager(interaction, msg, 200, 10);
     }
 }
@@ -337,6 +337,10 @@ async function switchRarity(card, rarity, interaction) {
         case 5:
             return interaction.reply("You can't burn ruby cards.");
             //red
+
+        case 6:
+            return interaction.reply("You can't burn Diamond cards.");
+
         default:
             return interaction.reply("Error");
             //wtf?
@@ -666,6 +670,31 @@ async function redcard(card) {
         return cardString
     }
 }
+
+async function diacard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    
+    if (tag) {
+        const cardString = `:large_blue_diamond:` + ID + ` | ${tag}` + charname + ` (#${inumber}) Won't be burnt`;
+        console.log(cardString);
+        return cardString
+    } else {
+        const cardString = `:large_blue_diamond:` + ID + ` | ` + charname + `(#${inumber}) Won't be burnt`;
+        console.log(cardString);
+        return cardString
+    }
+}
 async function switchRarity2(card, rarity) {
     switch (rarity) {
         case 1:
@@ -683,6 +712,9 @@ async function switchRarity2(card, rarity) {
         case 5:
             return redcard(card);
             //red
+
+        case 6:
+            return diacard(card);
         default:
             return "error";
             //wtf?

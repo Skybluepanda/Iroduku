@@ -1,17 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
+const { Op } = require("sequelize");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('addgame')
-        .setDescription('adds gem to a profile.')
-        .addUserOption(option => 
-            option
-                .setName("target")
-                .setDescription("The user account")
-                .setRequired(true)
-                )
+        .setName('addkamraall')
+        .setDescription('rewards karma to everyone.')
         .addIntegerOption(option => 
             option
                 .setName("quantity")
@@ -34,12 +29,12 @@ module.exports = {
         const embedDone = new MessageEmbed();
         const embedError = new MessageEmbed();
 
-        embed.setTitle("Adding Gem")
+        embed.setTitle("Adding Karma")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
             .setColor("#00ecff")
 
-        embedDone.setTitle("Added Gems")
+        embedDone.setTitle("Added Karma")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setColor("#7cff00")
 
@@ -57,15 +52,11 @@ module.exports = {
 
             };
             console.log("you have gemmod role");
-            const target = await interaction.options.getUser('target');
             const quantity = await interaction.options.getInteger('quantity');
             const reason = await interaction.options.getString('reason');
-            console.log(target);
-            console.log(target.username);
-            console.log(target.id);
-            embedDone.setDescription(`${target.username} recieved ${quantity} gems!
+            embedDone.setDescription(`Everyone recieved ${quantity} karma!
             Reason: ${reason}`);
-            await database.Player.increment({gems: quantity}, {where: {playerID: target.id}})
+            await database.Player.increment({karma: quantity}, {where: {id: {[Op.gt]: 0}}})
             await interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
         } catch (error) {
             return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});

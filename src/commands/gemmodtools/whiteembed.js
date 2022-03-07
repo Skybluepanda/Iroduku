@@ -1,10 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-
+const color = require('../../color.json');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-    .setName('white')
+    .setName('awhite')
     .setDescription('makes an embed!'),
     async execute(interaction) {
         const embed = new MessageEmbed();
@@ -12,37 +12,36 @@ module.exports = {
         embed.setTitle("This is a test embed")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription("this is some plain text")
-            .setColor("#ffffff")
+            .setColor(color.white)
             .addField("BBot Version", "1.0.0", true);
         const embedg = new MessageEmbed();
 
         embedg.setTitle("This is a test embed")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription("this is some plain text")
-            .setColor("#55cc00")
+            .setColor(color.blue)
             .addField("BBot Version", "1.0.0", true);
         const embedb = new MessageEmbed();
 
         embedb.setTitle("This is a test embed")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription("this is some plain text")
-            .setColor("#0070dd")
+            .setColor(color.aqua)
             .addField("BBot Version", "1.0.0", true);
         const embedp = new MessageEmbed();
 
         embedp.setTitle("This is a test embed")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription("this is some plain text")
-            .setColor("#a335ee")
+            .setColor("#9ee6ff")
             .addField("BBot Version", "1.0.0", true);
         const embedl = new MessageEmbed();
 
         embedl.setTitle("This is a test embed")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription("this is some plain text")
-            .setColor("#ffd700")
+            .setColor("#bceeff")
             .addField("BBot Version", "1.0.0", true);
-        var off = 0;
         await interaction.reply({ embeds: [embed] });
         await interaction.followUp({ embeds: [embedg] });
         await interaction.followUp({ embeds: [embedb] });

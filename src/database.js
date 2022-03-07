@@ -135,7 +135,12 @@ const Image = sequelize.define('image', {
 		type: Sequelize.STRING,
 		unique: false,
 		allowNull: false,
-	}
+	},
+	uploaderid: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
 });
 
 const Gif = sequelize.define('gif', {

@@ -46,10 +46,18 @@ async function subSwitch(interaction){
         case "locktrade":
             lockTrade(interaction);
             break;
+
+        case 'cancelall':
+            cancelTrade(interaction);
     }
 }
 
-
+async function cancelTrade(interaction) {
+    const uid = await interaction.user.id;
+    await database.Trade.destroy({where: {player1ID: uid}});
+    await database.Trade.destroy({where: {player2ID: uid}});
+    await interaction.reply("All trade items involving you have been reset regardless of locked.");
+}
 
 async function tradeList1(embed, interaction, page) {
     const uid = await interaction.user.id;
@@ -131,7 +139,19 @@ async function tradeList1(embed, interaction, page) {
     const gems = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 2}});
     const karma = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 3}});
     const coins = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 4}});
-    
+    let gemt = 0;
+    let karmat = 0;
+    let coinst = 0;
+
+    if (gems) {
+        gemt = gems.value;
+    }
+    if (karma) {
+        karmat = karma.value;
+    }
+    if (coins) {
+        coinst = coins.value;
+    }
     
     
     const totalPage = Math.ceil(maxPage/20);
@@ -146,9 +166,9 @@ async function tradeList1(embed, interaction, page) {
     **Lapis:** ${blueCount} cards
     **Amethyst:** ${purpleCount} cards
     **Ruby:** ${redCount} cards
-    **Gem:** ${gems.value}
-    **Karma:** ${karma.value}
-    **Coins:** ${coins.value}
+    **Gem:** ${gemt}
+    **Karma:** ${karmat}
+    **Coins:** ${coinst}
     `);
     
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
@@ -238,6 +258,19 @@ async function tradeList2(embed, interaction, page){
         }}
     )
 
+    let gemt = 0;
+    let karmat = 0;
+    let coinst = 0;
+
+    if (gems) {
+        gemt = gems.value;
+    }
+    if (karma) {
+        karmat = karma.value;
+    }
+    if (coins) {
+        coinst = coins.value;
+    }
     
     const totalPage = Math.ceil(maxPage/20);
     await deployButton2(interaction, embed);
@@ -251,9 +284,9 @@ async function tradeList2(embed, interaction, page){
     Lapis: ${blueCount} cards
     Amethyst: ${purpleCount} cards
     Ruby: ${redCount} cards
-    Gem: ${gems.value}
-    Karma: ${karma.value}
-    Coins: ${coins.value}
+    **Gem:** ${gemt}
+    **Karma:** ${karmat}
+    **Coins:** ${coinst}
     `);
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
     const msg = await updateReply(interaction, embed);
@@ -1037,7 +1070,11 @@ module.exports = {
                         .setName("user")
                         .setDescription("User you want to trade with")
                         .setRequired(true)
-                        )),
+                        ))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("cancelall")
+                .setDescription("Cancels all trades.")),
 	async execute(interaction) {
 		//first bring up list from 1 for default call.
 		//then select pages
