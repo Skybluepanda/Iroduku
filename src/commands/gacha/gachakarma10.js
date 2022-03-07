@@ -267,7 +267,7 @@ async function createRedCard(cid, interaction) {
     console.log("8")
     
     let channel = await interaction.guild.channels.cache.get('948507565577367563');
-    await channel.send(`An luck sack got a Ruby ${cid} | ${char.characterName}!`)
+    await channel.send(`An luck sack got a Ruby ${cid} | ${char.characterName}!`);
     await viewRCard(newcard, interaction);
     const gachaString = (`:red_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`);
     console.log("9")
@@ -364,11 +364,9 @@ async function createDiaCard(cid, interaction) {
         rarity: 6,
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
-    
-    channel.send(`An extra lucky luck sack got a Diamond ${cid} | ${char.characterName}!`)
-    const gachaString = `:large_blue_diamond:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
-    
+    channel.send(`An extra lucky luck sack got a Diamond ${cid} | ${char.characterName}!`);
     await viewDiaCard(newcard, interaction);
+    const gachaString = `:large_blue_diamond:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
     return gachaString;
     
 }

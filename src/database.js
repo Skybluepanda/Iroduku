@@ -356,7 +356,13 @@ const Card = sequelize.define('card', {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: true,
-	  }
+	  },
+	lock: {
+		type: Sequelize.BOOLEAN,
+		unique: false,
+		allowNull: false,
+		defaultValue: false
+	}
 });
 
 

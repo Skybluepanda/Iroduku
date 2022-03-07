@@ -190,7 +190,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else {
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageNumber)}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(card.imageNumber)}});
         if (image){
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -357,7 +357,7 @@ async function createRedCard(cid, interaction) {
         rarity: 5,
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`A luck sack got a Ruby ${cid} | ${char.characterName}!`)
+    channel.send(`A luck sack got a Ruby ${cid} | ${char.characterName}!`);
     await viewRCard(newcard, interaction);
     const gachaString = `:red_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
     return gachaString;
@@ -452,11 +452,9 @@ async function createDiaCard(cid, interaction) {
         rarity: 6,
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
-    
-    channel.send(`An extra lucky luck sack got a Diamond ${cid} | ${char.characterName}!`)
-    const gachaString = `:large_blue_diamond:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
-    
+    channel.send(`An extra lucky luck sack got a Diamond ${cid} | ${char.characterName}!`);
     await viewDiaCard(newcard, interaction);
+    const gachaString = `:large_blue_diamond:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
     return gachaString;
     
 }

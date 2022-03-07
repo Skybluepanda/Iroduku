@@ -81,9 +81,9 @@ async function newDaily(interaction, player){
         streak: 1,
         
     });
-    await player.increment('gems', {by: 200});
+    await player.increment('gems', {by: 1000});
     await embedDone.setDescription(`
-    Streak: 1\nGems: (first time bonus!) ${player.gems+200} (+200)\nUse daily again within two days to continue the streak.`);
+    Streak: 1\nGems: (first time bonus!) ${player.gems+1000} (+1000)\nUse daily again within two days to continue the streak.`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
 }
 
@@ -91,12 +91,12 @@ async function streakDaily(interaction, player, daily){
     const embedDone = await embedD(interaction);
     const streak = daily.streak;
     if (streak > 10) {
-        await player.increment('gems', {by: 100});
+        await player.increment('gems', {by: 500});
         await embedDone.setDescription(`
-    Streak: (max) ${streak+1}\nGems: ${player.gems+100} (+100)\nUse daily again within two days to continue the streak.`);
+    Streak: (max) ${streak+1}\nGems: ${player.gems+500} (+500)\nUse daily again within two days to continue the streak.`);
         return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
     } else {
-        const reward = 50 + streak*5;
+        const reward = 250 + streak*25;
         await player.increment('gems', {by: reward});
         await embedDone.setDescription(`
     Streak: ${streak+1}\nGems: ${player.gems+reward} (+${reward})\nUse daily again within two days to continue the streak.`);
@@ -106,9 +106,9 @@ async function streakDaily(interaction, player, daily){
 
 async function resetDaily(interaction, player){
     const embedDone = await embedD(interaction);
-    await player.increment('gems', {by: 50});
+    await player.increment('gems', {by: 250});
     await embedDone.setDescription(`
-Streak: (reset) 1\nGems: ${player.gems+50} (+50)\nUse daily again within two days to continue the streak.`);
+Streak: (reset) 1\nGems: ${player.gems+250} (+250)\nUse daily again within two days to continue the streak.`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
 }
 

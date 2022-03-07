@@ -594,7 +594,7 @@ module.exports = {
         try {
             const user = interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: user}});
-            const embedE = embedError(interaction);
+            const embedE = await embedError(interaction);
             if(player) {
                 if (player.gems >= 10){
                     const inventory = await database.Card.count({where: {playerID: user}});

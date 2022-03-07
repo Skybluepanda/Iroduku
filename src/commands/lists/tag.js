@@ -83,7 +83,8 @@ async function cnameTag(interaction){
                 rarity: rarity,
                 tag: tag,
                 playerID: uid,
-                characterID: {[Op.or]: cidList}
+                characterID: {[Op.or]: cidList},
+                lock: false
             }}
         );
     } else {
@@ -91,7 +92,8 @@ async function cnameTag(interaction){
             {
                 where: {
                 playerID: uid,
-                characterID: {[Op.or]: cidList}
+                characterID: {[Op.or]: cidList},
+                lock: false
             }}
         );
     }
@@ -120,7 +122,8 @@ async function cidTag(interaction){
                 rarity: rarity,
                 tag: tag,
                 playerID: uid,
-                characterID: cid
+                characterID: cid,
+                lock: false
             }}
         );
     } else {
@@ -128,7 +131,8 @@ async function cidTag(interaction){
             {
                 where: {
                 playerID: uid,
-                characterID: cid
+                characterID: cid,
+                lock: false
             }}
         );
     }
@@ -175,7 +179,8 @@ async function snameTag(interaction){
                 rarity: rarity,
                 tag: tag,
                 playerID: uid,
-                characterID: {[Op.or]: cidList}
+                characterID: {[Op.or]: cidList},
+                lock: false
             }}
         );
     } else {
@@ -183,7 +188,8 @@ async function snameTag(interaction){
             {
                 where: {
                 playerID: uid,
-                characterID: {[Op.or]: cidList}
+                characterID: {[Op.or]: cidList},
+                lock: false
             }}
         );
     }
@@ -222,7 +228,8 @@ async function sidTag(interaction){
                 rarity: rarity,
                 tag: tag,
                 playerID: uid,
-                characterID: {[Op.or]: cidList}
+                characterID: {[Op.or]: cidList},
+                lock: false
             }}
         );
     } else {
@@ -230,7 +237,8 @@ async function sidTag(interaction){
             {
                 where: {
                 playerID: uid,
-                characterID: {[Op.or]: cidList}
+                characterID: {[Op.or]: cidList},
+                lock: false
             }}
         );
     }
@@ -255,6 +263,7 @@ async function justTag(interaction){
                 where: {
                 rarity: rarity,
                 playerID: uid,
+                lock: false
             }}
         );
     } else {
@@ -262,6 +271,7 @@ async function justTag(interaction){
             {
                 where: {
                 playerID: uid,
+                lock: false
             }}
         );
         
@@ -294,7 +304,8 @@ async function tagTag(interaction){
                 where: {
                 rarity: rarity,
                 playerID: uid,
-                tag: searchtag
+                tag: searchtag,
+                lock: false
             }}
         );
     } else {
@@ -302,7 +313,8 @@ async function tagTag(interaction){
             {
                 where: {
                 playerID: uid,
-                tag: searchtag
+                tag: searchtag,
+                lock: false
             }}
         );
         
@@ -314,6 +326,14 @@ async function singleTag(interaction){
     const uid = await interaction.user.id;
     const lid = await interaction.options.getInteger("lid")
     const tag = await interaction.options.getString("tag");
+    const card = await database.Card.findOne({where: {playerID: uid, inventoryID:lid}})
+    if (card) {
+        if (card.lock) {
+            return interaction.reply(`Card ${lid} is locked`);
+        }
+    } else {
+        return interaction.reply(`Card ${lid} is doesn't exist.`);
+    }
     if (tag) {
         if (tag.length > 35) {
             return interaction.reply(`Tag length is too large pick a different tag.`);

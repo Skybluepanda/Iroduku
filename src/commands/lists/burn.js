@@ -352,6 +352,9 @@ async function burnLid(interaction){
     const lid = await interaction.options.getInteger('lid');
     const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}})
     if (card) {
+        if (card.lock) {
+            return interaction.reply(`Card ${lid} is locked. Unlock the card before burning.`)
+        }
         return switchRarity(card, card.rarity, interaction);
     } else {
         return interaction.reply("Invalid List ID.")
@@ -388,6 +391,8 @@ async function burnList(embed, interaction, page){
             where: {
             tag: tag,
             playerID: uid,
+            lock: false
+                
         }}
     );
     const totalList = await database.Card.findAll(
@@ -395,6 +400,7 @@ async function burnList(embed, interaction, page){
             where: {
             tag: tag,
             playerID: uid,
+            lock: false
         }}
     );
     const maxPage = await database.Card.count(
@@ -402,6 +408,7 @@ async function burnList(embed, interaction, page){
             where: {
             tag: tag,
             playerID: uid,
+            lock: false
         }}
     );
     const whiteCount = await database.Card.sum('quantity',
@@ -410,6 +417,7 @@ async function burnList(embed, interaction, page){
             rarity: 1,
             tag: tag,
             playerID: uid,
+            lock: false
         }}
     );
     const greenCount = await database.Card.sum('quantity',
@@ -418,6 +426,7 @@ async function burnList(embed, interaction, page){
             rarity: 2,
             tag: tag,
             playerID: uid,
+            lock: false
         }}
     );
     const blueCount = await database.Card.sum('quantity',
@@ -426,6 +435,7 @@ async function burnList(embed, interaction, page){
             rarity: 3,
             tag: tag,
             playerID: uid,
+            lock: false
         }}
     );
     const purpleCount = await database.Card.count(
@@ -434,6 +444,7 @@ async function burnList(embed, interaction, page){
             rarity: 4,
             tag: tag,
             playerID: uid,
+            lock: false
         }}
     );
     const totalCoin = purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
@@ -522,6 +533,7 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, coins, gem
                             rarity: {[Op.lt]: 5},
                             tag: tag,
                             playerID: uid,
+                            lock: false
                         }}
                     );
                     await database.Player.increment({money: coins, gems: gems}, {where: {playerID: uid}});
