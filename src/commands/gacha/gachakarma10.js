@@ -434,10 +434,11 @@ async function raritySwitch(cid, rngRarity, interaction) {
 
 async function gacha(interaction) {
     const user = interaction.user.id;
-    const rngChar = Math.floor(Math.random() * 10);
     const rngRarity = Math.floor(Math.random() * 1000);
     const wlist = await database.Wishlist.findAll({where: {playerID: user}})
-    const cid = await wlist[rngChar].characterID;
+    const rngChar = Math.floor(Math.random() * 1000);
+    const char = (rngChar%wlist.length);
+    const cid = await wlist[char].characterID;
     return await raritySwitch(cid, rngRarity, interaction);
 }
 
@@ -458,7 +459,7 @@ module.exports = {
                         return interaction.reply("you have more than 1000 cards. Burn some before doing more gacha.")
                     }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
-                    if (wlist == 10) {
+                    if (wlist >= 10) {
                         await interaction.reply({embeds: [embedS]});
                         const list = [];
                         for (let i = 0; i < 10; i++) {
@@ -469,7 +470,7 @@ module.exports = {
                             await interaction.editReply({embeds: [embedS]});
                         }
                     }else {
-                        (await embedE).setDescription("You need 10 waifus in wishlist to use karma gacha. use /wadd to add to your wishlist!")
+                        (await embedE).setDescription("You need 10 or more waifus in wishlist to use karma gacha. use /wadd to add to your wishlist!")
                         return await interaction.reply({embeds: [embedE]});
                     }
                 } else {

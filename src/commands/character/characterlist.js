@@ -178,10 +178,10 @@ async function pageList(embed, interaction, page){
         {attributes: ['characterID', 'characterName', 'seriesID'],
         order: ['characterID'],
         limit: 20,
-        offset: (page-1)*20,}, {
-            where: {
-                side: sides
-            }});
+        offset: (page-1)*20,
+        where: {
+            side: sides
+        }});
     const maxPage =  Math.ceil(await database.Character.count({
         where: {
             side: sides

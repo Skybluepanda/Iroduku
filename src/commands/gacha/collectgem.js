@@ -81,13 +81,13 @@ async function newCollect(interaction, player){
         lastcollect: timeNow,
         
     });
-    await player.increment('gems', {by: 180});
+    await player.increment('gems', {by: 900});
     await embedDone.setDescription(`
     Collect is a command that you grants you 5 gems per 8 minutes (what is this... resin?)
     This is a temporary solution for those who are too lazy to send images but still want to gacha.
-    Collection will cap at 8hrs for total of 60 gems per 8hr cycle.
-    Collecting after more than 8hrs have past will grant 60 gems.
-    Gems: (Start collecting bonus +180 gems!) ${player.gems+900}`);
+    Collection will cap at 8hrs for total of 300 gems per 8hr cycle.
+    Collecting after more than 8hrs have past will grant 300 gems.
+    Gems: (Start collecting bonus +900 gems!) ${player.gems+900}`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
 }
 

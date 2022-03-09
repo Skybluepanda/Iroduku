@@ -403,7 +403,7 @@ async function viewRCard(card, interaction) {
     let image;
     let url;
     if (card.imageID > 0) {
-        image = await database.Image.findOne({where: {characterID: cid, imageID: -(card.imageID)}});
+        image = await database.Image.findOne({where: {characterID: cid, imageID: (card.imageID)}});
         if (image) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}

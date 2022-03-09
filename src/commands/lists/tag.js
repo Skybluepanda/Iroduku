@@ -41,6 +41,10 @@ async function listSwitch(interaction){
             justTag(interaction);
             break;
 
+        case "wl":
+            wlTag(interaction);
+            break;
+
         case "tag":
             tagTag(interaction);
             break;
@@ -248,6 +252,7 @@ async function justTag(interaction){
     const uid = await interaction.user.id;
     let rarity = await interaction.options.getInteger("rarity");
     let tag = await interaction.options.getString("tag");
+    
     if (tag) {
         console.log(tag.length);
         if (tag.length > 35) {
@@ -256,9 +261,8 @@ async function justTag(interaction){
     } else {
         tag = null;
     }
-    let cardList;
     if (rarity) {
-        cardList = await database.Card.update({tag :tag},
+        await database.Card.update({tag :tag},
             {
                 where: {
                 rarity: rarity,
@@ -267,7 +271,7 @@ async function justTag(interaction){
             }}
         );
     } else {
-        cardList = await database.Card.update({tag :tag},
+        await database.Card.update({tag :tag},
             {
                 where: {
                 playerID: uid,
@@ -277,6 +281,60 @@ async function justTag(interaction){
         
     }
     return interaction.reply(`Cards have been tagged with ${tag}`);
+}
+
+async function gacha(interaction) {
+    const user = interaction.user.id;
+    const rngRarity = Math.floor(Math.random() * 1000);
+    const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+    const rngChar = Math.floor(Math.random() * 1000);
+    const char = (rngChar%wlist.length);
+    const cid = await wlist[char].characterID;
+    await raritySwitch(cid, rngRarity, interaction);
+}
+
+
+
+async function wlTag(interaction){
+    const uid = await interaction.user.id;
+    const wlist = await database.Wishlist.findAll({where: {playerID: uid}});
+    let rarity = await interaction.options.getInteger("rarity");
+    let tag = await interaction.options.getString("tag");
+    let cidList = [];
+    for (let i = 0; i < wlist.length; i++) {
+        const cid = wlist[i].characterID;
+        cidList[i] = cid;
+    }
+    if (tag) {
+        console.log(tag.length);
+        if (tag.length > 35) {
+            return interaction.reply(`Tag length is too large pick a different tag.`);
+        }
+    } else {
+        tag = null;
+    }
+    if (rarity) {
+        await database.Card.update({tag :tag},
+            {
+                where: {
+                rarity: rarity,
+                playerID: uid,
+                characterID: {[Op.or]: cidList},
+                lock: false
+            }}
+        );
+    } else {
+        await database.Card.update({tag :tag},
+            {
+                where: {
+                playerID: uid,
+                characterID: {[Op.or]: cidList},
+                lock: false
+            }}
+        );
+        
+    }
+    return interaction.reply(`Cards of characters from wishlist have been tagged with ${tag}`);
 }
 
 async function tagTag(interaction){
@@ -480,6 +538,29 @@ module.exports = {
             subcommand
                 .setName("base")
                 .setDescription("Bulk tag all cards within the filter.")
+                .addStringOption(option => 
+                    option
+                        .setName("tag")
+                        .setDescription("Tag you want to apply, leave empty if you want to remove tags")
+                        .setRequired(false)
+                        )
+                .addIntegerOption(option => 
+                    option
+                        .setName("rarity")
+                        .setDescription("Filters cards with certain rarity")
+                        .setRequired(false)
+                        .addChoice('quartz',1)
+                        .addChoice('jade',2)
+                        .addChoice('lapis',3)
+                        .addChoice('amethyst',4)
+                        .addChoice('ruby',5)
+                        .addChoice('diamond',6)
+                        )
+                )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("wl")
+                .setDescription("Bulk tag all cards matching your wishlist.")
                 .addStringOption(option => 
                     option
                         .setName("tag")

@@ -167,7 +167,7 @@ async function createBlueCard(cid, interaction) {
         });
         
     }
-    await viewBCard(newcard, interaction);
+    // await viewBCard(newcard, interaction);
     const gachaString = `:blue_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
     return gachaString;
 }

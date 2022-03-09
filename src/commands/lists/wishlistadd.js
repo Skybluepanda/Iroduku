@@ -18,9 +18,9 @@ module.exports = {
             const character = await database.Character.findOne({where: {characterID: cid}})
             const wishCount = await database.Wishlist.count({where: {playerID: uid}});
             console.log('2')
-            if (wishCount >= 10) {
+            if (wishCount >= 20) {
                 console.log('3')
-                return await interaction.reply("Current maximum wishlist is 10!");
+                return await interaction.reply("Current maximum wishlist is 20!");
                 console.log('4')
             }
             const wishCheck = await database.Wishlist.findOne({where: {playerID: uid, characterID: cid}});
