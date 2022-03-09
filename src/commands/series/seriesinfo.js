@@ -21,7 +21,7 @@ function createEmbed(interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('sinfo')
+		.setName('si')
 		.setDescription('Shows information of a series')
         .addIntegerOption(option => 
             option

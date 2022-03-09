@@ -386,6 +386,7 @@ module.exports = {
                         .addChoice('lapis',3)
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
+                        .addChoice('diamond',6)
                         ))
                 
         .addSubcommand(subcommand =>
@@ -414,6 +415,7 @@ module.exports = {
                         .addChoice('lapis',3)
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
+                        .addChoice('diamond',6)
                         )
                 )
         .addSubcommand(subcommand =>
@@ -442,6 +444,7 @@ module.exports = {
                         .addChoice('lapis',3)
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
+                        .addChoice('diamond',6)
                         )
                 )
         .addSubcommand(subcommand =>
@@ -470,6 +473,7 @@ module.exports = {
                         .addChoice('lapis',3)
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
+                        .addChoice('diamond',6)
                         )
                 )
         .addSubcommand(subcommand =>
@@ -492,6 +496,7 @@ module.exports = {
                         .addChoice('lapis',3)
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
+                        .addChoice('diamond',6)
                         )
                 )
         .addSubcommand(subcommand =>
@@ -520,6 +525,7 @@ module.exports = {
                         .addChoice('lapis',3)
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
+                        .addChoice('diamond',6)
                         )
                 )
         .addSubcommand(subcommand =>

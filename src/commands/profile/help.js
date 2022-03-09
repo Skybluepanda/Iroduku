@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
+const color = require('../../color.json');
 
 
 
@@ -62,7 +63,7 @@ idelete: deletes an image from database. (requires photoshopper role)
 gupload: uploads a gif (requires photoshopper role)
 gedit: uploads a gif (requires photoshopper role)
 gdelete: uploads a gif (requires photoshopper role)`)
-            .setColor("#00ecff")
+            .setColor(color.aqua)
         return interaction.reply({embeds: [embed]});
 	},
 };

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
+const color = require('../../color.json');
 
 async function createEmbed(interaction) {
     const embed = new MessageEmbed();
@@ -8,14 +9,14 @@ async function createEmbed(interaction) {
     embed.setTitle("Wishlisting")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("wishlisting...")
-        .setColor("#00ecff")
+        .setColor(color.aqua)
     
     return embed;
 }
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('wlist')
+        .setName('wl')
         .setDescription('Displays wishlist')
         .addUserOption(option => 
             option.setName('user')

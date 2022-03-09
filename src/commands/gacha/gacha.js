@@ -279,11 +279,10 @@ async function createPurpleCard(cid, interaction) {
     if (imageRng > 0) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: imageRng}});
         if (image) {imgID = await image.imageID;} 
-    } else {
+    } else if (imageRng < 0){
         image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(imageRng)}});
         if (image) {imgID = -(await image.gifID);}
-    }
-    if (!imgID) {
+    } else {
         imgID = 0;
     }
     const inumber = await inventorycheck(uid)
@@ -311,7 +310,8 @@ async function viewPCard(card, interaction) {
         if (image) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
+Image ID is ${image.imageID} report any errors using ID.
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -321,7 +321,8 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         if (image){
             url = await image.gifURL;
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
+Gif ID is ${image.gifID} report any errors using ID.
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -373,11 +374,10 @@ async function createRedCard(cid, interaction) {
     if (imageRng > 0) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: imageRng}});
         if (image) {imgID = await image.imageID;} 
-    } else {
+    } else if (imageRng < 0){
         image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(imageRng)}});
         if (image) {imgID = -(await image.gifID);}
-    }
-    if (!imgID) {
+    } else {
         imgID = 0;
     }
     const inumber = await inventorycheck(uid)
@@ -408,7 +408,7 @@ async function viewRCard(card, interaction) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -419,7 +419,7 @@ Image ID is ${image.imageID} report any errors using ID.
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -446,8 +446,7 @@ Gif ID is ${image.gifID} report any errors using ID.
     }
 }
 
-async function createDiaCard(cid, interaction) {
-    const uid = await interaction.user.id;
+async function rngImgID(cid, interaction) {
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const imageCap = await rngImage(cid, interaction);
     const gifCap = await rngGif(cid, interaction);
@@ -455,22 +454,33 @@ async function createDiaCard(cid, interaction) {
     let imageRng;
     if (total == 0) {
         imageRng = 1;
+        return imageRng;
     } else {
         imageRng = ((Math.floor(Math.random() * 100))%total)+1;
         if (imageRng > imageCap) {
             imageRng = -(imageRng-imageCap);
+            return imageRng;
+        } else {
+            return imageRng;
         }
+        
     }
+   
+}
+
+async function createDiaCard(cid, interaction) {
+    const uid = await interaction.user.id;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const imageRng = await rngImgID(cid, interaction);
     let image;
     let imgID;
     if (imageRng > 0) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: imageRng}});
         if (image) {imgID = await image.imageID;} 
-    } else {
+    } else if (imageRng < 0){
         image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(imageRng)}});
         if (image) {imgID = -(await image.gifID);}
-    }
-    if (!imgID) {
+    } else {
         imgID = 0;
     }
     const inumber = await inventorycheck(uid)
@@ -485,7 +495,7 @@ async function createDiaCard(cid, interaction) {
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
     channel.send(`An extra lucky luck sack got a Diamond ${cid} | ${char.characterName}!`)
-    await viewDiaCard(newcard, interaction);
+    return await viewDiaCard(newcard, interaction);
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -496,12 +506,12 @@ async function viewDiaCard(card, interaction) {
     let image;
     let url;
     if (card.imageID > 0) {
-        image = await database.Image.findOne({where: {characterID: cid, imageID: -(card.imageID)}});
+        image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*Set image with /diaset*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -511,8 +521,8 @@ Image ID is ${image.imageID} report any errors using ID.
         if (image){
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+Gif ID is ${image.gifID} report any errors using ID
+*Set image with /diaset*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -521,14 +531,14 @@ Gif ID is ${image.gifID} report any errors using ID.
         image = database.Image.findOne({where: {imageID: 1}})
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
-    embedCard.setTitle(`${char.characterName}`)
+    await (embedCard.setTitle(`${char.characterName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
-        .setColor(color.diamond);
+        .setColor(color.diamond));
     const nsfw = await image.nsfw;
     if (nsfw) {
         await interaction.reply(`||${image.imageURL}||`)
@@ -568,7 +578,7 @@ async function raritySwitch(cid, rngRarity, interaction) {
 
 async function gacha(interaction) {
     const user = interaction.user.id;
-    const sideson = await database.Character.findOne({where: {playerID: user}});
+    const sideson = await database.Sideson.findOne({where: {playerID: user}});
     if (sideson) {
         const totalChar = await database.Character.count();
         const rngChar = Math.floor(Math.random() * 100000);

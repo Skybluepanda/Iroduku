@@ -586,10 +586,10 @@ async function snameList(embed, interaction, page){
                 order: [orderOpt],
                 limit: 20,
                 offset: (page-1)*20,
-                here: {
+                where: {
+                characterID: {[Op.or]: cidList},
                 rarity: rarity,
                 playerID: uid,
-                characterID: {[Op.or]: cidList}
             }}
         );
         maxPage = await database.Card.count(
@@ -607,7 +607,6 @@ async function snameList(embed, interaction, page){
                 limit: 20,
                 offset: (page-1)*20,
                 where: {
-                rarity: rarity,
                 tag: tag,
                 playerID: uid,
                 characterID: {[Op.or]: cidList}

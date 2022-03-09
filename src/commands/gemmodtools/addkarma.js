@@ -34,12 +34,12 @@ module.exports = {
         const embedDone = new MessageEmbed();
         const embedError = new MessageEmbed();
 
-        embed.setTitle("Adding Gem")
+        embed.setTitle("Adding Karma")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
             .setColor("#00ecff")
 
-        embedDone.setTitle("Added Gems")
+        embedDone.setTitle("Added Karma")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setColor("#7cff00")
 

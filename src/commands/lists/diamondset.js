@@ -36,7 +36,7 @@ module.exports = {
             const iNumber = interaction.options.getInteger('imagenumber');
             const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}});
             if (card) {
-                if (card.rarity >= 5) {
+                if (card.rarity >= 6) {
                     if (iNumber > 0) {
                         const image = await database.Image.findOne({where: {characterID: card.characterID, imageNumber: iNumber}});
                         if (image) {

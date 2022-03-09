@@ -6,7 +6,7 @@ const { MessageEmbed } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('idelete')
-		.setDescription('Edits image Details')
+		.setDescription('Deletes Image')
         //cid is constant
         //subcommands for
         /** 

@@ -4,7 +4,7 @@ const database = require('../../database.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('wadd')
+        .setName('wa')
         .setDescription('Adds a character into your wishlist')
         .addIntegerOption(option => 
             option.setName('cid')

@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
-
+const color = require('../../color.json');
 
 
 function embedNew(interaction) {
@@ -9,7 +9,7 @@ function embedNew(interaction) {
     embedNew.setTitle("Character Created")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Character is being created.`)
-        .setColor("#ffb400")
+        .setColor(color.purple)
     return embedNew;
 };
 
@@ -18,7 +18,7 @@ function embedError(interaction) {
     embedError.setTitle("Unknown Error")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Please report the error if it persists.`)
-        .setColor("#ff0000");
+        .setColor(color.failred);
     return embedError;
 };
 
@@ -47,11 +47,16 @@ module.exports = {
         .addIntegerOption(option => option
             .setName('sid')
             .setDescription('Enter the series id that the character is part of.')
+            .setRequired(true))
+        .addBooleanOption(option => option
+            .setName('side')
+            .setDescription('Whether the character is a side character or not')
             .setRequired(true)),
 	async execute(interaction) {
 		const name = interaction.options.getString('cname');
         const link = interaction.options.getString('clink');
         const sid = interaction.options.getInteger('sid');
+        const side = interaction.options.getBoolean('side');
         
         const embedN = embedNew(interaction);
         const embedD = embedDupe(interaction);
@@ -72,6 +77,7 @@ module.exports = {
                     characterName: name,
                     infoLink: link,
                     seriesID: sid,
+                    side: side
                 });
                 const series = await database.Series.findOne({ where: {seriesID: sid}});
                 embedN.setDescription(`Character ${name} was created with id ${character.characterID} in series ${series.seriesName}

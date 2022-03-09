@@ -4,7 +4,7 @@ const database = require('../../database.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('wremove')
+        .setName('wr')
         .setDescription('Removes a character from your wishlist')
         .addSubcommand(subcommand => 
             subcommand

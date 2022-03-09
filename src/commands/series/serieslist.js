@@ -193,7 +193,7 @@ async function pageList(embed, interaction, page){
  */
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('slist')
+		.setName('sl')
 		.setDescription('Shows a list of series')
         .addSubcommand(subcommand => 
             subcommand

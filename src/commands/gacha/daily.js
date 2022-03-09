@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
 // const { dayjs } = require('dayjs');
+const color = require('../../color.json');
 var dayjs = require('dayjs')
 var duration = require('dayjs/plugin/duration')
 //import dayjs from 'dayjs' // ES 2015
@@ -15,7 +16,7 @@ function embedC(interaction) {
     embed.setTitle("Checking in")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
-            .setColor("#00fff4")
+            .setColor(color.purple)
     return embed;
 };
 
@@ -24,7 +25,7 @@ function embedD(interaction) {
     const embedDone = new MessageEmbed();
     embedDone.setTitle("Daily claimed!")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
-            .setColor("#7cff00")
+            .setColor(color.successgreen)
     return embedDone;
 };
 
@@ -34,7 +35,7 @@ function embedL(interaction) {
     embedCool.setTitle("Daily on cooldown.")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please wait for the cooldown.`)
-            .setColor("#ff00bf")
+            .setColor(color.failred)
     return embedCool;
 };
 
@@ -44,7 +45,7 @@ function embedE(interaction) {
     embedError.setTitle("Unknown Error")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please report the error if it persists.`)
-            .setColor("#ff0000")
+            .setColor(color.failred)
     return embedError;
 }
 

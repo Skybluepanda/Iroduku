@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
+const color = require('../../color.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,25 +19,25 @@ module.exports = {
         embed.setTitle("Creating Profile")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
-            .setColor("#00ecff")
+            .setColor(color.purple)
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
 
         embedNew.setTitle("Profile Created")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Profile ${username} was created using discord ID ${userId}`)
-            .setColor("#7cff00")
+            .setColor(color.successgreen)
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
 
         embedError.setTitle("Unknown Error")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please report the error if it persists.`)
-            .setColor("#ff0000")
+            .setColor(color.failred)
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
 
         embedDupe.setTitle("Account Exists")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Account with discord ID ${userId} already exists`)
-            .setColor("#ff0000")
+            .setColor(color.failred)
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }));
 
         

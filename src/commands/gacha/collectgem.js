@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
+const color = require('../../color.json');
 // const { dayjs } = require('dayjs');
 var dayjs = require('dayjs')
 var duration = require('dayjs/plugin/duration')
@@ -15,7 +16,7 @@ function embedC(interaction) {
     embed.setTitle("Collecting...")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Checking for ${username}'s account.`)
-            .setColor("#00fff4")
+            .setColor(color.purple)
     return embed;
 };
 
@@ -24,7 +25,7 @@ function embedD(interaction) {
     const embedDone = new MessageEmbed();
     embedDone.setTitle("Collected gems!")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
-            .setColor("#7cff00")
+            .setColor(color.successgreen)
     return embedDone;
 };
 
@@ -34,7 +35,7 @@ function embedL(interaction) {
     embedCool.setTitle("Collection too soon.")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please wait for the cooldown.`)
-            .setColor("#ff00bf")
+            .setColor(color.failred)
     return embedCool;
 };
 
@@ -56,7 +57,7 @@ async function checkTime(interaction, player){
         const timeNow = Date.now();
         const timeDiff = await timeNow - lastCheck;
         if (28800000 > timeDiff && timeDiff >= 480000) {
-            const amount = Math.floor(timeDiff/480000);
+            const amount = 5 * Math.floor(timeDiff/480000);
             const timeLeft = (timeDiff%480000);
             await normalCollect(interaction, player, amount);
             await database.Collect.update({lastcollect: timeNow-timeLeft}, {where: {playerID: userId}});
@@ -82,11 +83,11 @@ async function newCollect(interaction, player){
     });
     await player.increment('gems', {by: 180});
     await embedDone.setDescription(`
-    Collect is a command that you grants you a gem per 8 minutes (what is this... resin?)
+    Collect is a command that you grants you 5 gems per 8 minutes (what is this... resin?)
     This is a temporary solution for those who are too lazy to send images but still want to gacha.
     Collection will cap at 8hrs for total of 60 gems per 8hr cycle.
     Collecting after more than 8hrs have past will grant 60 gems.
-    Gems: (Start collecting bonus +180 gems!) ${player.gems+180}`);
+    Gems: (Start collecting bonus +180 gems!) ${player.gems+900}`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
 }
 
@@ -100,9 +101,9 @@ async function normalCollect(interaction, player, amount){
 
 async function maxCollect(interaction, player){
     const embedDone = await embedD(interaction);
-    await player.increment('gems', {by: 60});
+    await player.increment('gems', {by: 300});
     await embedDone.setDescription(`
-    Gems Collected: (Capped! +60) ${player.gems+60}`);
+    Gems Collected: (Capped! +300) ${player.gems+300}`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
 }
 

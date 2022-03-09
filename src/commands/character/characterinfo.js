@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database');
 const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
 const { Op } = require("sequelize");
+const color = require('../../color.json');
 
 /**
  * Creates an embed for the command.
@@ -14,7 +15,7 @@ function createEmbed(interaction) {
     embed.setTitle("Char Search")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("Character Not Found. It's possible that the character doesn't exist.")
-        .setColor("#ff0000");
+        .setColor(color.failred);
     
     return embed;
 }
@@ -180,7 +181,7 @@ async function charList(interaction, embed){
             .setDescription(`
             ${listString}
             If there are 20 listed characters and you don't see yours, try /clist!`)
-            .setColor("#7cff00");
+            .setColor(color.aqua);
         return await interaction.reply({embeds: [embed]});
     } catch(error) {
         console.log("Error has occured with charList");
@@ -269,7 +270,7 @@ Gif Count: ${char.gifCount}
 Side: ${char.side}
             `)
             .setTitle(`${char.characterName}`)
-            .setColor("#7cff00");
+            .setColor(color.successgreen);
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
         await buttonManager(embed, interaction, msg, 1, totalImage, imageC, cid);
@@ -310,7 +311,7 @@ Gif Count: ${char.gifCount}
 Side: ${char.side}
             `)
             .setTitle(`${char.characterName}`)
-            .setColor("#7cff00");
+            .setColor(color.successgreen);
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
         await buttonManager(embed, interaction, msg, 1, totalImage, imageC, cid);
@@ -326,7 +327,7 @@ Side: ${char.side}
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('cinfo')
+		.setName('ci')
 		.setDescription('Shows information of a character')
         .addSubcommand(subcommand =>
             subcommand

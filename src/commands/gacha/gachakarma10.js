@@ -175,7 +175,8 @@ async function viewPCard(card, interaction) {
         if (image) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
+Image ID is ${image.imageID} report any errors using ID.
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -185,7 +186,8 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         if (image){
             url = await image.gifURL;
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.`).setImage(url);
+Gif ID is ${image.gifID} report any errors using ID.
+*you can update image with /amethystupdate*`).setImage(url);
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -220,37 +222,29 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url);
 
 
 async function createRedCard(cid, interaction) {
-    console.log("1")
     const uid = await interaction.user.id;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const imageCap = await rngImage(cid, interaction);
     const gifCap = await rngGif(cid, interaction);
     const total = await (imageCap + gifCap);
     let imageRng;
-    console.log("2")
     if (total == 0) {
-        console.log("3")
         imageRng = 1;
     } else {
-        console.log("4")
         imageRng = ((Math.floor(Math.random() * 100))%total)+1;
         if (imageRng > imageCap) {
             imageRng = -(imageRng-imageCap);
-            console.log(imageRng);
         }
     }
     let image;
     let imgID;
     if (imageRng > 0) {
-        console.log("5")
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: imageRng}});
         if (image) {imgID = await image.imageID;} 
     } else {
-        console.log("6")
         image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(imageRng)}});
         if (image) {imgID = -(await image.gifID);}
     }
-    console.log("7")
     if (!imgID) {
         imgID = 0;
     }
@@ -264,13 +258,11 @@ async function createRedCard(cid, interaction) {
         quantity: 1,
         rarity: 5,
     });
-    console.log("8")
     
     let channel = await interaction.guild.channels.cache.get('948507565577367563');
     await channel.send(`An luck sack got a Ruby ${cid} | ${char.characterName}!`);
     await viewRCard(newcard, interaction);
     const gachaString = (`:red_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`);
-    console.log("9")
     
     return gachaString;
 }
@@ -288,7 +280,7 @@ async function viewRCard(card, interaction) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -299,7 +291,7 @@ Image ID is ${image.imageID} report any errors using ID.
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -379,23 +371,23 @@ async function viewDiaCard(card, interaction) {
     let image;
     let url;
     if (card.imageID > 0) {
-        image = await database.Image.findOne({where: {characterID: cid, imageID: -(card.imageID)}});
+        image = await database.Image.findOne({where: {characterID: cid, imageID: (card.imageID)}});
         if (image) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*Set image with /diaset*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: card.imageID}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -card.imageID}});
         if (image){
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*Set image with /diaset*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -414,11 +406,11 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setColor(color.diamond);
     const nsfw = await image.nsfw;
     if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
+        msg = await interaction.followUp(`||${image.imageURL}||`);
+        await msg.edit({embeds: [embedCard]});
         return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
     } else {
-        return await interaction.reply({embeds: [embedCard]});
+        await interaction.followUp({embeds: [embedCard]});
     }
 }
 

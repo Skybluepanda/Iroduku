@@ -9,7 +9,7 @@ const { MessageActionRow, MessageButton } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('lidupdate')
+		.setName('lu')
 		.setDescription('Sets an Amethyst card to the new image assigned to the image number.')
         .addIntegerOption(option => 
             option

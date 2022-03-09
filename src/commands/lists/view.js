@@ -148,7 +148,8 @@ async function viewPurpleCard(card, interaction) {
         if (image) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
+Image ID is ${image.imageID} report any errors using ID.
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -158,7 +159,8 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         if (image){
             url = await image.gifURL;
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
+Gif ID is ${image.gifID} report any errors using ID.
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -200,7 +202,7 @@ async function viewRedCard(card, interaction) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -211,7 +213,7 @@ Image ID is ${image.imageID} report any errors using ID.
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -253,7 +255,7 @@ async function viewDiaCard(card, interaction) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*Set image with /diaset*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -264,7 +266,7 @@ Image ID is ${image.imageID} report any errors using ID.
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*Set image with /rubyset*`).setImage(url)
+*Set image with /diaset*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");

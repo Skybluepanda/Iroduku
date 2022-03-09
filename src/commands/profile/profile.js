@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
+const color = require('../../color.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -42,8 +43,8 @@ module.exports = {
 **Pity:** ${player.pity}
                 `)
             } else {
-                embedDone.setDescription('Character does not exist.')
-                        .setColor('#ff0000');
+                embedDone.setDescription('Player does not exist.')
+                        .setColor(color.aqua);
             }
             return interaction.editReply({ embeds: [embedDone] });
         } catch (error) {

@@ -72,6 +72,7 @@ module.exports = {
                         .setRequired(true)
                         .addChoice('Anime', 'Anime')
                         .addChoice('Game', 'Game')
+                        .addChoice('Vtuber', 'Vtuber')
                         .addChoice('Others', 'Others'))),
 	async execute(interaction) {
         try {

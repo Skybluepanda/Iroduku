@@ -37,7 +37,7 @@ async function clistSwitch(embed, interaction, page){
             nameList(embed, interaction, page);
             break;
         
-        case "seriesid":
+        case "sid":
             sidList(embed, interaction, page);
             break;
         
@@ -50,7 +50,7 @@ async function clistSwitch(embed, interaction, page){
             snameList(embed, interaction, page);
             break;
 
-        case "nopics":
+        case "np":
             nopicList(embed, interaction, page);
             break;
     }
@@ -63,7 +63,7 @@ async function clistSwitch2(embed, interaction, page){
             nameList(embed, interaction, page);
             break;
         
-        case "seriesid":
+        case "sid":
             sidList(embed, interaction, page);
             break;
 
@@ -75,7 +75,7 @@ async function clistSwitch2(embed, interaction, page){
             snameList(embed, interaction, page);
             break;
 
-        case "nopics":
+        case "np":
             nopicList(embed, interaction, page);
             break;
     }
@@ -173,19 +173,29 @@ async function pageSearch(embed, interaction, page) {
 
 async function pageList(embed, interaction, page){
     //use page for pages
-    const maxPage =  Math.ceil(await database.Character.count()/20);
+    const sides = interaction.options.getBoolean('side');
     const list = await database.Character.findAll(
         {attributes: ['characterID', 'characterName', 'seriesID'],
         order: ['characterID'],
         limit: 20,
-        offset: (page-1)*20,}
-        );
+        offset: (page-1)*20,}, {
+            where: {
+                side: sides
+            }});
+    const maxPage =  Math.ceil(await database.Character.count({
+        where: {
+            side: sides
+        }})/20);
+    
     if (maxPage > 0) {
         deployButton(interaction, embed);
     }
     const listString = await list.map(joinBar).join(`\n`);
     await embed.setDescription(`${listString}`);
-    const total = await database.Character.count();
+    const total = await database.Character.count({
+        where: {
+            side: sides
+        }});
     await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
@@ -215,40 +225,23 @@ async function nopicList(embed, interaction, page){
 async function sidList(embed, interaction, page){
     const series = await interaction.options.getInteger('sid');
     const side = await interaction.options.getBoolean('side');
-    let maxPage;
-    let list;
-    if (side) {
-        maxPage =  Math.ceil(await database.Character.count(
-            {where: {
-            seriesID: series,
-        }}
-            )/20);
-        list = await database.Character.findAll(
-            {attributes: ['characterID', 'characterName', 'seriesID'],
-            order: ['characterID'],
-            limit: 20,
-            offset: (page-1)*20,
-        where: {
-            seriesID: series
-        }}
-        );
-    } else {
-        maxPage =  Math.ceil(await database.Character.count(
-            {where: {
-            seriesID: series,
-        }}
-            )/20);
-        list = await database.Character.findAll(
-            {attributes: ['characterID', 'characterName', 'seriesID'],
-            order: ['characterID'],
-            limit: 20,
-            offset: (page-1)*20,
-        where: {
-            seriesID: series,
-            side: false
-        }}
-        );
-    }
+        
+    const maxPage =  Math.ceil(await database.Character.count(
+        {where: {
+        seriesID: series,
+        side: side,
+    }}
+        )/20);
+    const list = await database.Character.findAll(
+        {attributes: ['characterID', 'characterName', 'seriesID'],
+        order: ['characterID'],
+        limit: 20,
+        offset: (page-1)*20,
+    where: {
+        seriesID: series,
+        side: side
+    }}
+    );
     
     if (maxPage > 0) {
         deployButton(interaction, embed);
@@ -312,7 +305,7 @@ async function snameList(embed, interaction, page){
  */
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('clist')
+		.setName('cl')
 		.setDescription('Shows a list of characters')
         .addSubcommand(subcommand => 
             subcommand
@@ -328,14 +321,19 @@ module.exports = {
             subcommand
                 .setName("page")
                 .setDescription("Lists pages of characters with no filter. ")
+                .addBooleanOption(option => 
+                    option
+                        .setName("side")
+                        .setDescription("Show sides or not")
+                        .setRequired(true)
+                        )        
                 .addIntegerOption(option => 
                     option
                         .setName("page")
-                        .setDescription("The page you want to open.")
-                        ))
+                        .setDescription("The page you want to open.")))
         .addSubcommand(subcommand =>
             subcommand
-                .setName("seriesid")
+                .setName("sid")
                 .setDescription("Search by series id. ")
                 .addIntegerOption(option => 
                     option
@@ -361,7 +359,7 @@ module.exports = {
                         ))
         .addSubcommand(subcommand =>
             subcommand
-                .setName("nopics")
+                .setName("np")
                 .setDescription("Shows characters with 0 images.")),
 	async execute(interaction) {
         if (!interaction.options.getSubcommand()) {

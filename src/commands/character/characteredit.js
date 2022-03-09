@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database');
 const { MessageEmbed } = require('discord.js');
+const color = require('../../color.json');
 
 async function embedProcess(interaction) {
     const embedProcess = new MessageEmbed();
@@ -8,7 +9,7 @@ async function embedProcess(interaction) {
     embedProcess.setTitle(`Character ${cid} is being edited`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Processing...`)
-        .setColor("#ffb400")
+        .setColor(color.purple)
     return embedProcess;
 };
 
@@ -19,7 +20,7 @@ async function embedSuccess(interaction) {
     embedSuccess.setTitle(`Character ${cid} edited`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Character ${char.characterName} has been edited`)
-        .setColor("#7cff00")
+        .setColor(color.successgreen)
     return embedSuccess;
 };
 
@@ -28,7 +29,7 @@ async function embedError(interaction) {
     embedError.setTitle("Unknown Error")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Please report the error if it persists.`)
-        .setColor("#ff0000");
+        .setColor(color.failred);
     return embedError;
 };
 
