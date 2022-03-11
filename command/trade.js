@@ -1,12 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../database.js');
-const { MessageEmbed, Guild } = require('discord.js');
+const database = require('../src/database.js');
+const { MessageEmbed, Guild, ThreadManager } = require('discord.js');
 const { Op } = require("sequelize");
-const color = require('../../color.json');
+const color = require('../src/color.json');
 const { MessageActionRow, MessageButton } = require('discord.js');
 var dayjs = require('dayjs');
-const { canTreatArrayAsAnd } = require('sequelize/dist/lib/utils');
-const { isApplicationCommandDMInteraction } = require('discord-api-types/utils/v9');
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
 
@@ -23,6 +21,11 @@ function embedSucess(interaction) {
 async function subSwitch(interaction){
     const subCommand = await interaction.options.getSubcommand();
     switch (subCommand) {
+
+        case "start":
+            startTrade(interaction);
+            break;
+
         case "addcard":
             addCard(interaction);
             break;
@@ -52,21 +55,96 @@ async function subSwitch(interaction){
     }
 }
 
+async function startTrade(interaction) {
+    const uid = await interaction.user.id
+    const trade = await database.Trade.findOne({where: {[Op.or]: [{player1ID: uid},{player2ID: uid}]}});
+    const target = interaction.options.getUser('user');
+    const player = await database.Player.findOne({where: {playerID: target.id}});
+    console.log("1");
+    if (trade) {
+        console.log("2");
+        const member1 = await database.Player.findOne({where: {playerID: trade.player1ID}});
+        const member2 = await database.Player.findOne({where: {playerID: trade.player2ID}});
+        return await interaction.reply(`You are already in trade. Participants ${member1.name} and ${member2.name}`);
+    } else {
+        if (player) {
+            const row = await createButton(interaction);
+            console.log("4");
+            const msg = await interaction.reply({content: `${interaction.user.toString()} is requesting trade with ${target.toString()}`, components: [row]});
+            await buttonManager3(interaction, msg);
+        } else {
+            return await interaction.reply(`Target user is not a player.`);
+        }
+    }
+}
+
+async function createButton() {
+    try {
+        const row = await new MessageActionRow()
+        .addComponents(
+            new MessageButton()
+                .setCustomId('accept')
+                .setLabel('Accept')
+                .setStyle('SUCCESS'),
+            new MessageButton()
+                .setCustomId('decline')
+                .setLabel('Decline')
+                .setStyle('DANGER'),
+        );
+        return row;
+    } catch(error) {
+        console.log("error has occured in crearteButton");
+    }
+}
+
+async function buttonManager3(interaction, msg) {
+    try {
+        const target = await interaction.options.getUser('user');
+        console.log("5.1");
+        const uid = await interaction.user.id;
+        console.log("5.2");
+        const tid = await target.id
+        console.log("5.4.1");
+        const filter = i => i.user.id === interaction.user.id;
+        console.log("5.4.2");
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        console.log("5.5");
+        console.log("6");
+        collector.on('collect', async i => {
+            switch (i.customId){
+                case 'accept':
+                    console.log("7");
+                    await database.Trade.create({
+                        player1ID: uid,
+                        player2ID: tid
+                    });
+                    await interaction.channel.send("Trade accepted");
+                    break;
+                
+                case 'decline':
+                    console.log("8");
+                    await interaction.channel.send("Trade declined");
+                    break;
+            };
+            i.deferUpdate();
+        });
+    } catch(error) {
+        console.log("Error has occured in button Manager");
+    }
+}
+
 async function cancelTrade(interaction) {
     const uid = await interaction.user.id;
-    await database.Trade.destroy({where: {player1ID: uid}});
-    await database.Trade.destroy({where: {player2ID: uid}});
+    await database.Trade.destroy({where: {[Op.or]: [{player1ID: uid},{player2ID: uid}]}});
     await interaction.reply("All trade items involving you have been reset regardless of locked.");
 }
 
 async function tradeList1(embed, interaction, page) {
     const uid = await interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
     //grab all cards type 1 with database.trade.findall
     //then grab all cards into a list and display
     //type 2,3,4 gem, karma, coins respectively.
-    const tradeCards = await database.Trade.findAll({where: {player1ID: uid, player2ID: tid, type: 1}});
+    const tradeCards = await database.Trade.findAll({where: {player1ID: uid}});
     let tradeLidList = [];
     for (let i = 0; i < tradeCards.length; i++) {
         tradeLidList[i] = tradeCards[i].value;
@@ -129,28 +207,11 @@ async function tradeList1(embed, interaction, page) {
         }}
     )
     let locked
-    const locks = (database.Trade.count({where: {player1ID: uid, player2ID: tid, locked: true}}) 
-            + database.Trade.count({where: {player1ID: tid, player2ID: uid, locked: true}}));
-    if (locks > 0) {
+    const locks = await database.Trade.findOne({where: {[Op.or]: [{player1ID: uid},{player2ID: uid}], locked: true}})
+    if (locks) {
         locked = true;
     } else {
         locked = false;
-    }
-    const gems = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 2}});
-    const karma = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 3}});
-    const coins = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 4}});
-    let gemt = 0;
-    let karmat = 0;
-    let coinst = 0;
-
-    if (gems) {
-        gemt = gems.value;
-    }
-    if (karma) {
-        karmat = karma.value;
-    }
-    if (coins) {
-        coinst = coins.value;
     }
     
     
@@ -166,9 +227,6 @@ async function tradeList1(embed, interaction, page) {
     **Lapis:** ${blueCount} cards
     **Amethyst:** ${purpleCount} cards
     **Ruby:** ${redCount} cards
-    **Gem:** ${gemt}
-    **Karma:** ${karmat}
-    **Coins:** ${coinst}
     `);
     
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
@@ -177,28 +235,23 @@ async function tradeList1(embed, interaction, page) {
 }
 
 async function tradeList2(embed, interaction, page){
-    const tid = await interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const uid = target.id;
+    const uid = await interaction.user.id;
     //grab all cards type 1 with database.trade.findall
     //then grab all cards into a list and display
     //type 2,3,4 gem, karma, coins respectively.
-    const tradeCards = await database.Trade.findAll({where: {player1ID: uid, player2ID: tid, type: 1}});
+    const tradeCards = await database.Trade.findAll({where: {player2ID: uid}});
+    const tid = tradeCards[0].player1ID;
     let tradeLidList = [];
     for (let i = 0; i < tradeCards.length; i++) {
         tradeLidList[i] = tradeCards[i].value;
     }
     let locked
-    const locks = (database.Trade.count({where: {player1ID: uid, player2ID: tid, locked: true}}) 
-            + database.Trade.count({where: {player1ID: tid, player2ID: uid, locked: true}}));
-    if (locks > 0) {
+    const locks = await database.Trade.findOne({where: {[Op.or]: [{player1ID: uid},{player2ID: uid}], locked: true}})
+    if (locks) {
         locked = true;
     } else {
         locked = false;
     }
-    const gems = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 2}});
-    const karma = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 3}});
-    const coins = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 4}});
 
     const cardList = await database.Card.findAll(
         {
@@ -257,20 +310,14 @@ async function tradeList2(embed, interaction, page){
             inventoryID: {[Op.or]: [tradeLidList]}
         }}
     )
-
-    let gemt = 0;
-    let karmat = 0;
-    let coinst = 0;
-
-    if (gems) {
-        gemt = gems.value;
-    }
-    if (karma) {
-        karmat = karma.value;
-    }
-    if (coins) {
-        coinst = coins.value;
-    }
+    const diaCount = await database.Card.count(
+        {
+            where: {
+            rarity: 6,
+            playerID: uid,
+            inventoryID: {[Op.or]: [tradeLidList]}
+        }}
+    )
     
     const totalPage = Math.ceil(maxPage/20);
     await deployButton2(interaction, embed);
@@ -284,9 +331,7 @@ async function tradeList2(embed, interaction, page){
     Lapis: ${blueCount} cards
     Amethyst: ${purpleCount} cards
     Ruby: ${redCount} cards
-    **Gem:** ${gemt}
-    **Karma:** ${karmat}
-    **Coins:** ${coinst}
+    Diamond: ${diaCount} cards
     `);
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
     const msg = await updateReply(interaction, embed);
@@ -334,6 +379,20 @@ async function deployButton2(interaction, embed){
     await interaction.editReply({ embeds: [embed], components: [row]});
 }
 
+async function inventorycheck(uid) {
+    var notfound = true;
+    var i = 1;
+    while (notfound) {
+        const number = await database.Card.findOne({where: {playerID: uid, inventoryID: i}})
+        if (number) {
+            i += 1;
+        } else {
+            notfound = false;
+        }
+    }
+    return i;
+}
+
 async function processCard1(interaction) {
     const uid = await interaction.user.id;
     const target = interaction.options.getUser('user');
@@ -342,18 +401,16 @@ async function processCard1(interaction) {
     //then grab all cards into a list and display
     //type 2,3,4 gem, karma, coins respectively.
     const tradeCards = await database.Trade.findAll({where: {player1ID: uid, player2ID: tid, type: 1}});
-    let tradeLidList = [];
     for (let i = 0; i < tradeCards.length; i++) {
-        tradeLidList[i] = tradeCards[i].value;
-    }
-
-    await database.Card.update({playerID: tid},
-        {
-            where: {
-            playerID: uid,
-            inventoryID: {[Op.or]: [tradeLidList]}
-        }}
-    );
+        const slot = await inventorycheck(tid);
+        await database.Card.update({playerID: tid, inventoryID: slot},
+            {
+                where: {
+                playerID: uid,
+                inventoryID: tradeCards.inventoryID
+            }}
+        );
+    };
 }
 
 async function processCard2(interaction) {
@@ -364,98 +421,25 @@ async function processCard2(interaction) {
     //then grab all cards into a list and display
     //type 2,3,4 gem, karma, coins respectively.
     const tradeCards = await database.Trade.findAll({where: {player1ID: uid, player2ID: tid, type: 1}});
-    let tradeLidList = [];
     for (let i = 0; i < tradeCards.length; i++) {
-        tradeLidList[i] = tradeCards[i].value;
-    }
-
-    await database.Card.update({playerID: tid},
-        {
-            where: {
-            playerID: uid,
-            inventoryID: {[Op.or]: [tradeLidList]}
-        }}
-    );
+        const slot = await inventorycheck(tid);
+        await database.Card.update({playerID: tid, inventoryID: slot},
+            {
+                where: {
+                playerID: uid,
+                inventoryID: tradeCards.inventoryID
+            }}
+        );
+    };
 }
-
-async function processGem(interaction) {
-    const uid = await interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
-    const player1 = await database.Player.findOne({where: {playerID: uid}});
-    const player2 = await database.Player.findOne({where: {playerID: tid}});
-    const gems1 = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 2}});
-    const gems2 = await database.Trade.findOne({where: {player1ID: tid, player2ID: uid, type: 2}});
-    if (gems1 && gems2) {
-        const gem = gems1.value-gems2.value
-        player1.increment({gems: -gem});
-        player2.increment({gems: gem});
-    } else if (gems1 && !gems2) {
-        player1.increment({gems: -gems1.value});
-        player2.increment({gems: gems1.value});
-    } else if (gems2 && !gems2) {
-        player1.increment({gems: gems2.value});
-        player2.increment({gems: -gems2.value});
-    }
-}
-
-async function processKarma(interaction) {
-    const uid = await interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
-    const player1 = await database.Player.findOne({where: {playerID: uid}});
-    const player2 = await database.Player.findOne({where: {playerID: tid}});
-    const karma1 = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 3}});
-    const karma2 = await database.Trade.findOne({where: {player1ID: tid, player2ID: uid, type: 3}});
-    if (karma1 && karma2) {
-        const karma = karma1.value-karma2.value
-        player1.increment({karma: -karma.value});
-        player2.increment({karma: karma.value});
-    } else if (karma1 && !karma2) {
-        player1.increment({karma: -karma1.value});
-        player2.increment({karma: karma1.value});
-    } else if (karma1 && !karma2) {
-        player1.increment({karma: karma2.value});
-        player2.increment({karma: -karma2.value});
-    }
-}
-
-async function processCoins(interaction) {
-    const uid = await interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
-    const player1 = await database.Player.findOne({where: {playerID: uid}});
-    const player2 = await database.Player.findOne({where: {playerID: tid}});
-    const coins1 = await database.Trade.findOne({where: {player1ID: uid, player2ID: tid, type: 4}});
-    const coins2 = await database.Trade.findOne({where: {player1ID: tid, player2ID: uid, type: 4}});
-    if (coins1 && coins2) {
-        const coins = coins1.value-coins2.value
-        player1.increment({money: -coins.value});
-        player2.increment({money: coins.value});
-    } else if (coins1 && !coins2) {
-        player1.increment({money: -coins1.value});
-        player2.increment({money: coins1.value});
-    } else if (coins2 && !coins1) {
-        player1.increment({money: coins2.value});
-        player2.increment({money: -coins2.value});
-    }
-}
-async function processCurrency(interaction) {
-    await processGem(interaction);
-    await processKarma(interaction);
-    await processCoins(interaction);
-}
-
 async function processTrade(interaction) {
     const uid = interaction.user.id;
     const target = interaction.options.getUser('user');
     const tid = target.id;
-    const locked = (await database.Trade.count({where: {player1ID: uid, player2ID: tid, locked: false}}) 
-        + await database.Trade.count({where: {player1ID: tid, player2ID: uid, locked: false}}));
-    if (locked == 0) {
+    const locks = await database.Trade.findOne({where: {[Op.or]: [{player1ID: uid},{player2ID: uid}], locked: true}})
+    if (locks) {
         await processCard1(interaction);
         await processCard2(interaction);
-        await processCurrency(interaction);
         return interaction.followUp("Trade Successful!")
     } else {
         return interaction.followUp("Trade is not locked yet!")
@@ -671,6 +655,31 @@ async function redcard(card) {
         return cardString
     }
 }
+
+async function diacard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    
+    if (tag) {
+        const cardString = `:large_blue_diamond:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
+        console.log(cardString);
+        return cardString
+    } else {
+        const cardString = `:large_blue_diamond:` + ID + ` | ` + charname + `(#${inumber})`;
+        console.log(cardString);
+        return cardString
+    }
+}
 async function switchRarity(card, rarity) {
     switch (rarity) {
         case 1:
@@ -688,6 +697,9 @@ async function switchRarity(card, rarity) {
         case 5:
             return redcard(card);
             //red
+
+        case 5:
+            return diacard(card);
         default:
             return "error";
             //wtf?
@@ -752,8 +764,8 @@ async function tradeStatus(interaction) {
 
 async function lockTrade(interaction) {
     const uid = interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
+    const trade = await database.Trade.findOne({where: {player1ID: uid}});
+    const tid = trade.player2ID;
     if (await check(interaction)) {
         await database.Trade.update({locked: true}, {where: {player1ID: uid, player2ID: tid}});
         await interaction.reply(`Trade items from you to ${target.username} has been locked.
@@ -764,95 +776,24 @@ To change the trade items, both players must unlock their trade items.`);
 
 
 
-
-async function addGem(interaction) {
-    const uid = interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
-    const amount = interaction.options.getInteger('amount');
-    const player1 = await database.Player.findOne({where: {playerID: uid}});
-    if (player1.gems > amount) {
-        await database.Trade.upsert({player1ID: uid, player2ID: tid, type: 2, value: amount}, 
-            {where: {player1ID: uid, player2ID: tid, type: 2}});
-        interaction.reply(`Added ${amount} gems to the trade with ${target.username}`);
-    } else {
-        await interaction.reply("Insufficient gems.")
-    }
-}
-
-async function addKarma(interaction) {
-    const uid = interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
-    const amount = interaction.options.getInteger('amount');
-    const player1 = await database.Player.findOne({where: {playerID: uid}});
-    if (player1.karma > amount) {
-        await database.Trade.upsert({player1ID: uid, player2ID: tid, type: 3, value: amount}, 
-            {where: {player1ID: uid, player2ID: tid, type: 3}});
-        interaction.reply(`Added ${amount} karma to the trade with ${target.username}`);
-        
-    } else {
-        await interaction.reply("Insufficient karma.")
-    }
-    
-}
-
-async function addCoins(interaction) {
-    const uid = interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
-    const amount = interaction.options.getInteger('amount');
-    const player1 = await database.Player.findOne({where: {playerID: uid}});
-    if (player1.money > amount) {
-        await database.Trade.upsert({player1ID: uid, player2ID: tid, type: 4, value: amount}, 
-            {where: {player1ID: uid, player2ID: tid, type: 4}});
-        interaction.reply(`Added ${amount} coins to the trade with ${target.username}`);
-    } else {
-        await interaction.reply("Insufficient coins.")
-    }
-}
-
-
-
-async function currency(interaction) {
-    if (await check(interaction)) {
-        const type = interaction.options.getInteger('currency');
-        switch (type) {
-            case 1:
-                addGem(interaction);
-                break;
-            
-            case 2:
-                addKarma(interaction);
-                break;
-            
-            case 3:
-                addCoins(interaction);
-                break;
-        }
-    }
-}
-
 async function rmAll(interaction) {
     const uid = interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
     if (await check(interaction)) {
-        await database.Trade.destroy({where: {player1ID: uid, player2ID: tid, locked: false}});
+        await database.Trade.destroy({where: {player1ID: uid, locked: false}});
         await interaction.reply(`All trade items with ${target.username} has been removed.`)
     }
 }
 
 async function rmLid(interaction) {
     const uid = interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
     const lid = interaction.options.getInteger('lid');
     const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}});
     const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    if (check(interaction)) {
+        await database.Trade.destroy({where: {player1ID: uid, locked: false}});
+        interaction.reply(`Removed card ${lid}|${char.characterName}(#${card.imageNumber}) from the trade with ${target.username}`);
+    }
     
-    await database.Trade.destroy({where: {player1ID: uid, player2ID: tid, type: 1, value: lid, locked: false}});
-    interaction.reply(`Removed card ${lid}|${char.characterName}(#${card.imageNumber}) from the trade with ${target.username}`);
 }
 
 async function rmTag(interaction) {
@@ -862,9 +803,9 @@ async function rmTag(interaction) {
     const tag = interaction.options.getString('tag');
     const cardsList = await database.Card.findAll({where: {playerID: uid, tag: tag}});
     for (let i = 0; i < cardsList.length; i++) {
-        await database.Trade.destroy({where: {player1ID: uid, player2ID: tid, type: 1, value: cardsList[i].inventoryID, locked: false}});
+        await database.Trade.destroy({where: {player1ID: uid, player2ID: tid, inventoryID: cardsList[i].inventoryID, locked: false}});
     }
-    interaction.reply(`Removed ${cardsList.length} cards (not counting quantity) tagged with ${tag} to trade with ${target.username}`);
+    interaction.reply(`Removed ${cardsList.length} cards tagged with ${tag} to trade with ${target.username}`);
 }
 
 async function rmTagLid(interaction) {
@@ -886,20 +827,31 @@ async function rmCard(interaction) {
     return false;
 }
 
+//const trade = await database.Trade.findOne({where: {[Op.or]: [{player1ID: uid},{player2ID: uid}]}});
 async function check(interaction) {
     const uid = interaction.user.id;
-    const target = interaction.options.getUser('user');
+    let target;
+    const trade = await database.Trade.findOne({where: {player1ID: uid}});
+    const trade2 = await database.Trade.findOne({where: {player2ID: uid}});
+    if (trade) {
+        target = trade.player2ID;
+    } else if (trade2) {
+        target = trade.player1ID;
+    } else {
+        interaction.reply("You have no trades.")
+        return false;
+    }
     const tid = target.id;
     const player1 = await database.Player.findOne({where: {playerID: uid}});
     const player2 = await database.Player.findOne({where: {playerID: tid}});
     if (player1 && player2) {
-        const locked = (database.Trade.count({where: {player1ID: uid, player2ID: tid, locked: true}}) 
-            + database.Trade.count({where: {player1ID: tid, player2ID: uid, locked: true}}));
-        if (locked > 0) {
+        const locked = await database.Trade.findOne({where: { [Op.or]: [{player1ID: uid},{player2ID: uid}], locked: true}});
+        if (locked) {
             interaction.reply(`The trade is locked with ${locked} cards in the trade with ${target.username}
 Unlock trade with the player before modifying the trade.`);
+            return false;
         } else {
-            return true
+            return true;
         }
     } else {
         interaction.channel.send("One or both users aren't registered.")
@@ -910,35 +862,46 @@ Unlock trade with the player before modifying the trade.`);
 
 async function addLid(interaction) {
     const uid = await interaction.user.id;
-    const target = await interaction.options.getUser('user');
+    let target;
+    const trade = await database.Trade.findOne({where: {player1ID: uid}});
+    const trade2 = await database.Trade.findOne({where: {player2ID: uid}});
+    if (trade) {
+        target = trade.player2ID;
+    } else if (trade2) {
+        target = trade.player1ID;
+    } else {
+        await interaction.reply("You have no trades.")
+        return false;
+    }
     const tid = await target.id;
     const lid = await interaction.options.getInteger('lid');
-    
-    let quantity = interaction.options.getInteger('quantity');
-    if (!quantity) {
-        quantity = 1;
-    }
     const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}});
     const char = await database.Character.findOne({where: {characterID: card.characterID}});
-    await database.Trade.upsert({player1ID: uid, player2ID: tid, type: 1, value: lid, quantity: quantity}, {where: {player1ID: uid, player2ID: tid, type: 1, value: lid}});
+    await database.Trade.upsert({player1ID: uid, player2ID: tid, inventoryID: lid}, {where: {player1ID: uid, player2ID: tid, inventoryID: lid}});
     
-    interaction.reply(`Added card ${lid}|${char.characterName}(#${card.imageNumber}) ×${quantity} to the trade with ${target.username}`);
+    interaction.reply(`Added card ${lid}|${char.characterName}(#${card.imageNumber}) to the trade with ${target.username}`);
 }
 
 async function addTag(interaction) {
     const uid = interaction.user.id;
-    const target = interaction.options.getUser('user');
-    const tid = target.id;
+    let target;
+    const trade = await database.Trade.findOne({where: {player1ID: uid}});
+    const trade2 = await database.Trade.findOne({where: {player2ID: uid}});
+    if (trade) {
+        target = trade.player2ID;
+    } else if (trade2) {
+        target = trade.player1ID;
+    } else {
+        interaction.reply("You have no trades.")
+        return false;
+    }
+    const tid = await target.id;
     const tag = interaction.options.getString('tag');
     const cardsList = await database.Card.findAll({where: {playerID: uid, tag: tag}});
     for (let i = 0; i < cardsList.length; i++) {
-        if (cardsList[i].rarity >= 4) {
-            await database.Trade.findOrCreate({where: {player1ID: uid, player2ID: tid, type: 1, value: cardsList[i].inventoryID}});
-        } else {
-            await database.Trade.findOrCreate({where: {player1ID: uid, player2ID: tid, type: 1, value: cardsList[i].inventoryID, quantity: cardsList[i].quantity}});
-        }
+        await database.Trade.findOrCreate({where: {player1ID: uid, player2ID: tid, inventoryID: cardsList[i].inventoryID}});
     }
-    interaction.reply(`Added ${cardsList.length} cards (not counting quantity) tagged with ${tag} to trade with ${target.username}`);
+    interaction.reply(`Added ${cardsList.length} cards tagged with ${tag} to trade with ${target.username}`);
 }
 
 async function tagLid(interaction) {
@@ -968,14 +931,18 @@ module.exports = {
 		.setDescription('Single or Bulk all with tag.')
         .addSubcommand(subcommand =>
             subcommand
-                .setName("addcard")
-                .setDescription("Adds cards to the trade by tag or lid")
+                .setName("start")
+                .setDescription("starts a trade with a user.")
                 .addUserOption(option => 
                     option
                         .setName("user")
                         .setDescription("User you want to trade with")
                         .setRequired(true)
-                        )
+                        ))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("addcard")
+                .setDescription("Adds cards to the trade by tag or lid")
                 .addStringOption(option => 
                     option
                         .setName("tag")
@@ -987,23 +954,11 @@ module.exports = {
                         .setName("lid")
                         .setDescription("lid you want to add to the trade")
                         .setRequired(false)
-                        )
-                .addIntegerOption(option => 
-                    option
-                        .setName("quantity")
-                        .setDescription("The quantity of cards if you are trading Quartz-Lapis rarity cards.")
-                        .setRequired(false)
                         ))
         .addSubcommand(subcommand =>
             subcommand
                 .setName("removecard")
                 .setDescription("Removes cards from the trade by tag or lid.")
-                .addUserOption(option => 
-                    option
-                        .setName("user")
-                        .setDescription("User you want to trade with")
-                        .setRequired(true)
-                        )
                 .addStringOption(option => 
                     option
                         .setName("tag")
@@ -1019,58 +974,15 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName("removeall")
-                .setDescription("Removes all trade components with the user.")
-                .addUserOption(option => 
-                    option
-                        .setName("user")
-                        .setDescription("User you want to trade with")
-                        .setRequired(true)
-                        ))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName("currency")
-                .setDescription("Add or remove currencies from part of the trade")
-                .addUserOption(option => 
-                    option
-                        .setName("user")
-                        .setDescription("User you want to trade with")
-                        .setRequired(true)
-                        )
-                .addIntegerOption(option => 
-                    option
-                        .setName("currency")
-                        .setDescription("The currency you want to add or remove")
-                        .setRequired(true)
-                        .addChoice('Gem', 1)
-                        .addChoice('Karma', 2)
-                        .addChoice('Coins', 3)
-                        )
-                .addIntegerOption(option => 
-                    option
-                        .setName("amount")
-                        .setDescription("The amount you want to add or remove. Enter a negative number to remove.")
-                        .setRequired(true)
-                        ))
+                .setDescription("Removes all trade components with the user."))
         .addSubcommand(subcommand =>
             subcommand
                 .setName("tradestatus")
-                .setDescription("Displays what's in the trade with a user.")
-                .addUserOption(option => 
-                    option
-                        .setName("user")
-                        .setDescription("User you want to trade with")
-                        .setRequired(true)
-                        ))
+                .setDescription("Displays what's in the trade with a user."))
         .addSubcommand(subcommand =>
             subcommand
                 .setName("locktrade")
-                .setDescription("Displays what's in the trade with a user.")
-                .addUserOption(option => 
-                    option
-                        .setName("user")
-                        .setDescription("User you want to trade with")
-                        .setRequired(true)
-                        ))
+                .setDescription("Locks the trade"))
         .addSubcommand(subcommand =>
             subcommand
                 .setName("cancelall")

@@ -204,15 +204,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        msg = await interaction.followUp(`||${image.imageURL}||`);
-        await msg.edit({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        return await interaction.followUp({embeds: [embedCard]});
-    }
-    
+    return await interaction.followUp({embeds: [embedCard]});
 }
 
 
@@ -308,14 +300,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        msg = await interaction.followUp(`||${image.imageURL}||`);
-        await msg.edit({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        await interaction.followUp({embeds: [embedCard]});
-    }
+    await interaction.followUp({embeds: [embedCard]});
 }
 
 async function createDiaCard(cid, interaction) {
@@ -404,14 +389,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        msg = await interaction.followUp(`||${image.imageURL}||`);
-        await msg.edit({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        await interaction.followUp({embeds: [embedCard]});
-    }
+    await interaction.followUp({embeds: [embedCard]});
 }
 
 

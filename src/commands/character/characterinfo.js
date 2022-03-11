@@ -237,6 +237,10 @@ async function updateEmbed(embed, interaction){
     await interaction.editReply({ embeds:[embed], fetchReply: true});
 }
 
+async function isMain(embed, cid) {
+    const main = await interaction.Character.findAll({})
+}
+
 async function cinfoID(embed, interaction) {
     try {
         const cid = await interaction.options.getInteger("id");
@@ -267,7 +271,6 @@ Simps: ${simps}
 Series: ${char.seriesID} | ${series.seriesName}
 Image Count: ${char.imageCount}
 Gif Count: ${char.gifCount}
-Side: ${char.side}
             `)
             .setTitle(`${char.characterName}`)
             .setColor(color.successgreen);
@@ -308,7 +311,7 @@ Simps: ${simps}
 Series: ${char.seriesID} | ${series.seriesName}
 Image Count: ${char.imageCount}
 Gif Count: ${char.gifCount}
-Side: ${char.side}
+Side:
             `)
             .setTitle(`${char.characterName}`)
             .setColor(color.successgreen);

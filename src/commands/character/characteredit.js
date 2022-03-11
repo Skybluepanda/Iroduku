@@ -165,13 +165,6 @@ module.exports = {
             .addStringOption(option => option
                 .setName("gifcount")
                 .setDescription("The gifcount")
-                .setRequired(true)))
-        .addSubcommand(subcommand =>subcommand
-            .setName("side")
-            .setDescription("Toggle them as sides.")
-            .addIntegerOption(option => option
-                .setName("id")
-                .setDescription("The id of the character")
                 .setRequired(true))),
 	async execute(interaction) {
         const id = interaction.options.getInteger('id');

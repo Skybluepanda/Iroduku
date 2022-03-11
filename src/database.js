@@ -72,10 +72,15 @@ const Character = sequelize.define('character', {
 		defaultValue: 0,
 		allowNull: false,
 	},
-	side : {
-		type: Sequelize.BOOLEAN,
+	score: {
+		type: Sequelize.INTEGER,
 		allowNull: false,
-		defaultValue: false,
+		defaultValue: 0,
+	},
+	votes: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+		defaultValue: 0,
 	}
 	
 });
@@ -281,7 +286,27 @@ const Sideson = sequelize.define('sideson', {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
-	}
+	},
+});
+
+const Votetrack = sequelize.define('votetrack', {
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	charVote: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 2,
+	},
+	imageVote: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 1,
+	},
 });
 
 const Trade = sequelize.define('trade', {
@@ -295,18 +320,9 @@ const Trade = sequelize.define('trade', {
 		unique: false,
 		allowNull: false,
 	},
-	type: {
+	inventoryID: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
-	},
-	value: {
-		type: Sequelize.INTEGER,
-		unique: false,
-		allowNull: false,
-	},
-	quantity: {
-		type: Sequelize.INTEGER,
 		allowNull: true,
 	},
 	locked: {
@@ -383,3 +399,4 @@ exports.Sideson = Sideson;
 exports.Card = Card;
 exports.Collect = Collect;
 exports.Trade = Trade;
+exports.Votetrack = Votetrack;

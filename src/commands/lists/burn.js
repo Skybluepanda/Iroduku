@@ -5,7 +5,6 @@ const { Op } = require("sequelize");
 const color = require('../../color.json');
 const { MessageActionRow, MessageButton } = require('discord.js');
 var dayjs = require('dayjs');
-const { canTreatArrayAsAnd } = require('sequelize/dist/lib/utils');
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
 
@@ -64,7 +63,7 @@ async function createButton() {
 async function buttonManager(interaction, msg, coins, gems) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'confirm':
@@ -216,6 +215,7 @@ async function viewBlueCard(card, interaction) {
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         } else {
+            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else {
@@ -226,6 +226,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         } else {
+            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     }
@@ -269,6 +270,7 @@ async function viewPurpleCard(card, interaction) {
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         } else {
+            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
@@ -278,9 +280,11 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         } else {
+            image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else {
+        image = database.Image.findOne({where: {imageID: 1}})
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
     embedCard.setTitle(`${char.characterName}`)

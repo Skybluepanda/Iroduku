@@ -40,6 +40,7 @@ module.exports = {
                 Series ID: ${series.seriesID}
                 Series Name: ${series.seriesName}
                 Series Link: ${series.malLink}
+                Category: ${series.category}
                 `);
                 return await interaction.reply( {embeds: [embed]});
             }

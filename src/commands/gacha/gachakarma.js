@@ -146,14 +146,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Lapis
 **Quantity:** ${card.quantity}`)
         .setColor(color.blue);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        return await interaction.reply({embeds: [embedCard]});
-    }
+    return await interaction.reply({embeds: [embedCard]});
 }
 
 ///Purple Zone
@@ -242,14 +235,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        return await interaction.reply({embeds: [embedCard]});
-    }
+    return await interaction.reply({embeds: [embedCard]});
 }
 
 
@@ -340,14 +326,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        return await interaction.reply({embeds: [embedCard]});
-    }
+    return await interaction.reply({embeds: [embedCard]});
 }
 
 async function createDiaCard(cid, interaction) {
@@ -433,14 +412,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        return await interaction.reply({embeds: [embedCard]});
-    }
+    return await interaction.reply({embeds: [embedCard]});
 }
 
 

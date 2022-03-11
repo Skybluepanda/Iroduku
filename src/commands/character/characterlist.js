@@ -172,30 +172,19 @@ async function pageSearch(embed, interaction, page) {
 }
 
 async function pageList(embed, interaction, page){
-    //use page for pages
-    const sides = interaction.options.getBoolean('side');
     const list = await database.Character.findAll(
         {attributes: ['characterID', 'characterName', 'seriesID'],
         order: ['characterID'],
         limit: 20,
-        offset: (page-1)*20,
-        where: {
-            side: sides
-        }});
-    const maxPage =  Math.ceil(await database.Character.count({
-        where: {
-            side: sides
-        }})/20);
+        offset: (page-1)*20});
+    const maxPage =  Math.ceil(await database.Character.count()/20);
     
     if (maxPage > 0) {
         deployButton(interaction, embed);
     }
     const listString = await list.map(joinBar).join(`\n`);
     await embed.setDescription(`${listString}`);
-    const total = await database.Character.count({
-        where: {
-            side: sides
-        }});
+    const total = await database.Character.count();
     await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
@@ -224,12 +213,10 @@ async function nopicList(embed, interaction, page){
 
 async function sidList(embed, interaction, page){
     const series = await interaction.options.getInteger('sid');
-    const side = await interaction.options.getBoolean('side');
         
     const maxPage =  Math.ceil(await database.Character.count(
         {where: {
         seriesID: series,
-        side: side,
     }}
         )/20);
     const list = await database.Character.findAll(
@@ -238,8 +225,7 @@ async function sidList(embed, interaction, page){
         limit: 20,
         offset: (page-1)*20,
     where: {
-        seriesID: series,
-        side: side
+        seriesID: series
     }}
     );
     
@@ -320,13 +306,7 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName("page")
-                .setDescription("Lists pages of characters with no filter. ")
-                .addBooleanOption(option => 
-                    option
-                        .setName("side")
-                        .setDescription("Show sides or not")
-                        .setRequired(true)
-                        )        
+                .setDescription("Lists pages of characters with no filter. ")     
                 .addIntegerOption(option => 
                     option
                         .setName("page")
@@ -339,12 +319,6 @@ module.exports = {
                     option
                         .setName("sid")
                         .setDescription("The series ID you want to search with")
-                        .setRequired(true)
-                        )
-                .addBooleanOption(option => 
-                    option
-                        .setName("side")
-                        .setDescription("Show sides or not")
                         .setRequired(true)
                         ))
         .addSubcommand(subcommand =>

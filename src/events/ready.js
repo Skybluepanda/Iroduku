@@ -22,6 +22,7 @@ module.exports = {
         database.Sideson.sync();
         database.Collect.sync();
         database.Trade.sync();
+        database.Votetrack.sync();
         console.log('database sync complete!');
     },
 };

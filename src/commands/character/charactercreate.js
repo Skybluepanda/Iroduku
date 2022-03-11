@@ -47,16 +47,11 @@ module.exports = {
         .addIntegerOption(option => option
             .setName('sid')
             .setDescription('Enter the series id that the character is part of.')
-            .setRequired(true))
-        .addBooleanOption(option => option
-            .setName('side')
-            .setDescription('Whether the character is a side character or not')
             .setRequired(true)),
 	async execute(interaction) {
 		const name = interaction.options.getString('cname');
         const link = interaction.options.getString('clink');
         const sid = interaction.options.getInteger('sid');
-        const side = interaction.options.getBoolean('side');
         
         const embedN = embedNew(interaction);
         const embedD = embedDupe(interaction);
@@ -76,8 +71,7 @@ module.exports = {
                 const character = await database.Character.create({
                     characterName: name,
                     infoLink: link,
-                    seriesID: sid,
-                    side: side
+                    seriesID: sid
                 });
                 const series = await database.Series.findOne({ where: {seriesID: sid}});
                 embedN.setDescription(`Character ${name} was created with id ${character.characterID} in series ${series.seriesName}
