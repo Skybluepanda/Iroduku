@@ -462,7 +462,7 @@ module.exports = {
                     if (wlist >= 10) {
                         await gacha(interaction);
                     }else {
-                        (await embedE).setDescription("You need 10 or more waifus in wishlist to use karma gacha. use /wadd to add to your wishlist!")
+                        (await embedE).setDescription("You need 10 or more waifus in wishlist to use karma gacha. use /wa to add to your wishlist!")
                         return await interaction.reply({embeds: [embedE]});
                     }
                 } else {

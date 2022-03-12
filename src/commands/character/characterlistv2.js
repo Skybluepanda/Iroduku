@@ -40,6 +40,10 @@ async function clistSwitch(embed, interaction, page){
         case "sid":
             sidList(embed, interaction, page);
             break;
+
+        case "rank":
+            rankList(embed, interaction, page);
+            break;
         
 
         case "page":
@@ -65,6 +69,10 @@ async function clistSwitch2(embed, interaction, page){
         
         case "sid":
             sidList(embed, interaction, page);
+            break;
+
+        case "rank":
+            rankList(embed, interaction, page);
             break;
 
         case "page":
@@ -127,7 +135,15 @@ async function buttonManager(embed, interaction, msg, page, maxPage) {
 }
 
 function joinBar(character){
-    return [character.characterID, character.characterName].join(" | ");
+    // const series = await database.Series.findOne({where: {seriesID: character.seriesID}});
+    const charlist = character.characterID + " | " + character.characterName + " [" + character.rank+ "]";
+    // if (series) {
+    //      - " + series.alias;
+    // } else {
+    //     charlist = character.characterID + " | " + character.characterName + " [" + character.rank+ "] - No series alias set";
+    // }
+    //CID | Cname -Rank- Series shortened
+    return charlist;
 }
 
 async function nameList(embed, interaction, page){
@@ -141,7 +157,7 @@ async function nameList(embed, interaction, page){
         deployButton(interaction, embed);
     }
     const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName', 'seriesID'],
+        {
             order: ['characterID'],
             limit: 20,
             offset: (page-1)*20,
@@ -149,8 +165,9 @@ async function nameList(embed, interaction, page){
             characterName: {[Op.like]: '%' + name + '%'}
         }}
         );
-    
-    const listString = await list.map(joinBar).join(`\n`);
+
+    const listMap = await list.map(joinBar);
+    const listString = await listMap.join(`\n`);
     await embed.setDescription(`${listString}`);
     const total = await database.Character.count({where: {
         characterName: {[Op.like]: '%' + name + '%'}
@@ -173,7 +190,7 @@ async function pageSearch(embed, interaction, page) {
 
 async function pageList(embed, interaction, page){
     const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName', 'seriesID'],
+        {
         order: ['characterID'],
         limit: 20,
         offset: (page-1)*20});
@@ -182,9 +199,38 @@ async function pageList(embed, interaction, page){
     if (maxPage > 0) {
         deployButton(interaction, embed);
     }
-    const listString = await list.map(joinBar).join(`\n`);
+    const listMap = await list.map(joinBar);
+    const listString = await listMap.join(`\n`);
     await embed.setDescription(`${listString}`);
     const total = await database.Character.count();
+    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    const msg = await updateReply(interaction, embed);
+    await buttonManager(embed, interaction, msg, page, maxPage)
+};
+
+async function rankList(embed, interaction, page){
+    const rank = await interaction.options.getInteger('rank');
+    const list = await database.Character.findAll(
+        {
+        order: [['final', 'DESC']],
+        limit: 20,
+        offset: (page-1)*20,
+        where: {
+            rank: rank
+        }});
+    const maxPage =  Math.ceil(await database.Character.count({where: {
+        rank: rank
+    }})/20);
+    
+    if (maxPage > 0) {
+        deployButton(interaction, embed);
+    }
+    const listMap = await list.map(joinBar);
+    const listString = await listMap.join(`\n`);
+    await embed.setDescription(`${listString}`);
+    const total = await database.Character.count({where: {
+        rank: rank
+    }});
     await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
@@ -194,7 +240,7 @@ async function nopicList(embed, interaction, page){
     //use page for pages
     const maxPage =  Math.ceil(await database.Character.count({where: {imageCount: 0}})/20);
     const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName', 'seriesID'],
+        {
         order: ['characterID'],
         limit: 20,
         offset: (page-1)*20,
@@ -203,7 +249,8 @@ async function nopicList(embed, interaction, page){
     if (maxPage > 0) {
         deployButton(interaction, embed);
     }
-    const listString = await list.map(joinBar).join(`\n`);
+    const listMap = await list.map(joinBar);
+    const listString = await listMap.join(`\n`);
     await embed.setDescription(`Characters without any images\n${listString}`);
     const total = await database.Character.count({where: {imageCount: 0}});
     await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
@@ -220,7 +267,7 @@ async function sidList(embed, interaction, page){
     }}
         )/20);
     const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName', 'seriesID'],
+        {
         order: ['characterID'],
         limit: 20,
         offset: (page-1)*20,
@@ -232,7 +279,8 @@ async function sidList(embed, interaction, page){
     if (maxPage > 0) {
         deployButton(interaction, embed);
     }
-    const listString = await list.map(joinBar).join(`\n`);
+    const listMap = await list.map(joinBar);
+    const listString = await listMap.join(`\n`);
     await embed.setDescription(`${listString}`);
     const total = await database.Character.count({where: { seriesID: series}});
     await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
@@ -253,7 +301,7 @@ async function snameList(embed, interaction, page){
         sidList[i] = sid;
     }
     const list = await database.Character.findAll(
-        {attributes: ['characterID', 'characterName', 'seriesID'],
+        {
         order: ['characterID'],
         limit: 20,
         offset: (page-1)*20,
@@ -270,7 +318,8 @@ async function snameList(embed, interaction, page){
     if (maxPage > 0) {
         deployButton(interaction, embed);
     }
-    const listString = await list.map(joinBar).join(`\n`);
+    const listMap = await list.map(await joinBar);
+    const listString = await listMap.join(`\n`);
     
     await embed.setDescription(`${listString}`);
     await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
@@ -330,6 +379,19 @@ module.exports = {
                         .setName("sname")
                         .setDescription("The series name you want to search with")
                         .setRequired(true)
+                        ))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("rank")
+                .setDescription("Search by rank. ")
+                .addIntegerOption(option => 
+                    option
+                        .setName("rank")
+                        .setDescription("The rank you want to list.")
+                        .setRequired(true)
+                        .addChoice('main', 1)
+                        .addChoice('side', 2)
+                        .addChoice('trash', 3)
                         ))
         .addSubcommand(subcommand =>
             subcommand

@@ -12,6 +12,10 @@ async function selectOption(interaction) {
         const mal = interaction.options.getString('link');
         await database.Series.update({ malLink: mal }, { where: { seriesID: id } });
         return interaction.reply(`Series ${id} link was edited to ${mal}. Check to see if it worked.`);
+    } else if (interaction.options.getSubcommand() === "alias") {
+        const alias = interaction.options.getString('alias');
+        await database.Series.update({ alias: alias }, { where: { seriesID: id } });
+        return interaction.reply(`Series ${id} alias was edited to ${alias}. Check to see if it worked.`);
     } else if (interaction.options.getSubcommand() === "category") {
         const category = interaction.options.getString('category');
         await database.Series.update({ category: category }, { where: { seriesID: id } });
@@ -38,6 +42,22 @@ module.exports = {
                     option
                         .setName("name")
                         .setDescription("The name of the series")
+                        .setRequired(true)
+                        ))
+        .addSubcommand(subcommand => 
+            subcommand
+                .setName("alias")
+                .setDescription("Edit the name of the series.")
+                .addIntegerOption(option => 
+                    option
+                        .setName("id")
+                        .setDescription("The id of the series")
+                        .setRequired(true)
+                        )
+                .addStringOption(option => 
+                    option
+                        .setName("alias")
+                        .setDescription("The alias of the series")
                         .setRequired(true)
                         ))
         .addSubcommand(subcommand =>

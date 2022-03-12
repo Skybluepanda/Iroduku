@@ -38,12 +38,12 @@ async function selectOption(interaction) {
     const embedS = await embedSuccess(interaction);
     switch (interaction.options.getSubcommand()) {
         case "score":
-            const score = interaction.options.getString('score');
+            const score = interaction.options.getInteger('score');
             await database.Character.update({ score: score }, { where: { characterID: id } });
             return interaction.editReply({embeds: [embedS]});
 
         case "votes":
-            const link = interaction.options.getString('votes');
+            const votes = interaction.options.getInteger('votes');
             await database.Character.update({ votes: votes }, { where: { characterID: id } });
             return interaction.editReply({embeds: [embedS]});
 
@@ -66,7 +66,7 @@ module.exports = {
                 .setName("id")
                 .setDescription("The id of the character")
                 .setRequired(true))
-            .addStringOption(option => option
+            .addIntegerOption(option => option
                 .setName("score")
                 .setDescription("The name of the character")
                 .setRequired(true)))
@@ -77,7 +77,7 @@ module.exports = {
                 .setName("id")
                 .setDescription("The id of the character")
                 .setRequired(true))
-            .addStringOption(option => option
+            .addIntegerOption(option => option
                 .setName("votes")
                 .setDescription("The link of the character")
                 .setRequired(true))),

@@ -268,6 +268,7 @@ async function cinfoID(embed, interaction) {
 Character ID: ${char.characterID}
 Character Alias: ${char.alias}
 Simps: ${simps}
+Rank: ${char.rank}
 Series: ${char.seriesID} | ${series.seriesName}
 Image Count: ${char.imageCount}
 Gif Count: ${char.gifCount}
@@ -308,10 +309,10 @@ async function sendEmbed(interaction, embed) {
 Character ID: ${char.characterID}
 Character Alias: ${char.alias}
 Simps: ${simps}
+Rank: ${char.rank}
 Series: ${char.seriesID} | ${series.seriesName}
 Image Count: ${char.imageCount}
 Gif Count: ${char.gifCount}
-Side:
             `)
             .setTitle(`${char.characterName}`)
             .setColor(color.successgreen);

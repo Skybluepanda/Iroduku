@@ -11,6 +11,10 @@ module.exports = {
             .setDescription('Enter the series name')
             .setRequired(true))
         .addStringOption(option => option
+            .setName('alias')
+            .setDescription('Enter an alias/shortest name that is unique and identifiable to the series.')
+            .setRequired(true))
+        .addStringOption(option => option
             .setName('link')
             .setDescription('Enter the mal link for the series or a game link.')
             .setRequired(true))
@@ -24,6 +28,7 @@ module.exports = {
                 .addChoice('Others', 'Others')),
 	async execute(interaction) {
 		const name = interaction.options.getString('sname');
+        const alias = interaction.options.getString('alias');
         const mlink = interaction.options.getString('link');
         const category = interaction.options.getString('category');
 
@@ -66,6 +71,7 @@ module.exports = {
                 await interaction.editReply({ embeds: [embed] });
                 const series = await database.Series.create({
                     seriesName: name,
+                    alias: alias,
                     malLink: mlink,
                     category: category
                 });

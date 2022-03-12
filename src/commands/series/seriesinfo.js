@@ -39,6 +39,7 @@ module.exports = {
                 await embed.setDescription(`
                 Series ID: ${series.seriesID}
                 Series Name: ${series.seriesName}
+                Series Alias: ${series.alias}
                 Series Link: ${series.malLink}
                 Category: ${series.category}
                 `);

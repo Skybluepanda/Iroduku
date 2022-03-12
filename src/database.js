@@ -54,12 +54,6 @@ const Character = sequelize.define('character', {
 		unique: false,
 		defaultValue: "none",
 	},
-	simps: {
-		type: Sequelize.INTEGER,
-		unique: false,
-		defaultValue: 0,
-		allowNull: false,
-	},
 	imageCount: {
 		type: Sequelize.INTEGER,
 		unique: false,
@@ -90,7 +84,7 @@ const Character = sequelize.define('character', {
 	rank: {
 		type: Sequelize.INTEGER,
 		allowNull: false,
-		defaultValue: 0,
+		defaultValue: 3,
 	}
 });
 
@@ -105,6 +99,11 @@ const Series = sequelize.define('series', {
 		type: Sequelize.STRING,
 		unique: false,
 		allowNull: false,
+	},
+	alias: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: true,
 	},
 	malLink: {
 		type: Sequelize.STRING,

@@ -31,7 +31,14 @@ async function checkPage(direction, page, maxPage) {
 }
 
 function joinBar(series){
-    return [series.seriesID, series.seriesName].join(" | ");
+    const alias = series.alias;
+    if (alias) {
+        const serieslist = series.seriesID + " | " + series.seriesName + " - " + alias;
+        return serieslist;
+    } else {
+        const serieslist = series.seriesID + " | " + series.seriesName + " - No alias set"
+        return serieslist
+    }
 }
 
 
@@ -116,7 +123,7 @@ async function buttonManager2(embed, interaction, msg, page, maxPage) {
 
 async function nameList(embed, interaction, name, page){
     const list = await database.Series.findAll(
-        {attributes: ['seriesID', 'seriesName'],
+        {
         order: ['seriesID'],
         limit: 20,
         offset: (page-1)*20,
@@ -125,7 +132,7 @@ async function nameList(embed, interaction, name, page){
     }}
         );
     const maxPage = Math.ceil(await database.Series.count(
-        {attributes: ['seriesID', 'seriesName'],
+        {
         order: ['seriesID'],
     where: {
         seriesName: {[Op.like]: '%' + name + '%'},
@@ -144,13 +151,13 @@ async function nameList(embed, interaction, name, page){
 async function pageList(embed, interaction, page){
     //use page for pages
     const list = await database.Series.findAll(
-        {attributes: ['seriesID', 'seriesName'],
+        {
         order: ['seriesID'],
         limit: 20,
         offset: (page-1)*20}
         );
     const maxPage = Math.ceil(await database.Series.count(
-        {attributes: ['seriesID', 'seriesName'],
+        {
         order: ['seriesID'],}
         )/20);
     if (maxPage > 0) {
