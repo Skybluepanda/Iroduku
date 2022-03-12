@@ -221,16 +221,9 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setColor(color.blue);
     
     const row = await createButton();
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg);
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg);
-    }
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewPurpleCard(card, interaction) { 
@@ -274,17 +267,10 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
-    const nsfw = await image.nsfw;
     const row = await createButton();
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg);
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg);
-    }
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewRedCard(card, interaction) { 
@@ -328,17 +314,10 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
-    const nsfw = await image.nsfw;
     const row = await createButton();
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg);
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg);
-    }
+    
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -384,17 +363,10 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
-    const nsfw = await image.nsfw;
     const row = await createButton();
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg);
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg);
-    }
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function switchRarity(card, rarity, interaction) {

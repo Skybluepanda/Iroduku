@@ -57,19 +57,15 @@ module.exports = {
                 return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});
 
             };
-            if (interaction.channel.id === '950495634337726575') {
-                console.log("you have gemmod role");
-                const target = await interaction.options.getUser('target');
-                const quantity = await interaction.options.getInteger('quantity');
-                const reason = await interaction.options.getString('reason');
-                embedDone.setDescription(`${target.toString()} recieved ${quantity} gems!
-                Reason: ${reason}`);
-                await database.Player.increment({gems: quantity}, {where: {playerID: target.id}})
-                await interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
-            } else {
-                embedError.setDescription("Use this command in #rewards-commands channel")
-                return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});
-            }
+            console.log("you have gemmod role");
+            const target = await interaction.options.getUser('target');
+            const quantity = await interaction.options.getInteger('quantity');
+            const reason = await interaction.options.getString('reason');
+            embedDone.setDescription(`${target.toString()} recieved ${quantity} gems!
+            Reason: ${reason}`);
+            await database.Player.increment({gems: quantity}, {where: {playerID: target.id}})
+            await interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
+            
             
         } catch (error) {
             return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});

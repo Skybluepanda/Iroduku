@@ -20,6 +20,7 @@ module.exports = {
         database.Wishlist.sync();
         database.Card.sync();
         database.Sideson.sync();
+        database.Trashon.sync();
         database.Collect.sync();
         database.Trade.sync();
         database.Votetrack.sync();

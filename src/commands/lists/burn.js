@@ -136,8 +136,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageU
 **Rarity: Quartz**
 **Quantity:** ${card.quantity}
 
-BURNING THIS CARD WILL YIELD 10 COINS AND 1 GEMS
-${quantity} copies being burnt for ${coins} coins and ${gem} gems`)
+Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:947388797916700672>`)
         .setColor(color.white);
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
@@ -185,8 +184,7 @@ async function viewGreenCard(card, interaction) {
 **Rarity:** Jade
 **Quantity:** ${card.quantity}
 
-BURNING THIS CARD WILL YIELD 20 COINS AND 5 GEMS
-${quantity} copies being burnt for ${coins} coins and ${gem} gems`)
+Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:947388797916700672>`)
         .setColor(color.green);
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
@@ -295,7 +293,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-BURNING THIS CARD WILL YIELD 200 COINS AND 10 GEMS`)
+Burn Reward: 200 <:datacoin:947388797828612127> | 10 <:waifugem:947388797916700672>`)
         .setColor(color.purple);
     const row = await createButton();
     const nsfw = await image.nsfw;

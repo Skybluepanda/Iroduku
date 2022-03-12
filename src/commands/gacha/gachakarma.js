@@ -128,7 +128,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else {
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageNumber)}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(card.imageNumber)}});
         if (image){
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}

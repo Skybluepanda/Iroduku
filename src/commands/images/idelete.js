@@ -22,8 +22,8 @@ module.exports = {
             .setRequired(true)),
 	async execute(interaction) {
 		try {
-            if (!interaction.member.roles.cache.has('947640668031975465')) {
-                return interaction.reply("You don't have the photoshopper role!", {ephemeral: true});
+            if (!interaction.member.roles.cache.has('951960776380416000')) {
+                return interaction.reply("You don't have the picaso role!", {ephemeral: true});
             };
         	const id = await interaction.options.getInteger('id');
             image = await database.Image.findOne({where: {imageID: id}})

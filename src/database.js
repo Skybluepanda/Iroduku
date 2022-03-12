@@ -81,8 +81,17 @@ const Character = sequelize.define('character', {
 		type: Sequelize.INTEGER,
 		allowNull: false,
 		defaultValue: 0,
+	},
+	final: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+		defaultValue: 0,
+	},
+	rank: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+		defaultValue: 0,
 	}
-	
 });
 
 
@@ -289,6 +298,14 @@ const Sideson = sequelize.define('sideson', {
 	},
 });
 
+const Trashon = sequelize.define('trashon', {
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+});
+
 const Votetrack = sequelize.define('votetrack', {
 	playerID: {
 		type: Sequelize.INTEGER,
@@ -396,6 +413,7 @@ exports.Player = Player;
 exports.Daily = Daily;
 exports.Wishlist = Wishlist;
 exports.Sideson = Sideson;
+exports.Trashon = Trashon;
 exports.Card = Card;
 exports.Collect = Collect;
 exports.Trade = Trade;

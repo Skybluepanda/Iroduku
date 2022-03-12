@@ -518,29 +518,89 @@ async function raritySwitch(cid, rngRarity, interaction) {
     }
 }
 
-async function gacha(interaction) {
+async function wlPool(interaction) {
     const user = interaction.user.id;
-    const sideson = await database.Sideson.findOne({where: {playerID: user}});
+    const wlist = await database.Wishlist.findAll({where: {playerID: user}});
+    const rngChar = Math.floor(Math.random() * 1000);
+    const char = (rngChar%wlist.length);
+    const cid = await wlist[char].characterID;
+    const rngRarity = Math.floor(Math.random() * 10000);
+    return await raritySwitch(cid, rngRarity, interaction);
+}
+
+async function mainPool(interaction) {
+    const rngChar = Math.floor(Math.random() * 10000);
+    const rngRarity = Math.floor(Math.random() * 10000);
+    const offset = (rngChar%100);
+    const char = await database.Character.findOne({offset: offset, where: {rank: 1}});
+    const cid = await char.characterID;
+    return await raritySwitch(cid, rngRarity, interaction);
+}
+
+async function sidePool(interaction) {
+    const sideChar = await database.Character.count({where: {rank: 2}});
+    const rngChar = Math.floor(Math.random() * 10000);
+    const rngRarity = Math.floor(Math.random() * 10000);
+    const offset = (rngChar%sideChar);
+    const char = await database.Character.findOne({offset: offset, where: {rank: 2}});
+    const cid = await char.characterID;
+    return await raritySwitch(cid, rngRarity, interaction);
+}
+
+async function allPool(interaction) {
     const totalChar = await database.Character.count();
     const rngChar = Math.floor(Math.random() * 100000);
     const rngRarity = Math.floor(Math.random() * 10000);
     const cid = (rngChar%totalChar)+1;
     return await raritySwitch(cid, rngRarity, interaction);
-    // if (sideson) {
-    //     const totalChar = await database.Character.count();
-    //     const rngChar = Math.floor(Math.random() * 100000);
-    //     const rngRarity = Math.floor(Math.random() * 10000);
-    //     const cid = (rngChar%totalChar)+1;
-    //     return await raritySwitch(cid, rngRarity, interaction);
-    // } else {
-    //     const totalChar = await database.Character.count({where: {side: false}});
-    //     const rngChar = Math.floor(Math.random() * 100000);
-    //     const rngRarity = Math.floor(Math.random() * 10000);
-    //     const offset = (rngChar%totalChar);
-    //     const char = await database.Character.findOne({offset: offset, where: {side: false}});
-    //     const cid = await char.characterID;
-    //     return await raritySwitch(cid, rngRarity, interaction);
-    // }
+}
+
+
+
+
+async function sideofftrashoff(interaction) {
+    const rngPool = Math.floor(Math.random() * 100);
+    if (rngPool >= 90) {
+        return await wlPool(interaction);
+    } else if (rngPool >= 30) {
+        return await mainPool(interaction);
+    } else {
+        return await sidePool(interaction);
+    }
+}
+async function sideontrashoff(interaction) {
+    const rngPool = Math.floor(Math.random() * 100);
+    if (rngPool >= 80) {
+        return await wlPool(interaction);
+    } else if (rngPool >= 40) {
+        return await mainPool(interaction);
+    } else {
+        return await sidePool(interaction);
+    }
+}
+async function sideontrashon(interaction) {
+    const rngPool = Math.floor(Math.random() * 100);
+    if (rngPool >= 70) {
+        return await wlPool(interaction);
+    } else {
+        return await allPool(interaction);
+    }
+}
+
+async function gacha(interaction) {
+    const user = interaction.user.id;
+    const sideson = await database.Sideson.findOne({where: {playerID: user}});
+    const trashon = await database.Trashon.findOne({where: {playerID: user}});
+    if (!sideson && !trashon) {
+        return await sideofftrashoff(interaction);
+    } else if (sideson && !trashon){
+        return await sideontrashoff(interaction);
+    } else {
+        return await sideontrashon(interaction);
+    }
+    //side off trash off 10%wl, 60%tops, 30% sides
+    //sides on trash off 20%wl, 40%tops, 40%sides
+    //sides on trash on  30%wl, 70% normal.
 }
 
 module.exports = {
@@ -560,7 +620,9 @@ module.exports = {
                     if (inventory > 1000) {
                         return interaction.reply("you have more than 1000 cards. Burn some before doing more gacha.")
                     }
-                    await interaction.reply({embeds: [embedS]});
+                    const wlist = await database.Wishlist.count({where: {playerID: user}})
+                    if (wlist >= 10) {
+                        await interaction.reply({embeds: [embedS]});
                     const list = [];
                     for (let i = 0; i < 10; i++) {
                         const card = await gacha(interaction);
@@ -569,6 +631,11 @@ module.exports = {
                         embedS.setDescription(`${listString}`)
                         await interaction.editReply({embeds: [embedS]});
                     }
+                    }else {
+                        (await embedE).setDescription("You need 10 or more waifus in wishlist to use gacha. use /wadd to add to your wishlist!")
+                        return await interaction.reply({embeds: [embedE]});
+                    }
+                    
                 } else {
                     //not enough gems embed.
                     (await embedE).setDescription("You need 100 gems to gacha.\nDo dailies, add new series, characters or send images to gain more gems")
