@@ -76,6 +76,7 @@ async function newDaily(interaction, player){
     const embedDone = await embedD(interaction);
     const userId = interaction.user.id;
     const timeNow = Date.now();
+    await checkSeverB(interaction);
     await database.Daily.create({
         playerID: userId,
         lastDaily: timeNow,
@@ -91,6 +92,7 @@ async function newDaily(interaction, player){
 async function streakDaily(interaction, player, daily){
     const embedDone = await embedD(interaction);
     const streak = daily.streak;
+    await checkSeverB(interaction);
     if (streak > 10) {
         await player.increment('gems', {by: 500});
         await embedDone.setDescription(`
@@ -105,9 +107,21 @@ async function streakDaily(interaction, player, daily){
     }
 }
 
+async function checkSeverB(interaction) {
+    const player = database.Player.findOne({where: {playerID: interaction.user.id}});
+    const embed = await embedD(interaction);
+    if (interaction.member.roles.cache.has('951152537598320721')) {
+        await player.increment('karma', {by: 30});
+        embed.setTitle("Server boost bonus")
+            .setDescription(`Daily bonus for boosting server. +30 karma`);
+        return interaction.followUp({ embeds: [embed] }, {ephemeral: true});
+    };
+}
+
 async function resetDaily(interaction, player){
     const embedDone = await embedD(interaction);
     await player.increment('gems', {by: 250});
+    await checkSeverB(interaction);
     await embedDone.setDescription(`
 Streak: (reset) 1\nGems: ${player.gems+250} (+250)\nUse daily again within two days to continue the streak.`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
