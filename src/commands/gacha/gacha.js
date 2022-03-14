@@ -510,7 +510,7 @@ Gif ID is ${image.gifID} report any errors using ID
         image = database.Image.findOne({where: {imageID: 1}})
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
-    await (embedCard.setTitle(`${char.characterName}`)
+    (embedCard.setTitle(`${char.characterName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
@@ -525,26 +525,26 @@ Gif ID is ${image.gifID} report any errors using ID
 async function raritySwitch(cid, rngRarity, interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
-    await player.increment({gems: -10});
+    player.increment({gems: -10});
     const pity = Math.floor(player.pity/4);
     if ((rngRarity) >= 9992) {
-        await player.increment({pity: 1});
-        await createDiaCard(cid, interaction);
+        player.increment({pity: 1});
+        createDiaCard(cid, interaction);
     } else if (rngRarity + pity >= 9922) {
-        await player.update({pity: 0});
-        await createRedCard(cid, interaction);
+        player.update({pity: 0});
+        createRedCard(cid, interaction);
     } else if (rngRarity >= 9592) {
-        await player.increment({pity: 1});
-        await createPurpleCard(cid, interaction);
+        player.increment({pity: 1});
+        createPurpleCard(cid, interaction);
     } else if (rngRarity >= 8092) {
-        await player.increment({pity: 1});
-        await createBlueCard(cid, interaction);
+        player.increment({pity: 1});
+        createBlueCard(cid, interaction);
     } else if (rngRarity >= 6000) {
-        await player.increment({pity: 1});
-        await createGreenCard(cid, interaction);
+        player.increment({pity: 1});
+        createGreenCard(cid, interaction);
     } else {
-        await player.increment({pity: 1});
-        await createWhiteCard(cid, interaction);
+        player.increment({pity: 1});
+        createWhiteCard(cid, interaction);
     }
 }
 
@@ -677,17 +677,17 @@ module.exports = {
                     if (wlist >= 10) {
                         await gacha(interaction);
                     }else {
-                        (await embedE).setDescription("You need 10 or more waifus in wishlist to use gacha. use /wa to add to your wishlist!")
+                        (embedE).setDescription("You need 10 or more waifus in wishlist to use gacha. use /wa to add to your wishlist!")
                         return await interaction.reply({embeds: [embedE]});
                     }
                 } else {
                     //not enough gems embed.
-                    await embedE.setDescription(`You need 10 gems to gacha. Do dailies, add new series, characters or send images to gain more gems`);
+                    embedE.setDescription(`You need 10 gems to gacha. Do dailies, add new series, characters or send images to gain more gems`);
                     return await interaction.reply({embeds: [embedE]});
                 }
             } else {
                 //embed no player registered.
-                (await embedE).setDescription("You haven't isekaied yet. Do /isekai to get started.")
+                (embedE).setDescription("You haven't isekaied yet. Do /isekai to get started.")
                 return await interaction.reply({embeds: [embedE]});
             }
         } catch(error) {

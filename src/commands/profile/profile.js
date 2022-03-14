@@ -51,7 +51,7 @@ module.exports = {
 **Money:** ${player.money} <:datacoin:947388797828612127>
 **Karma:** ${player.karma} <:karma:947388797627281409>
 **Pity:** ${player.pity}
-**Gacha Toggles:**: ${toggle}
+**Gacha Toggles:** ${toggle}
                 `)
             } else {
                 embedDone.setDescription('Player does not exist.')

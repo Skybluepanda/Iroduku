@@ -559,32 +559,60 @@ async function allPool(interaction) {
 
 
 async function sideofftrashoff(interaction) {
-    const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 90) {
-        return await wlPool(interaction);
-    } else if (rngPool >= 30) {
-        return await mainPool(interaction);
-    } else {
-        return await sidePool(interaction);
+    const embedS = await embedSucess(interaction);
+    await interaction.reply({embeds: [embedS]});
+    const list = [];
+    for (let i = 0; i < 10; i++) {
+        const rngPool = Math.floor(Math.random() * 100);
+        if (rngPool >= 90) {
+            list[i] = await wlPool(interaction);
+        } else if (rngPool >= 30) {
+            list[i] = await mainPool(interaction);
+        } else {
+            list[i] = await sidePool(interaction);
+        }
+        const listString = list.join(`\n`);
+        embedS.setDescription(`${listString}`)
+        await interaction.editReply({embeds: [embedS]});
     }
+    
+    
 }
 async function sideontrashoff(interaction) {
-    const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 80) {
-        return await wlPool(interaction);
-    } else if (rngPool >= 40) {
-        return await mainPool(interaction);
-    } else {
-        return await sidePool(interaction);
+    const embedS = await embedSucess(interaction);
+    await interaction.reply({embeds: [embedS]});
+    const list = [];
+    for (let i = 0; i < 10; i++) {
+        const rngPool = Math.floor(Math.random() * 100);
+        if (rngPool >= 80) {
+            list[i] = await wlPool(interaction);
+        } else if (rngPool >= 40) {
+            list[i] = await mainPool(interaction);
+        } else {
+            list[i] = await sidePool(interaction);
+        }
+        const listString = list.join(`\n`);
+        embedS.setDescription(`${listString}`)
+        await interaction.editReply({embeds: [embedS]});
     }
+    
 }
 async function sideontrashon(interaction) {
-    const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 70) {
-        return await wlPool(interaction);
-    } else {
-        return await allPool(interaction);
+    const embedS = await embedSucess(interaction);
+    await interaction.reply({embeds: [embedS]});
+    const list = [];
+    for (let i = 0; i < 10; i++) {
+        const rngPool = Math.floor(Math.random() * 100);
+        if (rngPool >= 70) {
+            list[i] = await wlPool(interaction);
+        } else {
+            list[i] = await allPool(interaction);
+        }
+        const listString = list.join(`\n`);
+        embedS.setDescription(`${listString}`)
+        await interaction.editReply({embeds: [embedS]});
     }
+    
 }
 
 async function gacha(interaction) {
@@ -611,8 +639,8 @@ module.exports = {
         try {
             const user = interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: user}});
-            const embedE = await embedError(interaction);
-            const embedS = await embedSucess(interaction);
+            
+            
             
             if(player) {
                 if (player.gems >= 100){
@@ -622,29 +650,24 @@ module.exports = {
                     }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
                     if (wlist >= 10) {
-                        await interaction.reply({embeds: [embedS]});
-                    const list = [];
-                    for (let i = 0; i < 10; i++) {
-                        const card = await gacha(interaction);
-                        list[i] = card;
-                        const listString = list.join(`\n`);
-                        embedS.setDescription(`${listString}`)
-                        await interaction.editReply({embeds: [embedS]});
-                    }
+                        await gacha(interaction);
                     }else {
-                        (await embedE).setDescription("You need 10 or more waifus in wishlist to use gacha. use /wa to add to your wishlist!")
+                        (embedE).setDescription("You need 10 or more waifus in wishlist to use gacha. use /wa to add to your wishlist!")
+                        const embedE = await embedError(interaction);
                         return await interaction.reply({embeds: [embedE]});
                     }
                     
                 } else {
                     //not enough gems embed.
-                    (await embedE).setDescription("You need 100 gems to gacha.\nDo dailies, add new series, characters or send images to gain more gems")
+                    const embedE = await embedError(interaction);
+                    (embedE).setDescription("You need 100 gems to gacha.\nDo dailies, add new series, characters or send images to gain more gems")
                     return await interaction.reply({embeds: [embedE]});
                 }
                 
             } else {
                 //embed no player registered.
-                (await embedE).setDescription("You haven't isekaied yet. Do /isekai to get started.")
+                const embedE = await embedError(interaction);
+                (embedE).setDescription("You haven't isekaied yet. Do /isekai to get started.")
                 return await interaction.reply({embeds: [embedE]});
             }
         } catch(error) {

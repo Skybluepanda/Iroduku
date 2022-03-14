@@ -23,7 +23,7 @@ module.exports = {
 	async execute(interaction) {
 		try {
             if (!interaction.member.roles.cache.has('951960776380416000')) {
-                return interaction.reply("You don't have the picaso role!", {ephemeral: true});
+                return interaction.reply("You don't have the image mod role!", {ephemeral: true});
             };
         	const id = await interaction.options.getInteger('id');
             const gif = await database.Gif.findOne({where: {gifID: id}});

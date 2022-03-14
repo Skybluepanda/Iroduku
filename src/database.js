@@ -198,6 +198,61 @@ const Gif = sequelize.define('gif', {
 	}
 });
 
+const Sendqueue = sequelize.define('sendqueue', {
+	imageID: {
+		type: Sequelize.INTEGER,
+		autoIncrement: true,
+		primaryKey: true,
+	},
+	characterID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	imageNumber: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	imageURL: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	artist: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	nsfw: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
+	selfcrop: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
+	uploader: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	uploaderid: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	bonus: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
+	comments: {
+		type: Sequelize.STRING,
+	}
+});
+
 const Player = sequelize.define('player', {
 	playerID: {
 		type: Sequelize.INTEGER,
@@ -274,6 +329,11 @@ const Collect = sequelize.define('collect', {
 		unique: false,
 		allowNull: false,
 	},
+	lastclaim: {
+		type: Sequelize.DATE,
+		unique: false,
+		allowNull: true,
+	}
 });
 
 const Wishlist = sequelize.define('wishlist', {
@@ -406,6 +466,7 @@ const Card = sequelize.define('card', {
 exports.sequelize = sequelize;
 exports.Character = Character;
 exports.Image = Image;
+exports.Sendqueue = Sendqueue;
 exports.Gif = Gif;
 exports.Series = Series;
 exports.Player = Player;

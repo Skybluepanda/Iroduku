@@ -52,11 +52,11 @@ async function deployButton(interaction, embed){
         .addComponents(
             new MessageButton()
                 .setCustomId('prev')
-                .setLabel('Previous')
+                .setLabel('previous')
                 .setStyle('PRIMARY'),
             new MessageButton()
                 .setCustomId('next')
-                .setLabel('Next')
+                .setLabel('next')
                 .setStyle('PRIMARY'),
         );
     await interaction.editReply({ embeds: [embed], components: [row]});

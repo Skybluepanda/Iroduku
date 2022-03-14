@@ -492,11 +492,11 @@ async function deployButton2(interaction, embed){
         .addComponents(
             new MessageButton()
                 .setCustomId('prev')
-                .setLabel('Previous')
+                .setLabel('previous')
                 .setStyle('PRIMARY'),
             new MessageButton()
                 .setCustomId('next')
-                .setLabel('Next')
+                .setLabel('next')
                 .setStyle('PRIMARY'),
             new MessageButton()
                 .setCustomId('confirm')
