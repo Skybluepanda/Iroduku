@@ -25,6 +25,9 @@ module.exports = {
             }
             const wishCheck = await database.Wishlist.findOne({where: {playerID: uid, characterID: cid}});
             console.log(wishCheck);
+            if (!character) {
+                return await interaction.reply("Character with that ID doesn't exist");
+            }
             if (wishCheck) {
                 console.log('6')
                 

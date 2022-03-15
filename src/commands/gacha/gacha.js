@@ -549,6 +549,7 @@ async function raritySwitch(cid, rngRarity, interaction) {
 }
 
 async function wlPool(interaction) {
+    const user = interaction.user.id;
     const wlist = await database.Wishlist.findAll({where: {playerID: user}})
     const rngChar = Math.floor(Math.random() * 1000);
     const char = (rngChar%wlist.length);
@@ -621,11 +622,11 @@ async function gacha(interaction) {
     const sideson = await database.Sideson.findOne({where: {playerID: user}});
     const trashon = await database.Trashon.findOne({where: {playerID: user}});
     if (!sideson && !trashon) {
-        sideofftrashoff(interaction);
+        await sideofftrashoff(interaction);
     } else if (sideson && !trashon){
-        sideontrashoff(interaction);
+        await sideontrashoff(interaction);
     } else {
-        sideontrashon(interaction);
+        await sideontrashon(interaction);
     }
     //side off trash off 10%wl, 60%tops, 30% sides
     //sides on trash off 20%wl, 40%tops, 40%sides
