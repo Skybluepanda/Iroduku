@@ -124,7 +124,6 @@ async function cidTag(interaction){
             {
                 where: {
                 rarity: rarity,
-                tag: tag,
                 playerID: uid,
                 characterID: cid,
                 lock: false
@@ -176,12 +175,11 @@ async function snameTag(interaction){
         cidList[i] = cid;
     }
     let cardList
-    if (rarity && tag) {
+    if (rarity) {
         cardList = await database.Card.update({tag :tag},
             {
                 where: {
                 rarity: rarity,
-                tag: tag,
                 playerID: uid,
                 characterID: {[Op.or]: cidList},
                 lock: false
@@ -230,7 +228,6 @@ async function sidTag(interaction){
             {
                 where: {
                 rarity: rarity,
-                tag: tag,
                 playerID: uid,
                 characterID: {[Op.or]: cidList},
                 lock: false
