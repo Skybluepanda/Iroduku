@@ -49,11 +49,12 @@ async function disableButton() {
 
 async function buttonManager(message, msg) {
     try {
-        const collector = msg.createMessageComponentCollector({ max:1, time: 30000 });
+        const collector = msg.createMessageComponentCollector({ max:3, time: 30000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'claim':
-                    await message.channel.send('Test claim. Get scammed.');
+                    await database.Player.increment({gems: 10}, {where: {playerID: i.user.id}});
+                    await message.channel.send(`${i.user.toString()} gained 10 gems!`);
                     break;
             };
             i.deferUpdate();
@@ -67,7 +68,6 @@ async function buttonManager(message, msg) {
 module.exports = {
 	name: 'messageCreate',
 	async execute(message) {
-		console.log("I'm picking up shit dumbass.")
 		if (message.author.bot) {
 			return;
 		}
@@ -76,14 +76,17 @@ module.exports = {
 		if (cooldown) {
 			return;
 		} else {
-			const embed = createEmbed();
-			const row = await createButton();
-			msg = await message.channel.send({ embeds: [embed], components: [row], fetchReply: true });
-			await buttonManager(message, msg);
-			cooldown = true;
-			setTimeout(() => {
-				cooldown = false
-			  }, 30000);
+            const rng = Math.floor(Math.random()*20);
+            if (rng >= 17) {
+                const embed = createEmbed();
+                const row = await createButton();
+                msg = await message.channel.send({ embeds: [embed], components: [row], fetchReply: true });
+                await buttonManager(message, msg);
+                cooldown = true;
+                setTimeout(() => {
+                    cooldown = false
+                }, 30000);
+            }
 		}
 	},
 };
