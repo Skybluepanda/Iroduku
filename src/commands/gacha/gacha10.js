@@ -603,7 +603,7 @@ async function sideontrashon(interaction) {
     const list = [];
     for (let i = 0; i < 10; i++) {
         const rngPool = Math.floor(Math.random() * 100);
-        if (rngPool >= 70) {
+        if (rngPool >= 60) {
             list[i] = await wlPool(interaction);
         } else {
             list[i] = await allPool(interaction);
