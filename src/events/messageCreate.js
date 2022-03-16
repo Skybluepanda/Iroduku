@@ -47,14 +47,39 @@ async function disableButton() {
     }
 }
 
+async function claimBox(uid, message, msg) {
+    
+}
+
 async function buttonManager(message, msg) {
     try {
-        const collector = msg.createMessageComponentCollector({ max:3, time: 30000 });
+        const collector = msg.createMessageComponentCollector({max:1, time: 30000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'claim':
-                    await database.Player.increment({gems: 10}, {where: {playerID: i.user.id}});
-                    await message.channel.send(`${i.user.toString()} gained 10 gems!`);
+                    const time = await database.Collect.findOne({where: {playerID: i.user.id}});
+                    const timeNow = Date.now();
+                    const timeDiff = timeNow - time.lastclaim;
+                    if (timeDiff > 900000) {
+                        await database.Player.increment({gems: 10}, {where: {playerID: i.user.id}});
+                        await message.channel.send(`${i.user.toString()} gained 10 gems! 2/3 charges remaining`);
+                        await time.update({lastclaim: timeNow-600000});
+                    } else if (timeDiff > 600000) {
+                        await database.Player.increment({gems: 10}, {where: {playerID: i.user.id}});
+                        await message.channel.send(`${i.user.toString()} gained 10 gems! 1/3 charges remaining`);
+                        await time.update({lastclaim: timeNow-300000});
+                    } else if (timeDiff > 300000) {
+                        const cooldown = dayjs.duration(600000-timeDiff).format('mm[m : ]ss[s]');
+                        await database.Player.increment({gems: 10}, {where: {playerID: i.user.id}});
+                        await message.channel.send(`${i.user.toString()} gained 10 gems!
+                Cooldown remaining: ${cooldown}`);
+                        await time.update({lastclaim: timeNow-300000});
+                    } else {
+                        const cooldown = dayjs.duration(300000-timeDiff).format('mm[m : ]ss[s]');
+                        await message.channel.send(`${i.user.toString()} failed to claim. 
+                Cooldown remaining: ${cooldown}`);
+                        await buttonManager(message, msg);
+                    }
                     break;
             };
             i.deferUpdate();

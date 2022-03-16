@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.addColumn('collects', 'lastclaim', { 
       type: Sequelize.DATE,
       unique: false,
-      allowNull: true,
+      defaultValue: 0,
   }); 
     /**
      * Add altering commands here.

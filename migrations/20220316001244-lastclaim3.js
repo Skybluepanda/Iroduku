@@ -2,11 +2,11 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.addColumn('cards', 'quantity', {
-      type: Sequelize.INTEGER,
-		  unique: false,
-      allowNull: true,
-    });
+      await queryInterface.addColumn('collects', 'lastclaim', { 
+        type: Sequelize.DATE,
+        unique: false,
+        defaultValue: 0,
+    }); 
     /**
      * Add altering commands here.
      *

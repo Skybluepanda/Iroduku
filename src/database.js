@@ -329,11 +329,11 @@ const Collect = sequelize.define('collect', {
 		unique: false,
 		allowNull: false,
 	},
-	// lastclaim: {
-	// 	type: Sequelize.DATE,
-	// 	unique: false,
-	// 	allowNull: true,
-	// }
+	lastclaim: {
+		type: Sequelize.DATE,
+		unique: false,
+		allowNull: true,
+	}
 });
 
 const Wishlist = sequelize.define('wishlist', {
