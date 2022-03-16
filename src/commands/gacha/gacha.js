@@ -548,6 +548,15 @@ async function raritySwitch(cid, rngRarity, interaction) {
     }
 }
 
+async function pityPull(interaction) {
+    const user = interaction.user.id;
+    const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+    const rngChar = Math.floor(Math.random() * 1000);
+    const char = (rngChar%wlist.length);
+    const cid = await wlist[char].characterID;
+    await raritySwitch(cid, 10000, interaction);
+}
+
 async function wlPool(interaction) {
     const user = interaction.user.id;
     const wlist = await database.Wishlist.findAll({where: {playerID: user}})
@@ -619,6 +628,11 @@ async function sideontrashon(interaction) {
 
 async function gacha(interaction) {
     const user = interaction.user.id;
+    const player = await database.Player.findOne({where: {playerID: user}});
+    if (player.pity >= 10000) {
+        player.update({pity: 0});
+        return await pityPull(interaction);
+    } 
     const sideson = await database.Sideson.findOne({where: {playerID: user}});
     const trashon = await database.Trashon.findOne({where: {playerID: user}});
     if (!sideson && !trashon) {
