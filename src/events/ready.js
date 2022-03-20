@@ -25,6 +25,7 @@ module.exports = {
         database.Trade.sync();
         database.Votetrack.sync();
         database.Sendqueue.sync();
+        database.Gifqueue.sync();
         console.log('database sync complete!');
     },
 };

@@ -8,10 +8,15 @@ async function checkIDS(interaction) {
 	const gNumber = await interaction.options.getInteger('gifnumber')
 	const char = database.Character.findOne({where: {characterID:cid}});
 	try {
+        const total = await database.Gifqueue.count();
+			if (total >= 50) {
+				return interaction.reply("Send queue is at max capacity, annoy the image mods to complete their screening.")
+			}
 		if (char) {
 			if (1 <= gNumber && gNumber < 6) {
-				const count = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gNumber}})
-				if (count) {
+				const exist = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gNumber}})
+                const queue = await database.Gifqueue.findOne({ where: {characterID: cid, gifNumber: gNumber}})
+				if (exist || queue) {
 					return await interaction.reply(`Character ${cid} already has an gif ${gNumber}, maximum is 5.`)
 				} else {
 					return await upload(interaction);
@@ -65,67 +70,53 @@ async function upload(interaction) {
         const iNumber = await interaction.options.getInteger('gifnumber');
         const art = await interaction.options.getString('artist_name');
         const isnsfw = await interaction.options.getBoolean('nsfw');
+        const selfcrop = await interaction.options.getBoolean('selfcrop');
         const uploader = await interaction.user.username;
+		const player = await database.Player.findOne({where: {playerID: interaction.user.id}});
+
         // await check(interaction);
         const url = await interaction.options.getString('gif_link');
         // const message = await interaction.fetchReply();
 		let gif;
         // const link = await message.attachments.first().url;
         if (url.endsWith(".gif")) {
-            gif = await database.Gif.create({
+            gif = await database.Gifqueue.create({
                 characterID: cid,
                 gifNumber: iNumber,
                 gifURL: url,
                 artist: art,
                 nsfw: isnsfw, 
+                selfcrop: selfcrop, 
                 uploader: uploader,
+                uploaderid: player.id
             });
         } else {
             return interaction.channel.send("Thats not a gif.")
         }
 	
-		await database.Character.increment({gifCount: 1}, {where: {characterID: cid}})
+		// await database.Character.increment({gifCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
-		await database.Player.increment({gems: 125, karma: 5}, {where: {playerID: interaction.user.id}})
-		
+		// await database.Player.increment({gems: 25, karma: 1}, {where: {playerID: interaction.user.id}})
+		const channel = await interaction.guild.channels.cache.get('950318845430726686');
+		await channel.send(`${cid} | ${char.characterName}'s image ${iNumber}
+uploaded by ${uploader} and art by ${art}.
+Self crop: ${selfcrop}`);
+		await channel.send(`${url}`);
         return await interaction.reply(`Gif for ${char.characterName} has been added!
 Gif ID (for deleteing and editing): ${gif.gifID}
 Gif Number: ${iNumber}. 
-You've been rewarded 125 gems and karma, thanks for your hard work!`)
+The Gif has entered the send queue and will be reviewed by image mods.
+You will recieve minimum of 25 gems and 1 karma for gifs taken from other bots or MAL.
+There will be bonus rewards based on gif quality.`)
 	} catch(error) {
         console.log("upload failed.")
 	}
-
-	async function post(gif, interaction){
-		const cid = await interaction.options.getInteger('cid');
-		const char = await database.Character.findOne({where: {characterID: cid}})
-		const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
-		const embed = await embedSucess(interaction);
-		await embed.setDescription(`${char.characterName} from ${char.seriesID}| ${series.seriesName}`)
-			.setImage(gif.gifURL)
-			.setFooter(`#${gif.gifNumber} Art by ${gif.artist} | Uploaded by ${gif.uploader}
-Image ID is ${gif.gifID} report any errors using ID.`);
-		const channel = await interaction.guild.channels.cache.get('949952119052578877');
-		await channel.send({embeds: [embed]});
-	}
-	
-
-	async function embedSucess(interaction) {
-		const embed = new MessageEmbed();
-	
-		embed.setTitle("Art Archived")
-			.setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-			.setDescription("Followup should be the card embed.")
-			.setColor(color.successgreen);
-		
-		return embed;
-	}}
-
+}
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('gupload')
+		.setName('gsend')
 		.setDescription('Adding gif to the database for the character, gif should be 225x350px in size.')
 		.addIntegerOption(option => option
 			.setName('cid')
@@ -146,7 +137,11 @@ module.exports = {
 		.addBooleanOption(option => option
 			.setName('nsfw')
 			.setDescription('is this an nsfw gif?')
-			.setRequired(true)),
+            .setRequired(true))
+        .addBooleanOption(option => option
+            .setName('selfcrop')
+            .setDescription('did you find and crop this image/gif?')
+            .setRequired(true)),
 	async execute(interaction) {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.

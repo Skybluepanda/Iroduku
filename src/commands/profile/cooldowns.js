@@ -9,26 +9,18 @@ dayjs().format()
 dayjs.extend(duration)
 
 async function checkDaily1(interaction) {
-    console.log("11");
     const daily = await database.Daily.findOne({where: {playerID: interaction.user.id}});
-    console.log("12");
     if (!daily) {
-        console.log("13");
         return await interaction.followUp('Do /daily first!')
     }
-    console.log("14");
     return;
 }
 
 async function checkCollect1(interaction) {
-    console.log("15");
     const collect = await database.Collect.findOne({where: {playerID: interaction.user.id}});
-    console.log("16");
     if (!collect) {
-        console.log("17");
         return await interaction.followUp('Do /collect first!')
     }
-    console.log("18");
     return;
 }
 
@@ -39,15 +31,14 @@ async function checkDaily(interaction){
         const lastCheck = daily.lastDaily;
         const timeNow = Date.now();
         const timeDiff = await timeNow - lastCheck;
-        if (timeDiff>= 79200000) {
+        if (timeDiff >= 79200000) {
             return 'Ready!';
             //perfect
         } else if (timeDiff <= 79200000) {
             const timeLeft = 79200000 - timeDiff;
             const remain = dayjs.duration(timeLeft).format('HH[hr: ]mm[m : ]ss[s]');
-            await embedCool.setDescription(`Please wait for the cooldown.\nTime Remaining: ${remain}`);
             //on cooldown
-            return `On Cooldown [${remain}]`;
+            return `Cooldown for ${remain}`;
         }
     }
 }
@@ -66,8 +57,8 @@ async function checkCollect(interaction){
             const timeLeft = 480000 - cooltime;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
             return `(${amount}/300) gems collected. ${remain} until next 5 gems.`;
-        } else if (timeDiff <= 480000) {
-            const timeLeft = 480000 - cooltime;
+        } else if (timeDiff < 480000) {
+            const timeLeft = 480000 - timeDiff;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
             return `(0/300) gems collected. ${remain} until next 5 gems.`;
             //none collected show cooldown
@@ -126,28 +117,21 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
         try {
-            console.log('1');
             const player = await database.Player.findOne({where: {playerID: userId}});
             const daily = await database.Daily.findOne({where: {playerID: userId}});
             const collect = await database.Collect.findOne({where: {playerID: userId}});
-            console.log('2');
             await checkDaily1(interaction);
             await checkCollect1(interaction);
-            console.log('3');
             if (player && daily && collect) {
-                console.log('4');
                 const dailyText = await checkDaily(interaction);
-                console.log('5');
                 const collectText = await checkCollect(interaction);
-                console.log('6');
                 const claimText = await checkClaim(interaction);
-                console.log('7');
                 embedDone.setDescription(`
-Daily: ${dailyText}
+**Daily:** ${dailyText}
 
-Collect: ${collectText}
+**Collect:** ${collectText}
 
-Claim: ${claimText}`);
+**Claim:** ${claimText}`);
             } else {
                 embedDone.setDescription('Player does not exist.')
                         .setColor(color.failred);

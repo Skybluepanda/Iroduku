@@ -25,22 +25,30 @@ module.exports = {
         //rarity filter
         //
         try {
+            console.log("1");
             const uid = interaction.user.id;
             const lid = interaction.options.getInteger('lid');
             const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}});
+            console.log("2");
             if (card) {
+                console.log("3");
                 if (card.rarity >= 4) {
+                    console.log("4");
                     if (card.imageNumber > 0) {
+                        console.log("5");
                         const image = await database.Image.findOne({where: {characterID: card.characterID, imageNumber: card.imageNumber}});
                         if (image) {
+                            console.log("6");
                             await card.update({imageID: image.imageID});
                             return interaction.reply(`Card ${lid} has updated its image.`)
                         }
                         return interaction.reply(`Image not found make sure the image number exists.`)
                         
                     } else if (card.imageNumber < 0) {
-                        const gif = await database.Image.findOne({where: {characterID: card.characterID, gifNumber: -card.imageNumber}});
+                        console.log("7");
+                        const gif = await database.Gif.findOne({where: {characterID: card.characterID, gifNumber: -card.imageNumber}});
                         if (gif) {
+                            console.log("8");
                             card.update({imageID: -gif.gifID});
                             return interaction.reply(`Card ${lid} has updated its gif.`)
                         }
@@ -53,7 +61,7 @@ module.exports = {
                 return interaction.reply(`Card ${lid} doesn't exist. Check your list.`)
             }
         } catch (error) {
-            return interaction.editReply("Error has occured");
+            return interaction.channel.send("Error has occured");
         }
 	},
 };

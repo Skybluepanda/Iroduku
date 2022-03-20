@@ -374,7 +374,7 @@ async function tagTag(interaction){
         );
         
     }
-    return interaction.reply(`Cards with tag ${searchtag}have been tagged with ${tag}`);
+    return interaction.reply(`Cards with tag ${searchtag} have been tagged with ${tag}`);
 }
 
 async function singleTag(interaction){

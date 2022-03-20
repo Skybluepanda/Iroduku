@@ -1,7 +1,7 @@
 const { createCanvas, loadImage, Canvas } = require('canvas');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageAttachment, IntegrationApplication } = require('discord.js');
-const database = require('../../database.js');
+const database = require('../src/database.js');
 
 async function checkIDS(interaction) {
 	const cid = interaction.options.getInteger('cid');
@@ -116,13 +116,13 @@ async function upload(interaction) {
 		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
-		await database.Player.increment({gems: 75, karma: 3}, {where: {playerID: interaction.user.id}})
+		await database.Player.increment({gems: 25, karma: 1}, {where: {playerID: interaction.user.id}})
 		
 		return await interaction.channel.send(`Image for ${char.characterName} added!
 Image ID (One u use for delete and edit): ${image.imageID}
 Image Number: ${iNumber}
 Artist: ${art}
-You've been rewarded 75 gems and karma, thanks for your hard work!`);
+You've been rewarded 25 gems and karma, thanks for your hard work!`);
 	} catch(error) {
 		interaction.channel.send("Something went wrong. Dw if image got uploaded u got the rewards.");
 	}

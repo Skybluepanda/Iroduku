@@ -195,6 +195,10 @@ const Gif = sequelize.define('gif', {
 		type: Sequelize.STRING,
 		unique: false,
 		allowNull: false,
+	},
+	uploaderid: {
+		type: Sequelize.INTEGER,
+		unique: false,
 	}
 });
 
@@ -248,9 +252,58 @@ const Sendqueue = sequelize.define('sendqueue', {
 		allowNull: false,
 		defaultValue: 0
 	},
-	comments: {
+});
+
+const Gifqueue = sequelize.define('gifqueue', {
+	gifID: {
+		type: Sequelize.INTEGER,
+		autoIncrement: true,
+		primaryKey: true,
+	},
+	characterID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	gifNumber: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	gifURL: {
 		type: Sequelize.STRING,
-	}
+		unique: false,
+		allowNull: false,
+	},
+	artist: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	nsfw: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
+	selfcrop: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
+	uploader: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	uploaderid: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	bonus: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
 });
 
 const Player = sequelize.define('player', {
@@ -468,6 +521,7 @@ exports.Character = Character;
 exports.Image = Image;
 exports.Sendqueue = Sendqueue;
 exports.Gif = Gif;
+exports.Gifqueue = Gifqueue;
 exports.Series = Series;
 exports.Player = Player;
 exports.Daily = Daily;

@@ -11,9 +11,14 @@ async function checkIDS(interaction) {
 		if (char) {
 			console.log(iNumber);
 			console.log(1 <= iNumber && iNumber <= 10);
+			const total = await database.Sendqueue.count();
+			if (total >= 50) {
+				return interaction.reply("Send queue is at max capacity, annoy the image mods to complete their screening.")
+			}
 			if (1 <= iNumber && iNumber <= 10) {
-				const count = await database.Image.findOne({ where: {characterID: cid, imageNumber: iNumber}})
-				if (count) {
+				const exist = await database.Image.findOne({ where: {characterID: cid, imageNumber: iNumber}});
+				const queue = await database.Sendqueue.findOne({ where: {characterID: cid, imageNumber: iNumber}});
+				if (exist || queue) {
 					await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 10.`)
 				} else {
 					upload(interaction);
@@ -45,7 +50,6 @@ function imageFilename(interaction) {
 	} catch(error) {
 		console.log(error + " @imageupload/imagefilename.");
 	}
-
 }
 
 async function border(interaction) {
@@ -89,14 +93,20 @@ async function border(interaction) {
 
 async function upload(interaction) {
 	try {
+		const imagelink = await interaction.options.getString('image_link')
 		const cid = await interaction.options.getInteger('cid');
 		const char = await database.Character.findOne({where: {characterID: cid}})
 		const iNumber = await interaction.options.getInteger('image_number');
 		const art = await interaction.options.getString('artist_name');
 		const isnsfw = await interaction.options.getBoolean('nsfw');
+		const selfcrop = await interaction.options.getBoolean('selfcrop');
 		const uploader = await interaction.user.username;
 		const uploaderid = await interaction.user.id;
 		const bordered = await border(interaction);
+		const player = await database.Player.findOne({where: {playerID: interaction.user.id}});
+		
+		
+		
 		if (!bordered) {
 			return interaction.channel.send("image failed.")
 		}
@@ -104,25 +114,32 @@ async function upload(interaction) {
 			
 
 		const link = await message.attachments.first().url;
-		const image = await database.Image.create({
+		const image = await database.Sendqueue.create({
 			characterID: cid,
 			imageNumber: iNumber,
 			imageURL: link,
 			artist: art,
-			nsfw: isnsfw, 
+			nsfw: isnsfw,
+			selfcrop: selfcrop, 
 			uploader: uploader,
-			uploaderid: uploaderid
+			uploaderid: player.id
 		});
-		await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
+		// await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
-		await database.Player.increment({gems: 75, karma: 3}, {where: {playerID: interaction.user.id}})
-		
+		// await database.Player.increment({gems: 75, karma: 3}, {where: {playerID: interaction.user.id}})
+		const channel = await interaction.guild.channels.cache.get('950318845430726686');
+		await channel.send(`${cid} | ${char.characterName}'s image ${iNumber}
+uploaded by ${uploader} and art by ${art}.
+Self crop: ${selfcrop}`);
+		await channel.send(`${imagelink}`);
 		return await interaction.channel.send(`Image for ${char.characterName} added!
 Image ID (One u use for delete and edit): ${image.imageID}
 Image Number: ${iNumber}
 Artist: ${art}
-You've been rewarded 75 gems and karma, thanks for your hard work!`);
+Image has entered the send queue and will be reviewed by image mods.
+You will recieve minimum of 25 gems and 1 karma for pictures taken from other bots or MAL.
+There will be bonus rewards based on image and crop quality.`);
 	} catch(error) {
 		interaction.channel.send("Something went wrong. Dw if image got uploaded u got the rewards.");
 	}
@@ -141,7 +158,7 @@ async function embedSucess(interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('iupload2')
+		.setName('isend')
 		.setDescription('Adding image to the database for the character, image should be 225x350px in size.')
 		.addIntegerOption(option => option
 			.setName('cid')

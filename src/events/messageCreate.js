@@ -81,9 +81,14 @@ async function buttonManager(channel, msg, row) {
                     }
                     break;
             };
-            msg.edit({components: [row]});``
+            msg.edit({components: [row]});
             i.deferUpdate();
         });
+
+        collector.on('end', async i => {
+            row.components[0].setDisabled(true);
+            msg.edit({components: [row]});
+        })
 
     } catch(error) {
         console.log("Error has occured in button Manager");
@@ -125,6 +130,10 @@ async function buttonManager2(channel, msg, row) {
             msg.edit({components: [row]});
             i.deferUpdate();
         });
+        collector.on('end', async i => {
+            row.components[0].setDisabled(true);
+            msg.edit({components: [row]});
+        })
 
     } catch(error) {
         console.log("Error has occured in button Manager");
