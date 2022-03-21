@@ -254,6 +254,158 @@ const Sendqueue = sequelize.define('sendqueue', {
 	},
 });
 
+const Swapimage = sequelize.define('swapimage', {
+	imageID: {
+		type: Sequelize.INTEGER,
+		autoIncrement: true,
+		primaryKey: true,
+	},
+	characterID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	imageNumber: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	imageURL: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	previewURL: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	artist: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	nsfw: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
+	selfcrop: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
+	uploader: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	uploaderid: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	bonus: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
+	yes: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
+	no: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
+	another: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
+	
+});
+
+const Swapgif = sequelize.define('swapgif', {
+	imageID: {
+		type: Sequelize.INTEGER,
+		autoIncrement: true,
+		primaryKey: true,
+	},
+	characterID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	imageNumber: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	imageURL: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	previewURL: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	artist: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	nsfw: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
+	selfcrop: {
+		type: Sequelize.BOOLEAN,
+		allowNull: false,
+	},
+	uploader: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	uploaderid: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	bonus: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
+	yes: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
+	no: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
+	another: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
+	
+});
+
 const Gifqueue = sequelize.define('gifqueue', {
 	gifID: {
 		type: Sequelize.INTEGER,
@@ -368,6 +520,11 @@ const Daily = sequelize.define('daily', {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
+	},
+	dailykarma: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0
 	}
 });
 
@@ -522,6 +679,8 @@ exports.Image = Image;
 exports.Sendqueue = Sendqueue;
 exports.Gif = Gif;
 exports.Gifqueue = Gifqueue;
+exports.Swapimage = Swapimage;
+exports.Swapgif = Swapgif;
 exports.Series = Series;
 exports.Player = Player;
 exports.Daily = Daily;

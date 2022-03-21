@@ -95,6 +95,7 @@ async function streakDaily(interaction, player, daily){
     const streak = daily.streak;
     await checkSeverB(interaction);
     await checkSeverM(interaction);
+    await checkKarma(interaction, daily);
     if (streak > 10) {
         await player.increment('gems', {by: 500});
         await embedDone.setDescription(`
@@ -107,6 +108,17 @@ async function streakDaily(interaction, player, daily){
     Streak: ${streak+1}\nGems: ${player.gems+reward} (+${reward})\nUse daily again within two days to continue the streak.`);
         return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
     }
+}
+
+async function checkKarma(interaction, daily) {
+    const embed = embedD(interaction);
+    if (daily.dailykarma > 0) {
+        await database.Player.increment({Karma: 100}, {where: {playerID: interaction.user.id}});
+        await daily.increment({dailyKarma: -1});
+        embed.setTitle("Coffee daily bonus")
+            .setDescription(`Daily bonus for supporting the bot! <:amepainsip:954898370177146931> +100 karma (${daily.dailykarma-1} bonuses left)`);
+        await interaction.followUp({ embeds: [embed] }, {ephemeral: true});
+    };
 }
 
 async function checkSeverB(interaction) {

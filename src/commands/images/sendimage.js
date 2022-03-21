@@ -189,7 +189,7 @@ module.exports = {
 		//than create the image in database with all details.
 		if (interaction.channel.id === '947123054570512395') {
             if (!interaction.member.roles.cache.has('947640668031975465')) {
-                return interaction.reply("You don't have the photoshopper role!", {ephemeral: true});
+                return interaction.reply("You don't have the image sender role!", {ephemeral: true});
             };
 			try {
 				checkIDS(interaction);

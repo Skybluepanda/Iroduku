@@ -54,12 +54,18 @@ async function createButton() {
 }
 
 async function wlCheck(interaction, cid, row) {
+    console.log(cid);
+    console.log(row);
     const wl = await database.Wishlist.findOne({where: {playerID: interaction.user.id, characterID: cid}});
     if (wl){
-        row.components[3].setCustomId('wlremove').setLabel('wlremove')
+        
+        console.log("7.6");
+        row.components[3].setCustomId('wlremove').setLabel('wlremove').setDisabled(false);
         return row;
     } else {
-        row.components[3].setCustomId('wladd').setLabel('wladd')
+        
+        console.log("7.7");
+        row.components[3].setCustomId('wladd').setLabel('wladd').setDisabled(false);
         return row;
     }
 }
@@ -83,8 +89,9 @@ async function countGif(cid) {
     }
 }
 
-async function checkInumber(embed, interaction, direction, currentImage, totalImage, imageC, cid){
+async function checkInumber(embed, interaction, msg,  direction, currentImage, totalImage, imageC, cid, row){
     try {
+        console.log("1");
         if (currentImage == 1 && direction == -1){
             currentImage = totalImage;
             //going to end of page. If there is a gif view gif, else view image.
@@ -93,15 +100,22 @@ async function checkInumber(embed, interaction, direction, currentImage, totalIm
         } else {
             currentImage += direction;
         }
+        console.log("2");
         await currentImage;
+        console.log("3");
         if (currentImage <= imageC) {
+            console.log("4");
             await viewImage(embed, interaction, currentImage, cid);
         } else {
-            const image = currentImage - imageC
+            console.log("5");
+            const image = currentImage - imageC;
             await viewGif(embed, interaction, image, cid);
         }
+        console.log("6");
         await updateEmbed(embed, interaction);
-        await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row, scanned);
+        console.log("7");
+        await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row);
+        console.log("8");
     } catch(error) {
         console.log("Error has occured in checkInumber");
     }
@@ -110,40 +124,44 @@ async function checkInumber(embed, interaction, direction, currentImage, totalIm
 async function scan(interaction, cid) {
     const image = await database.Image.findAll({order: [['imageNumber', 'ASC']], where: {characterID: cid}});
     const gif = await database.Gif.findAll({order: [['gifNumber', 'ASC']], where: {characterID: cid}});
-    for (let i = 0; i < image.length(); i++) {
-        await interaction.channel.send(`${image.imageID} | #${image.imageNumber}\nArt by ${image.artist} and uploaded by ${image.uploader}`);
-        await interaction.channel.send(`${image.url}`);
+    for (let i = 0; i < image.length; i++) {
+        await interaction.channel.send(`${image[i].imageID} | #${image[i].imageNumber}\nArt by ${image[i].artist} and uploaded by ${image[i].uploader}`);
+        await interaction.channel.send(`${image[i].imageURL}`);
     }
-    for (let i = 0; i < gif.length(); i++) {
-        await interaction.channel.send(`${gif.gifID} | #${gif.gifNumber}\nArt by ${gif.artist} and uploaded by ${gif.uploader}`);
-        await interaction.channel.send(`${gif.url}`);
+    for (let g = 0; g < gif.length; g++) {
+        await interaction.channel.send(`${gif[g].gifID} | #${gif[g].gifNumber}\nArt by ${gif[g].artist} and uploaded by ${gif[g].uploader}`);
+        await interaction.channel.send(`${gif[g].gifURL}`);
     }
+    await interaction.channel.send("Scan complete. Initial embed has been disabled.")
 }
 
-async function buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row, scanned) {
+async function buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row) {
     try {
-        if (scanned) {
-            row.components[2].setDisabled(true);
-            await updateButton(embed, interaction, row);
-        }
+        console.log("7.1");
+        row = await wlCheck(interaction, cid, row);
+        console.log("7.2");
+        await updateButton(embed, interaction, row);
+        console.log("7.3");
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        console.log("7.4");
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'prev':
-                    await checkInumber(embed, interaction, -1, currentImage, totalImage, imageC, cid);
+                    await checkInumber(embed, interaction, msg, -1, currentImage, totalImage, imageC, cid, row);
                     break;
                 
                 case 'next':
-                    await checkInumber(embed, interaction, 1, currentImage, totalImage, imageC, cid);
+                    await checkInumber(embed, interaction, msg,  1, currentImage, totalImage, imageC, cid, row);
                     break;
                 
                 case 'scan':
-                    if (!scanned) {
+                    i.deferUpdate();
+                    if (interaction.channel.id === '947689297618812928') {
                         await scan(interaction, cid);
-                        scanned = true;
+                    } else {
+                        interaction.followUp("Please use scan in <#947689297618812928>");
                     }
-                    await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row, scanned);
                     break;
                 case 'wladd':
                     await database.Wishlist.create({
@@ -152,21 +170,23 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
                     })
                     row = await wlCheck(interaction, cid, row);
                     await updateButton(embed, interaction, row);
-                    await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row, scanned);
+                    await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row);
                     break;
                 case 'wlremove':
-                    await database.Wishlist.destroy({
+                    const wish = await database.Wishlist.destroy({
+                        where: {
                         playerID: interaction.user.id,
                         characterID: cid
-                    })
+                    }});
                     row = await wlCheck(interaction, cid, row);
                     await updateButton(embed, interaction, row);
-                    buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row, scanned);
+                    buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row);
                     break;
             };
             i.deferUpdate();
         }
         );
+
     } catch(error) {
         console.log("Error has occured in button Manager");
     }
@@ -260,7 +280,7 @@ async function viewImage(embed, interaction, imageNumber, cid) {
         `;
         await embed
             .setImage(url)
-            .setFooter(`${footer}`)
+            .setFooter({text: `${footer}`})
     } catch(error) {
         console.log("error has occured with view image");
     }
@@ -283,7 +303,7 @@ Gif ID is ${art.gifID} report any errors using ID.
         `;
         await embed
             .setImage(url)
-            .setFooter(`${footer}`)
+            .setFooter({text: `${footer}`})
     } catch(error) {
         console.log("error has occured with view image");
     }
@@ -301,32 +321,26 @@ async function updateButton(embed, interaction, row){
 
 async function cinfoID(embed, interaction) {
     try {
-        console.log("1");
         const cid = await interaction.options.getInteger("id");
         const char = await database.Character.findOne({
             where: {
                 characterID: cid
             }
         })
-        console.log("2");
 
         if (char) {
-            console.log("3");
             if (char.imageCount > 0){
-                console.log("4");
                 await viewImage(embed, interaction, 1, cid);
                 } else if(char.gifCount > 0){
                     await viewGif(embed, interaction, 1, cid)
                 } else {
                 embed.addField('No images found', 'add some', true);
             }
-            console.log("5");
         const imageC = await countImage(cid);
         const gifC = await countGif(cid);
         const totalImage = imageC + gifC;
         const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
         const simps = await database.Wishlist.count({where: {characterID: cid}});
-        console.log("6");
         await embed.setDescription(`
 Character ID: ${char.characterID}
 Character Alias: ${char.alias}
@@ -338,13 +352,9 @@ Gif Count: ${char.gifCount}
             `)
             .setTitle(`${char.characterName}`)
             .setColor(color.successgreen);
-            console.log("7");
         const row = await createButton();
-        console.log("8");
         const msg = await interaction.reply({ embeds: [embed], components: [row], fetchReply: true});
-        console.log("9");
         await buttonManager(embed, interaction, msg, 1, totalImage, imageC, cid, row, false);
-        console.log("10");
         }
     } catch(error) {
         console.log("error has occured in cinfoID.");
@@ -383,7 +393,7 @@ Gif Count: ${char.gifCount}
             `)
             .setTitle(`${char.characterName}`)
             .setColor(color.successgreen);
-        const row = createButton();
+        const row = await createButton();
         msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
         await buttonManager(embed, interaction, msg, 1, totalImage, imageC, cid, row, false);
         }

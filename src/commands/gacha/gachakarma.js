@@ -121,8 +121,8 @@ async function viewBCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: card.imageNumber}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
+            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+Image ID is ${image.imageID} report any errors using ID.`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -131,8 +131,8 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         image = await database.Gif.findOne({where: {characterID: cid, gifNumber: -(card.imageNumber)}});
         if (image){
         url = await image.gifURL;
-        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
+        embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+Gif ID is ${image.gifID} report any errors using ID.`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -205,9 +205,9 @@ async function viewPCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+*you can update image with /amethystupdate*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -216,9 +216,9 @@ Image ID is ${image.imageID} report any errors using ID.
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
             url = await image.gifURL;
-            embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+*you can update image with /amethystupdate*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -296,9 +296,9 @@ async function viewRCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+*you can update image with /amethystupdate*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -307,9 +307,9 @@ Image ID is ${image.imageID} report any errors using ID.
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
         url = await image.gifURL;
-        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+        embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+*you can update image with /amethystupdate*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -382,9 +382,9 @@ async function viewDiaCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: (card.imageID)}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*Set image with /diaset*`).setImage(url)
+*Set image with /diaset*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -393,9 +393,9 @@ Image ID is ${image.imageID} report any errors using ID.
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -card.imageID}});
         if (image){
         url = await image.gifURL;
-        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+        embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*Set image with /diaset*`).setImage(url)
+*Set image with /diaset*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -459,10 +459,10 @@ module.exports = {
                         return interaction.reply("you have more than 1000 cards. Burn some before doing more gacha.")
                     }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
-                    if (wlist >= 10) {
+                    if (wlist >= 5) {
                         await gacha(interaction);
                     }else {
-                        (await embedE).setDescription("You need 10 or more waifus in wishlist to use karma gacha. use /wa to add to your wishlist!")
+                        (await embedE).setDescription("You need 5 or more waifus in wishlist to use karma gacha. use /wa to add to your wishlist!")
                         return await interaction.reply({embeds: [embedE]});
                     }
                 } else {

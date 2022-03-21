@@ -95,7 +95,7 @@ async function pageList(embed, interaction, page){
     const listString = await list.map(joinBar).join(`\n`);
     await embed.setDescription(`${listString}`);
     const total = await database.Character.count();
-    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    await embed.setFooter({text: `page ${page} of ${maxPage} | ${total} results found`});
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
 };

@@ -3,25 +3,13 @@ const database = require('../../database');
 const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
 const { Op } = require("sequelize");
 const color = require('../../color.json');
+const { createCanvas, loadImage, Canvas } = require('canvas');
 
 async function start(interaction) {
     const user = interaction.user.id;
-    let cid;
-    const track = await database.Votetrack.findOne({
-        where: {playerID: user}
-    });
-    if (track) {
-        cid = await track.charVote;
-    } else {
-        await database.Votetrack.create({
-            playerID: user
-        });
-        cid = 2;
-    }
-    
     const embed = await createEmbed(interaction);
     await interaction.reply({embeds: [embed]});
-    await cvoteID(embed, interaction, cid);
+    await isvote(embed, interaction, 0);
 }
 
 function createEmbed(interaction) {
@@ -34,66 +22,33 @@ function createEmbed(interaction) {
     return embed;
 }
 
-async function viewImage(embed, interaction, cid, inumber) {
+async function isvote(embed, interaction, queue) {
     try {
-        let art;
-
-        art = await database.Image.findOne({
-        where: {
-            characterID: cid,
-            imageNumber: inumber,
-        }})
-        if (!art && inumber > 11) {
-            return await viewImage(embed, interaction, cid, inumber+1);
-        } else {
-            const url = art.imageURL;
-            const artist = art.artist;
-            const uploader = art.uploader;
-            const footer = `
-            #${art.imageNumber} Art by ${artist} | Uploaded by ${uploader}\nImage ID is ${art.imageID} report any errors using ID.
-            `;
-            await embed
-                .setImage(url)
-                .setFooter({text: `${footer}`});
-            await interaction.editReply({embeds: [embed]});
-        }
-        
-    } catch(error) {
-        console.log("error has occured with view image");
-    }
-}
-
-async function cvoteID(embed, interaction, cid) {
-    try {
-        const char = await database.Character.findOne({
-            where: {
-                characterID: cid
-            }
+        const swaps = await database.Swapimage.findOne({
+            order: [['imageID','ASC']],
+            offset: queue
         });
-        if (char) {
-            if (char.imageCount > 0){
-                await viewImage(embed, interaction, cid, 1);
-            } else {
-                embed.addField('No images found', 'add some', true);
-            }
-        const series = await database.Series.findOne({ where: { seriesID: char.seriesID}})
-        await embed
-            .setDescription(`
-Character ID: ${char.characterID}
+        if (swaps) {
+            console.log("3");
+            const char = await database.Character.findOne({
+                where: {
+                    characterID: swaps.characterID
+                }
+            });
+            const series = await database.Series.findOne({ where: { seriesID: char.seriesID}});
+            console.log("5");
+        await embed.setDescription(`
+Image ID: ${swaps.imageID}
+Character ID: ${swaps.characterID}
 Character Alias: ${char.alias}
 Series: ${char.seriesID} | ${series.seriesName}
-
-Please vote carefully and honestly. You will be rewarded 4 gems per vote
-This will impact the game's gacha pool.
-Vote 0 for characters you have 0 idea who they are.
-Vote 1 for characters you know.
-Vote 2 for characters you would love to collect.
-Your wishlist will also count towards total votes, for those who are looking to boost their waifus.
-Do not peer pressure or bribe people to influence this vote. Or I'll need to reset or adjust it.
-If the image isn't updated, it means they don't have a pic 1.
-`)
-            .setTitle(`${char.characterName}`)
-            .setColor(color.successgreen);
+Image Number: ${swaps.imageNumber}
+Uploader: ${swaps.uploader}
+Artist: ${swaps.artist}
+Nsfw: ${swaps.nsfw}
+Selfcrop: ${swaps.selfcrop}`).setTitle(`${char.characterName}`)
+            .setColor(color.successgreen)
+            .setImage(swaps.previewURL);
         const row = await createButton();
         msg = await interaction.editReply( {embeds: [embed], components: [row], fetchReply: true});
         await buttonManager(embed, interaction, msg, cid);
@@ -175,8 +130,8 @@ async function buttonManager(embed, interaction, msg, cid) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('cvote')
-		.setDescription('vote for the character pools to earn gems!'),
+		.setName('isvote')
+		.setDescription('vote for swaps!'),
 	async execute(interaction) { 
         try {
             const uid = interaction.user.id;

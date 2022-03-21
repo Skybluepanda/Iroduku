@@ -51,7 +51,7 @@ Selfcrop: ${sent.selfcrop}
 
 Bonus: ${sent.bonus} (25gems&1karma/bonus)`).setTitle(`${char.characterName}`)
             .setColor(color.successgreen)
-            .setImage(sent.imageURL)
+            .setImage(sent.imageURL);
         const row = await createButton();
         console.log("6");
         msg = await interaction.editReply( {embeds: [embed], components: [row], fetchReply: true});

@@ -80,8 +80,8 @@ async function viewWCard(card, interaction) {
     const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const image1 = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
     if (image1) {
-        embedCard.setImage(image1.imageURL).setFooter(`#${image1.imageNumber} Art by ${image1.artist} | Uploaded by ${image1.uploader}
-Image ID is ${image1.imageID} report any errors using ID.`)
+        embedCard.setImage(image1.imageURL).setFooter({text: `#${image1.imageNumber} Art by ${image1.artist} | Uploaded by ${image1.uploader}
+Image ID is ${image1.imageID} report any errors using ID.`})
     } else {
         embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
     }
@@ -130,8 +130,8 @@ async function viewGCard(card, interaction) {
     const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const image1 = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
     if (image1) {
-        embedCard.setImage(image1.imageURL).setFooter(`#${image1.imageNumber} Art by ${image1.artist} | Uploaded by ${image1.uploader}
-Image ID is ${image1.imageID} report any errors using ID.`)
+        embedCard.setImage(image1.imageURL).setFooter({text: `#${image1.imageNumber} Art by ${image1.artist} | Uploaded by ${image1.uploader}
+Image ID is ${image1.imageID} report any errors using ID.`})
     } else {
         embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
     }
@@ -219,8 +219,8 @@ async function viewBCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: card.imageNumber}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
+            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+Image ID is ${image.imageID} report any errors using ID.`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -229,8 +229,8 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageNumber)}});
         if (image){
         url = await image.gifURL;
-        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
+        embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+Gif ID is ${image.gifID} report any errors using ID.`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -302,9 +302,9 @@ async function viewPCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+*you can update image with /amethystupdate*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -313,9 +313,9 @@ Image ID is ${image.imageID} report any errors using ID.
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
             url = await image.gifURL;
-            embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+*you can update image with /amethystupdate*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -392,9 +392,9 @@ async function viewRCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: (card.imageID)}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+*you can update image with /amethystupdate*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -403,9 +403,9 @@ Image ID is ${image.imageID} report any errors using ID.
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -card.imageID}});
         if (image){
         url = await image.gifURL;
-        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+        embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+*you can update image with /amethystupdate*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -488,9 +488,9 @@ async function viewDiaCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*Set image with /diaset*`).setImage(url)
+*Set image with /diaset*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -499,9 +499,9 @@ Image ID is ${image.imageID} report any errors using ID.
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -card.imageID}});
         if (image){
         url = await image.gifURL;
-        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+        embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID
-*Set image with /diaset*`).setImage(url)
+*Set image with /diaset*`}).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -619,7 +619,7 @@ async function sideontrashoff(interaction) {
 }
 async function sideontrashon(interaction) {
     const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 60) {
+    if (rngPool >= 70) {
         await wlPool(interaction);
     } else {
         await allPool(interaction);
@@ -689,10 +689,10 @@ module.exports = {
                         return await interaction.reply("you have more than 1000 cards. Burn some before doing more gacha.")
                     }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
-                    if (wlist >= 10) {
+                    if (wlist >= 5) {
                         await gacha(interaction);
                     }else {
-                        (embedE).setDescription("You need 10 or more waifus in wishlist to use gacha. use /wa to add to your wishlist!")
+                        (embedE).setDescription("You need 5 or more waifus in wishlist to use gacha. use /wa to add to your wishlist!")
                         return await interaction.reply({embeds: [embedE]});
                     }
                 } else {

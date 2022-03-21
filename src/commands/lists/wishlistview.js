@@ -16,7 +16,7 @@ async function createEmbed(interaction) {
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('wl')
+        .setName('wl2')
         .setDescription('Displays wishlist')
         .addUserOption(option => 
             option.setName('user')

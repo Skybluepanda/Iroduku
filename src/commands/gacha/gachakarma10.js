@@ -437,7 +437,7 @@ module.exports = {
                         return interaction.reply("you have more than 1000 cards. Burn some before doing more gacha.")
                     }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
-                    if (wlist >= 10) {
+                    if (wlist >= 5) {
                         await interaction.reply({embeds: [embedS]});
                         const list = [];
                         for (let i = 0; i < 10; i++) {
@@ -448,7 +448,7 @@ module.exports = {
                             await interaction.editReply({embeds: [embedS]});
                         }
                     }else {
-                        (await embedE).setDescription("You need 10 or more waifus in wishlist to use karma gacha. use /wa to add to your wishlist!")
+                        (await embedE).setDescription("You need 5 or more waifus in wishlist to use karma gacha. use /wa to add to your wishlist!")
                         return await interaction.reply({embeds: [embedE]});
                     }
                 } else {

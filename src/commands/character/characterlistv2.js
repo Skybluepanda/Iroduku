@@ -172,7 +172,7 @@ async function nameList(embed, interaction, page){
     const total = await database.Character.count({where: {
         characterName: {[Op.like]: '%' + name + '%'}
     }});
-    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    await embed.setFooter({text: `page ${page} of ${maxPage} | ${total} results found`});
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
 };
@@ -203,7 +203,7 @@ async function pageList(embed, interaction, page){
     const listString = await listMap.join(`\n`);
     await embed.setDescription(`${listString}`);
     const total = await database.Character.count();
-    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    await embed.setFooter({text: `page ${page} of ${maxPage} | ${total} results found`});
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
 };
@@ -231,7 +231,7 @@ async function rankList(embed, interaction, page){
     const total = await database.Character.count({where: {
         rank: rank
     }});
-    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    await embed.setFooter({text: `page ${page} of ${maxPage} | ${total} results found`});
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
 };
@@ -253,7 +253,7 @@ async function nopicList(embed, interaction, page){
     const listString = await listMap.join(`\n`);
     await embed.setDescription(`Characters without any images\n${listString}`);
     const total = await database.Character.count({where: {imageCount: 0}});
-    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    await embed.setFooter({text: `page ${page} of ${maxPage} | ${total} results found`});
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
 };
@@ -283,7 +283,7 @@ async function sidList(embed, interaction, page){
     const listString = await listMap.join(`\n`);
     await embed.setDescription(`${listString}`);
     const total = await database.Character.count({where: { seriesID: series}});
-    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    await embed.setFooter({text: `page ${page} of ${maxPage} | ${total} results found`});
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage)
 };
@@ -322,7 +322,7 @@ async function snameList(embed, interaction, page){
     const listString = await listMap.join(`\n`);
     
     await embed.setDescription(`${listString}`);
-    await embed.setFooter(`page ${page} of ${maxPage} | ${total} results found`);
+    await embed.setFooter({text: `page ${page} of ${maxPage} | ${total} results found`});
     const msg = await updateReply(interaction, embed);
     await buttonManager(embed, interaction, msg, page, maxPage);
 };

@@ -11,7 +11,7 @@ var cooldown2 = false;
 
 function createEmbed() {
     const embed = new MessageEmbed();
-    embed.setTitle("Basic loot drop")
+    embed.setTitle("Basic loot drop").setAuthor({name: 'Iroduku'})
             .setDescription(`Press claim to gain 10 gems.`)
             .setColor(color.white)
     return embed;
@@ -51,7 +51,7 @@ async function disableButton() {
 
 async function buttonManager(channel, msg, row) {
     try {
-        const collector = msg.createMessageComponentCollector({max:1, time: 30000 });
+        const collector = msg.createMessageComponentCollector({time: 30000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'claim':
@@ -62,26 +62,24 @@ async function buttonManager(channel, msg, row) {
                         await database.Player.increment({gems: 10}, {where: {playerID: i.user.id}});
                         await channel.send(`${i.user.toString()} gained 10 gems! 2/3 Cooldown remaining`);
                         await time.update({lastclaim: timeNow-1200000});
-                        row.components[0].setDisabled(true)
+                        collector.stop('Collector stopped manually');
                     } else if (timeDiff > 1200000) {
                         await database.Player.increment({gems: 10}, {where: {playerID: i.user.id}});
                         await channel.send(`${i.user.toString()} gained 10 gems! 1/3 Cooldown remaining`);
                         await time.update({lastclaim: timeNow-timeDiff+600000});
-                        row.components[0].setDisabled(true)
+                        collector.stop('Collector stopped manually');
                     } else if (timeDiff > 600000) {
                         const cooldown = dayjs.duration(1200000-timeDiff).format('mm[m : ]ss[s]');
                         await database.Player.increment({gems: 10}, {where: {playerID: i.user.id}});
                         await channel.send(`${i.user.toString()} gained 10 gems!\nCooldown remaining: ${cooldown}`);
                         await time.update({lastclaim: timeNow-timeDiff+600000});
-                        row.components[0].setDisabled(true)
+                        collector.stop('Collector stopped manually');
                     } else {
                         const cooldown = dayjs.duration(600000-timeDiff).format('mm[m : ]ss[s]');
                         await channel.send(`${i.user.toString()} failed to claim.\nCooldown remaining: ${cooldown}`);
-                        await buttonManager(channel, msg, row);
                     }
                     break;
             };
-            msg.edit({components: [row]});
             i.deferUpdate();
         });
 
@@ -130,9 +128,12 @@ async function buttonManager2(channel, msg, row) {
             msg.edit({components: [row]});
             i.deferUpdate();
         });
-        collector.on('end', async i => {
-            row.components[0].setDisabled(true);
-            msg.edit({components: [row]});
+
+        collector.on('end', (collected) => {
+            if (!collected) {
+                row.components[0].setDisabled(true);
+                msg.edit({components: [row]});
+            }
         })
 
     } catch(error) {
@@ -188,18 +189,31 @@ module.exports = {
 		if (message.author.bot) {
 			return;
 		}
+        
+        if (message.channel.id === '948658879070355527') {
+            if (message.content == 'spawnbox') {
+                const embed = createEmbed();
+                embed.setDescription(`Press claim to gain 10 gems. This is an artificially spawned box and will never drop as epic box.`)
+                const row = await createButton();
+                const msg = await message.channel.send({ embeds: [embed], components: [row], fetchReply: true });
+                await buttonManager(message.channel, msg, row);
+            }
+            
+            
+        }
 
 		
 		if (cooldown) {
 			return;
 		} else {
+            
+            let channel = await message.guild.channels.cache.get('948658879070355527');
             const rng = Math.floor(Math.random()*100);
             if (rng >= 99) {
                 const embed = createEmbed();
                 embed.setDescription(`Claim to gain 100 gems.`).setColor(color.purple).setTitle('Epic Loot Box');
                 const row = await createButton();
-                let channel = message.guild.channels.cache.get('948658879070355527');
-                msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
+                const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
                 await buttonManager2(channel, msg, row);
                 cooldown = true;
                 setTimeout(() => {
@@ -208,8 +222,7 @@ module.exports = {
             }else if (rng >= 91) {
                 const embed = createEmbed();
                 const row = await createButton();
-                let channel = message.guild.channels.cache.get('948658879070355527');
-                msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
+                const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
                 await buttonManager(channel, msg, row);
                 cooldown = true;
                 setTimeout(() => {
@@ -221,23 +234,22 @@ module.exports = {
         if (cooldown2) {
 			return;
 		} else {
+            let channel = await message.guild.channels.cache.get('950948047985188884');
             const rng = Math.floor(Math.random()*100);
             if (rng >= 99) {
                 const embed = createEmbed();
                 embed.setDescription(`Claim to gain 100 gems.`).setColor(color.purple).setTitle('Epic Loot Box');
                 const row = await createButton();
-                let channel = message.guild.channels.cache.get('950948047985188884');
-                msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
+                const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
                 await buttonManager2(channel, msg, row);
                 cooldown2 = true;
                 setTimeout(() => {
                     cooldown2 = false
                 }, 30000);
-            }else if (rng >= 91) {
+            } else if (rng >= 91) {
                 const embed = createEmbed();
                 const row = await createButton();
-                let channel = message.guild.channels.cache.get('950948047985188884');
-                msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
+                const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
                 await buttonManager(channel, msg, row);
                 cooldown2 = true;
                 setTimeout(() => {
