@@ -97,7 +97,7 @@ async function previewswap(interaction) {
         const pic2 = await loadImage(previous.imageURL);
 		const nsfw = await interaction.options.getBoolean('nsfw');
 		context.drawImage(pic1, 0, 0, 225, canvas.height);
-        context.drawImage(pic2, 226, 0, canvas.width, canvas.height);
+        context.drawImage(pic2, 226, 0, 225, canvas.height);
 		
 		const attachment = await new MessageAttachment(canvas.toBuffer(), 'swap.png');
 		if (attachment) {

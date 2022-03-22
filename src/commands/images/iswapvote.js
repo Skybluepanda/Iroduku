@@ -8,15 +8,26 @@ const { createCanvas, loadImage, Canvas } = require('canvas');
 async function start(interaction) {
     const user = interaction.user.id;
     const embed = await createEmbed(interaction);
+    const track = await database.Votetrack.findOne({
+        where: {playerID: user}
+    });
+    if (track) {
+        image = await track.imageVote;
+    } else {
+        await database.Votetrack.create({
+            playerID: user
+        });
+        cid = 2;
+    }
     await interaction.reply({embeds: [embed]});
-    await isvote(embed, interaction, 0);
+    await isvote(embed, interaction, image);
 }
 
 function createEmbed(interaction) {
     const embed = new MessageEmbed();
 
-    embed.setTitle("Starting charvote")
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+    embed.setTitle("Starting isvote")
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription("Starting")
         .setColor(color.failred);
     return embed;
@@ -43,19 +54,26 @@ Character ID: ${swaps.characterID}
 Character Alias: ${char.alias}
 Series: ${char.seriesID} | ${series.seriesName}
 Image Number: ${swaps.imageNumber}
-Uploader: ${swaps.uploader}
 Artist: ${swaps.artist}
 Nsfw: ${swaps.nsfw}
-Selfcrop: ${swaps.selfcrop}`).setTitle(`${char.characterName}`)
+Selfcrop: ${swaps.selfcrop}`).setTitle(`${char.characterName}
+
+Vote for image swap. Left is the new image and right is the image being replaced.
+Once swapped old images will be accessible with old amethyst or ruby cards,
+and diamond cards will be able to set the image to them.
+Choose yes or no based on your opinion on the image, 
+Or anotheri# option is if you think another image slot is a better candidate for the swap.
+Or you may choose to abstain.
+`)
             .setColor(color.successgreen)
             .setImage(swaps.previewURL);
         const row = await createButton();
         msg = await interaction.editReply( {embeds: [embed], components: [row], fetchReply: true});
-        await buttonManager(embed, interaction, msg, cid);
+        await buttonManager(embed, interaction, msg, queue);
         } else {
-            await embed.setDescription(`You are done for now as there are no new characters.
-There will be a command in the future to let you know if there are new characters to vote for.
-Thank you so much for doing cvote!`);
+            await embed.setDescription(`You are done for now as there are no new swaps.
+There will be a command in the future to let you know if there are new swaps to vote for.
+Thank you so much for doing isvote!`);
             return await interaction.editReply( {embeds: [embed]});
         }
     } catch(error) {
@@ -69,19 +87,24 @@ async function createButton() {
             .addComponents(
                 new MessageButton()
                     .setCustomId('0')
-                    .setLabel('0')
-                    .setStyle('PRIMARY')
+                    .setLabel('no')
+                    .setStyle('DANGER')
             )
             .addComponents(
                 new MessageButton()
                     .setCustomId('1')
-                    .setLabel('1')
-                    .setStyle('PRIMARY')
+                    .setLabel('yes')
+                    .setStyle('SUCCESS')
             )
             .addComponents(
                 new MessageButton()
                     .setCustomId('2')
-                    .setLabel('2')
+                    .setLabel('anotheri#')
+                    .setStyle('PRIMARY'))
+            .addComponents(
+                new MessageButton()
+                    .setCustomId('3')
+                    .setLabel('abstain')
                     .setStyle('PRIMARY'))
         return row;
     } catch(error) {
@@ -89,7 +112,7 @@ async function createButton() {
     }
 }
 
-async function buttonManager(embed, interaction, msg, cid) {
+async function buttonManager(embed, interaction, msg, imageid) {
     try {
         const uid = interaction.user.id;
         const filter = i => i.user.id === interaction.user.id;
@@ -97,24 +120,31 @@ async function buttonManager(embed, interaction, msg, cid) {
         collector.on('collect', async i => {
             switch (i.customId){
                 case '0':
-                    await database.Votetrack.increment({charVote: 1}, {where: {playerID: uid}})
+                    await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
                     await database.Player.increment({gems: 4}, {where: {playerID: uid}});
-                    await database.Character.increment({votes: 1}, {where: {characterID: cid}});
-                    cvoteID(embed, interaction, cid+1);
+                    await database.Swapimage.increment({yes: 1}, {where: {imageID: imageid}});
+                    cvoteID(embed, interaction, imageid+1);
                     break;
                 
                 case '1':
-                    await database.Votetrack.increment({charVote: 1}, {where: {playerID: uid}})
+                    await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
                     await database.Player.increment({gems: 4}, {where: {playerID: uid}});
-                    await database.Character.increment({votes: 1, score: 1}, {where: {characterID: cid}});
-                    cvoteID(embed, interaction, cid+1);
+                    await database.Swapimage.increment({no: 1}, {where: {imageID: imageid}});
+                    cvoteID(embed, interaction, imageid+1);
                     break;
                 
                 case '2':
-                    await database.Votetrack.increment({charVote: 1}, {where: {playerID: uid}})
+                    await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
                     await database.Player.increment({gems: 4}, {where: {playerID: uid}});
-                    await database.Character.increment({votes: 1, score: 2}, {where: {characterID: cid}});
-                    cvoteID(embed, interaction, cid+1);
+                    await database.Swapimage.increment({another: 1}, {where: {imageID: imageid}});
+                    cvoteID(embed, interaction, imageid+1);
+                    break;
+
+                case '3':
+                    await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
+                    await database.Player.increment({gems: 4}, {where: {playerID: uid}});
+                    await database.Swapimage.increment({abstain: 1}, {where: {imageID: imageid}});
+                    cvoteID(embed, interaction, imageid+1);
                     break;
             };
             i.deferUpdate();

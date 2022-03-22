@@ -191,7 +191,7 @@ module.exports = {
 		}
         
         if (message.channel.id === '948658879070355527') {
-            if (message.content == 'spawnbox') {
+            if (message.content == 'spawnbox' || message.content == 'Spawnbox') {
                 const embed = createEmbed();
                 embed.setDescription(`Press claim to gain 10 gems. This is an artificially spawned box and will never drop as epic box.`)
                 const row = await createButton();

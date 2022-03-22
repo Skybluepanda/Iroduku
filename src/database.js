@@ -327,6 +327,12 @@ const Swapimage = sequelize.define('swapimage', {
 		allowNull: false,
 		defaultValue: 0
 	},
+	abstain: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0
+	},
 	
 });
 
