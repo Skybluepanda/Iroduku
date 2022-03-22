@@ -36,7 +36,7 @@ async function checkDaily(interaction){
             //perfect
         } else if (timeDiff <= 79200000) {
             const timeLeft = 79200000 - timeDiff;
-            const remain = dayjs.duration(timeLeft).format('HH[hr: ]mm[m : ]ss[s]');
+            const remain = dayjs.duration(timeLeft).format('HH[hr : ]mm[m : ]ss[s]');
             //on cooldown
             return `Cooldown for ${remain}`;
         }
@@ -50,20 +50,27 @@ async function checkCollect(interaction){
         const lastCheck = collect.lastcollect;
         const timeNow = Date.now();
         const timeDiff = await timeNow - lastCheck;
+        const timefull = 28800000 - timeDiff;
+        const fulltime = dayjs.duration(timefull).format('HH[hr : ]mm[m : ]ss[s]');
         if (28800000 > timeDiff && timeDiff >= 480000) {
             //some collected show cooldown.
             const amount = 5 * Math.floor(timeDiff/480000);
             const cooltime = (timeDiff%480000);
             const timeLeft = 480000 - cooltime;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(${amount}/300) gems collected. ${remain} until next 5 gems.`;
+            return `(${amount}/300) gems collected. 
+${remain} until next 5 gems.
+${fulltime} until collect is capped`;
         } else if (timeDiff < 480000) {
             const timeLeft = 480000 - timeDiff;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(0/300) gems collected. ${remain} until next 5 gems.`;
+            return `(0/300) gems collected. 
+${remain} until next 5 gems.
+${fulltime} until collect is capped`;
             //none collected show cooldown
         } else {
-            return `(300/300) gems collected. At maximum capacity and collection paused.`;
+            return `(300/300) gems collected. 
+At maximum capacity and collection paused.`;
             //capped out
         }
     }
@@ -74,16 +81,20 @@ async function checkClaim(interaction){
     const timeNow = Date.now();
     const timeDiff = timeNow - time.lastclaim;
     if (timeDiff > 1800000) {
-        return `3/3 Claims Ready! Cannot prepare more claims.`;
+        return `3/3 Claims Ready! 
+Cannot prepare more claims.`;
     } else if (timeDiff > 1200000) {
         const cooldown = dayjs.duration(1800000-timeDiff).format('mm[m : ]ss[s]');
-        return `2/3 Claims Ready. ${cooldown} until next claim`;
+        return `2/3 Claims Ready. 
+${cooldown} until next claim`;
     } else if (timeDiff > 600000) {
         const cooldown = dayjs.duration(1200000-timeDiff).format('mm[m : ]ss[s]');
-        return `1/3 Claims Ready. ${cooldown} until next claim`;
+        return `1/3 Claims Ready. 
+${cooldown} until next claim`;
     } else {
         const cooldown = dayjs.duration(600000-timeDiff).format('mm[m : ]ss[s]');
-        return `0/3 Claims Ready. ${cooldown} until next claim`;
+        return `0/3 Claims Ready. 
+${cooldown} until next claim`;
     }
 }
 

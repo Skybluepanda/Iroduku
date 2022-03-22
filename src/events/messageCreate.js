@@ -190,7 +190,7 @@ module.exports = {
 			return;
 		}
         
-        if (message.channel.id === '948658879070355527') {
+        if (message.channel.id === '955856440881451049') {
             if (message.content == 'spawnbox' || message.content == 'Spawnbox') {
                 const embed = createEmbed();
                 embed.setDescription(`Press claim to gain 10 gems. This is an artificially spawned box and will never drop as epic box.`)
@@ -219,16 +219,17 @@ module.exports = {
                 setTimeout(() => {
                     cooldown = false
                 }, 30000);
-            }else if (rng >= 91) {
-                const embed = createEmbed();
-                const row = await createButton();
-                const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
-                await buttonManager(channel, msg, row);
-                cooldown = true;
-                setTimeout(() => {
-                    cooldown = false
-                }, 30000);
             }
+            //  else if (rng >= 91) {
+            //     const embed = createEmbed();
+            //     const row = await createButton();
+            //     const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
+            //     await buttonManager(channel, msg, row);
+            //     cooldown = true;
+            //     setTimeout(() => {
+            //         cooldown = false
+            //     }, 30000);
+            // }
 		}
 
         if (cooldown2) {
@@ -246,16 +247,17 @@ module.exports = {
                 setTimeout(() => {
                     cooldown2 = false
                 }, 30000);
-            } else if (rng >= 91) {
-                const embed = createEmbed();
-                const row = await createButton();
-                const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
-                await buttonManager(channel, msg, row);
-                cooldown2 = true;
-                setTimeout(() => {
-                    cooldown2 = false
-                }, 30000);
             }
+            //  else if (rng >= 91) {
+            //     const embed = createEmbed();
+            //     const row = await createButton();
+            //     const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
+            //     await buttonManager(channel, msg, row);
+            //     cooldown2 = true;
+            //     setTimeout(() => {
+            //         cooldown2 = false
+            //     }, 30000);
+            // }
 		}
 	},
 };
