@@ -410,9 +410,33 @@ async function raritySwitch(cid, rngRarity, interaction) {
     }
 }
 
+async function raritySwitch(cid, rngRarity, interaction) {
+    const user = interaction.user.id;
+    const player = await database.Player.findOne({where: {playerID: user}});
+    const kity = Math.floor(player.kpity/10)
+    await player.increment({karma: -10});
+    if (rngRarity + kity == 9984 || player.kpity >= 240) {
+        if (player.kpity < 240) {
+            await player.update({kpity: 0});
+        } else {
+            await player.increment({kpity: -240});
+        }
+        return createDiaCard(cid, interaction);
+    } else if (rngRarity >= 9684) {
+        await player.increment({kpity: 1});
+        return createRedCard(cid, interaction);
+    } else if (rngRarity >= 6000) {
+        await player.increment({kpity: 1});
+        return createPurpleCard(cid, interaction);
+    } else {
+        await player.increment({kpity: 1});
+        return createBlueCard(cid, interaction);
+    }
+}
+
 async function gacha(interaction) {
     const user = interaction.user.id;
-    const rngRarity = Math.floor(Math.random() * 1000);
+    const rngRarity = Math.floor(Math.random() * 10000);
     const wlist = await database.Wishlist.findAll({where: {playerID: user}})
     const rngChar = Math.floor(Math.random() * 1000);
     const char = (rngChar%wlist.length);

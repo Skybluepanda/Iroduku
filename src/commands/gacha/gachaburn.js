@@ -544,9 +544,9 @@ async function allPool(interaction, rarity, inventoryID) {
 
 async function sideofftrashoff(interaction, rarity, inventoryID) {
     const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 90) {
+    if (rngPool >= 95) {
         await wlPool(interaction, rarity, inventoryID);
-    } else if (rngPool >= 30) {
+    } else if (rngPool >= 38) {
         await mainPool(interaction, rarity, inventoryID);
     } else {
         await sidePool(interaction, rarity, inventoryID);
@@ -556,9 +556,9 @@ async function sideofftrashoff(interaction, rarity, inventoryID) {
 }
 async function sideontrashoff(interaction, rarity, inventoryID) {
     const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 80) {
+    if (rngPool >= 90) {
         await wlPool(interaction, rarity, inventoryID);
-    } else if (rngPool >= 40) {
+    } else if (rngPool >= 45) {
         await mainPool(interaction, rarity, inventoryID);
     } else {
         await sidePool(interaction, rarity, inventoryID);
@@ -566,7 +566,7 @@ async function sideontrashoff(interaction, rarity, inventoryID) {
 }
 async function sideontrashon(interaction, rarity, inventoryID) {
     const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 70) {
+    if (rngPool >= 85) {
         await wlPool(interaction, rarity, inventoryID);
     } else {
         await allPool(interaction, rarity, inventoryID);
@@ -600,7 +600,11 @@ async function raritySwitch(interaction) {
         await player.increment({pity: 1});
         return 6;
     } else if (rngRarity + pity >= 9922) {
-        await player.update({pity: 0});
+        if (player.pity < 400) {
+            await player.update({pity: 0});
+        } else {
+            await player.increment({pity: -400});
+        }
         return 5;
     } else if (rngRarity >= 9592) {
         await player.increment({pity: 1});

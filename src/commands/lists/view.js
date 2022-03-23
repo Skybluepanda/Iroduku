@@ -124,14 +124,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setColor(color.blue);
     
 
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        return await interaction.reply({embeds: [embedCard]});
-    }
+    return await interaction.reply({embeds: [embedCard]});
 }
 
 async function viewPurpleCard(card, interaction) { 
@@ -177,14 +170,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        return await interaction.reply({embeds: [embedCard]});
-    }
+    return await interaction.reply({embeds: [embedCard]});
 }
 
 async function viewRedCard(card, interaction) { 
@@ -230,14 +216,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        return await interaction.reply({embeds: [embedCard]});
-    }
+    return await interaction.reply({embeds: [embedCard]});
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -283,14 +262,24 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`)
-        await interaction.editReply({embeds: [embedCard]});
-        return await interaction.followUp(`**Above embed may contain explicit content of ${char.characterName}.**`)
-    } else {
-        return await interaction.reply({embeds: [embedCard]});
-    }
+    return await interaction.reply({embeds: [embedCard]});
+}
+
+async function viewSpeCard(card, interaction) { 
+    const special = await database.Special.findOne({where: {cardID: card.cardID}});
+    const embedCard = new MessageEmbed();
+    //all we get is inventory id and player id
+    embedCard.setFooter(`Art by ${special.artist}
+*edit card with /spedit*`).setImage(special.imageURL)
+    embedCard.setTitle(`${special.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID}
+**Series:** ${special.seriesName}
+**Rarity: Special**
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+        .setColor(special.color);
+    return await interaction.reply({embeds: [embedCard]});
 }
 
 async function switchRarity(card, rarity, interaction) {
@@ -312,6 +301,10 @@ async function switchRarity(card, rarity, interaction) {
             //red
         case 6:
             return viewDiaCard(card, interaction);
+
+        case 10:
+            return viewSpeCard(card, interaction);
+
         default:
             return "error";
             //wtf?

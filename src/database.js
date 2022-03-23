@@ -89,6 +89,8 @@ const Character = sequelize.define('character', {
 });
 
 
+
+
 const Series = sequelize.define('series', {
 	seriesID: {
 		type: Sequelize.INTEGER,
@@ -509,6 +511,11 @@ const Player = sequelize.define('player', {
 		defaultValue: 0,
 		allowNull: false,
 	},
+	kpity: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+	},
 });
 
 const Daily = sequelize.define('daily', { 
@@ -679,6 +686,34 @@ const Card = sequelize.define('card', {
 });
 
 
+const Special = sequelize.define('special', {
+	cardID: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+	},
+	characterName: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	seriesName: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	imageURL: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+	artist: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	color: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+});
+
+
 exports.sequelize = sequelize;
 exports.Character = Character;
 exports.Image = Image;
@@ -697,3 +732,4 @@ exports.Card = Card;
 exports.Collect = Collect;
 exports.Trade = Trade;
 exports.Votetrack = Votetrack;
+exports.Special = Special;

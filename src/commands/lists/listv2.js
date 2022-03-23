@@ -225,6 +225,29 @@ async function diacard(card) {
         return cardString
     }
 }
+
+async function specard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    const special = await database.Special.findOne({where: {cardID: card.cardID}});
+    
+    //find charname
+    const charname = special.characterName;
+    
+    if (tag) {
+        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ${tag}` + charname;
+        console.log(cardString);
+        return cardString
+    } else {
+        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ` + charname;
+        console.log(cardString);
+        return cardString
+    }
+}
 async function switchRarity(card, rarity) {
     switch (rarity) {
         case 1:
@@ -244,6 +267,9 @@ async function switchRarity(card, rarity) {
             //red
         case 6:
             return diacard(card);
+
+        case 10:
+            return specard(card);
         default:
             return "error";
             //wtf?
@@ -1011,6 +1037,7 @@ module.exports = {
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
+                        .addChoice('special',10)
                         )
                 .addStringOption(option => 
                     option
@@ -1047,6 +1074,7 @@ module.exports = {
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
+                        .addChoice('special',10)
                         )
                 .addStringOption(option => 
                     option
@@ -1083,6 +1111,7 @@ module.exports = {
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
+                        .addChoice('special',10)
                         )
                 .addStringOption(option => 
                     option
@@ -1119,6 +1148,7 @@ module.exports = {
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
+                        .addChoice('special',10)
                         )
                 .addStringOption(option => 
                     option
@@ -1155,6 +1185,7 @@ module.exports = {
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
+                        .addChoice('special',10)
                         )
                 .addStringOption(option => 
                     option
@@ -1185,6 +1216,7 @@ module.exports = {
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
+                        .addChoice('special',10)
                         )
                 .addStringOption(option => 
                     option

@@ -369,6 +369,29 @@ Gif ID is ${image.gifID} report any errors using ID.
     await buttonManager(interaction, msg);
 }
 
+async function viewSpeCard(card, interaction) { 
+    const special = await database.findOne({where: {cardID: card.cardID}});
+    const embedCard = new MessageEmbed();
+    //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const cname = special.characterName;
+    url = await image.imageURL;
+    embedCard.setFooter(`Art by ${special.artist}
+*edit card with /spedit*`).setImage(special.imageURL)
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID}
+**Series:** ${special.seriesName}
+**Rarity: Diamond**
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+        .setColor(special.color);
+    const row = await createButton();
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
+}
+
 async function switchRarity(card, rarity, interaction) {
     switch (rarity) {
         case 1:
@@ -388,6 +411,9 @@ async function switchRarity(card, rarity, interaction) {
         //red
         case 6:
             return viewDiaCard(card, interaction);
+
+        case 10:
+            return viewSpeCard(card, interaction);
         default:
             return "error";
             //wtf?

@@ -4,7 +4,7 @@ const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('addpity')
+        .setName('addkpity')
         .setDescription('resets pity')
         .addUserOption(option => 
             option
@@ -14,7 +14,7 @@ module.exports = {
                 )
         .addIntegerOption(option => 
             option
-                .setName("pity")
+                .setName("kpity")
                 .setDescription("Target pity")
                 .setRequired(true)
                 )
@@ -58,14 +58,14 @@ module.exports = {
             };
             console.log("you have gemmod role");
             const target = await interaction.options.getUser('target');
-            const quantity = await interaction.options.getInteger('pity');
+            const quantity = await interaction.options.getInteger('kpity');
             const reason = await interaction.options.getString('reason');
             console.log(target);
             console.log(target.username);
             console.log(target.id);
-            embedDone.setDescription(`${target.username} recieved ${quantity} pity!
+            embedDone.setDescription(`${target.username} recieved ${quantity} gems!
             Reason: ${reason}`);
-            await database.Player.update({pity: quantity}, {where: {playerID: target.id}})
+            await database.Player.update({kpity: quantity}, {where: {playerID: target.id}})
             await interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
         } catch (error) {
             return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});

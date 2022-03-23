@@ -501,7 +501,11 @@ async function raritySwitch(cid, rngRarity, interaction) {
         await player.increment({pity: 1});
         return createDiaCard(cid, interaction);
     } else if (rngRarity + pity >= 9922) {
-        await player.update({pity: 0});
+        if (player.pity < 400) {
+            await player.update({pity: 0});
+        } else {
+            await player.increment({pity: -400});
+        }
         return createRedCard(cid, interaction);
     } else if (rngRarity >= 9592) {
         await player.increment({pity: 1});
@@ -564,9 +568,9 @@ async function sideofftrashoff(interaction) {
     const list = [];
     for (let i = 0; i < 10; i++) {
         const rngPool = Math.floor(Math.random() * 100);
-        if (rngPool >= 90) {
+        if (rngPool >= 95) {
             list[i] = await wlPool(interaction);
-        } else if (rngPool >= 30) {
+        } else if (rngPool >= 38) {
             list[i] = await mainPool(interaction);
         } else {
             list[i] = await sidePool(interaction);
@@ -584,9 +588,9 @@ async function sideontrashoff(interaction) {
     const list = [];
     for (let i = 0; i < 10; i++) {
         const rngPool = Math.floor(Math.random() * 100);
-        if (rngPool >= 80) {
+        if (rngPool >= 90) {
             list[i] = await wlPool(interaction);
-        } else if (rngPool >= 40) {
+        } else if (rngPool >= 45) {
             list[i] = await mainPool(interaction);
         } else {
             list[i] = await sidePool(interaction);
@@ -603,7 +607,7 @@ async function sideontrashon(interaction) {
     const list = [];
     for (let i = 0; i < 10; i++) {
         const rngPool = Math.floor(Math.random() * 100);
-        if (rngPool >= 70) {
+        if (rngPool >= 85) {
             list[i] = await wlPool(interaction);
         } else {
             list[i] = await allPool(interaction);

@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const database = require('../../database.js');
+const database = require('../../src/database.js');
 const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
 const { Op } = require("sequelize");
-const color = require('../../color.json');
+const color = require('../../src/color.json');
 var dayjs = require('dayjs')
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()

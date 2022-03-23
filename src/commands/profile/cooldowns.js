@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
+const { Op } = require("sequelize");
 const color = require('../../color.json');
 var dayjs = require('dayjs')
 var duration = require('dayjs/plugin/duration')
@@ -98,6 +99,19 @@ ${cooldown} until next claim`;
     }
 }
 
+async function checkIsvote(interaciton) {
+    console.log("10")
+    const votetrack = await database.Votetrack.findOne({where: {playerID: interaciton.user.id}});
+    console.log(votetrack.imageVote)
+    const isvote = await database.Swapimage.count({where: {imageID: {[Op.gte]: votetrack.imageVote}}});
+    console.log(isvote);
+    if (isvote) {
+        return isvote;
+    } else {
+        return 0;
+    }
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('cds')
@@ -128,23 +142,37 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
         try {
+            console.log("1")
             const player = await database.Player.findOne({where: {playerID: userId}});
             const daily = await database.Daily.findOne({where: {playerID: userId}});
             const collect = await database.Collect.findOne({where: {playerID: userId}});
+            const votetrack = await database.Votetrack.findOne({where: {playerID: userId}});
+            const ccount = await database.Character.count();
+            console.log("2")
             await checkDaily1(interaction);
             await checkCollect1(interaction);
-            if (player && daily && collect) {
+            console.log("3")
+            if (player && daily && collect && votetrack) {
+                console.log("1")
                 const dailyText = await checkDaily(interaction);
                 const collectText = await checkCollect(interaction);
                 const claimText = await checkClaim(interaction);
+                console.log("2")
+                const isvote = await checkIsvote(interaction);
+                console.log("3")
                 embedDone.setDescription(`
 **Daily:** ${dailyText}
 
 **Collect:** ${collectText}
 
-**Claim:** ${claimText}`);
+**Claim:** ${claimText}
+
+**Cvote:** ${votetrack.charVote-1}/${ccount} characters
+**Isvote:** ${isvote} swaps
+`);
+console.log("4")
             } else {
-                embedDone.setDescription('Player does not exist.')
+                embedDone.setDescription(`To enable cds, you must be a player, try /isekai\nThen do /daily, /collect and /cvote`)
                         .setColor(color.failred);
             }
             return interaction.editReply({ embeds: [embedDone] });
