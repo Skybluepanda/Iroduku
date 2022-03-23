@@ -394,10 +394,10 @@ async function singleTag(interaction){
             return interaction.reply(`Tag length is too large pick a different tag.`);
         }
         await database.Card.update({tag: tag}, {where: {playerID: uid, inventoryID: lid}})
-        return interaction.reply(`${lid} have been tagged with ${tag}`);
+        return interaction.reply(`${lid} has been tagged with ${tag}`);
     } else {
         await database.Card.update({tag: null}, {where: {playerID: uid, inventoryID: lid}})
-        return interaction.reply(`${lid}'s tag have been removed.`);
+        return interaction.reply(`${lid}'s tag has been removed.`);
     }
     
 }
