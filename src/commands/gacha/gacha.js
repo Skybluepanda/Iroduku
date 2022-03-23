@@ -531,7 +531,11 @@ async function raritySwitch(cid, rngRarity, interaction) {
         player.increment({pity: 1});
         createDiaCard(cid, interaction);
     } else if (rngRarity + pity >= 9922) {
-        player.update({pity: 0});
+        if (player.pity < 400) {
+            await player.update({pity: 0});
+        } else {
+            await player.increment({pity: -400});
+        }
         createRedCard(cid, interaction);
     } else if (rngRarity >= 9592) {
         player.increment({pity: 1});
@@ -599,9 +603,9 @@ async function allPool(interaction) {
 
 async function sideofftrashoff(interaction) {
     const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 90) {
+    if (rngPool >= 95) {
         await wlPool(interaction);
-    } else if (rngPool >= 30) {
+    } else if (rngPool >= 38) {
         await mainPool(interaction);
     } else {
         await sidePool;
@@ -609,9 +613,9 @@ async function sideofftrashoff(interaction) {
 }
 async function sideontrashoff(interaction) {
     const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 80) {
+    if (rngPool >= 90) {
         await wlPool(interaction);
-    } else if (rngPool >= 40) {
+    } else if (rngPool >= 45) {
         await mainPool(interaction);
     } else {
         await sidePool(interaction);
@@ -619,7 +623,7 @@ async function sideontrashoff(interaction) {
 }
 async function sideontrashon(interaction) {
     const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 70) {
+    if (rngPool >= 85) {
         await wlPool(interaction);
     } else {
         await allPool(interaction);
@@ -629,10 +633,6 @@ async function sideontrashon(interaction) {
 async function gacha(interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
-    if (player.pity >= 10000) {
-        player.update({pity: 0});
-        return await pityPull(interaction);
-    } 
     const sideson = await database.Sideson.findOne({where: {playerID: user}});
     const trashon = await database.Trashon.findOne({where: {playerID: user}});
     if (!sideson && !trashon) {

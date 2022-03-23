@@ -10,11 +10,11 @@ const { MessageActionRow, MessageButton } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('diaset')
-		.setDescription('Sets a ruby card to an image number')
+		.setDescription('Sets a diamond card to an image number')
         .addIntegerOption(option => 
             option
                 .setName("lid")
-                .setDescription("The inventory id of the ruby card.")
+                .setDescription("The inventory id of the diamond card.")
                 .setRequired(true)
                 )
         .addIntegerOption(option => 

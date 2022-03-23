@@ -28,6 +28,7 @@ module.exports = {
         database.Gifqueue.sync();
         database.Swapimage.sync();
         database.Swapgif.sync();
+        database.Special.sync();
         console.log('database sync complete!');
     },
 };

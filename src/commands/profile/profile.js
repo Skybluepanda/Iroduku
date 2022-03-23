@@ -51,6 +51,7 @@ module.exports = {
 **Money:** ${player.money} <:datacoin:947388797828612127>
 **Karma:** ${player.karma} <:karma:947388797627281409>
 **Pity:** ${player.pity}
+**Karma Pity:** ${player.kpity}
 **Gacha Toggles:** ${toggle}
                 `)
             } else {

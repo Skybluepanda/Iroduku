@@ -108,12 +108,17 @@ async function createButton() {
     }
 }
 
-async function moveImage (embed, interaction, queue) {
+async function moveImage (queue) {
     const sent = await database.Swapimage.findOne({
         order: [['imageID','ASC']],
         offset: queue
     });
-    
+    const imageCount = await database.Image.count({where: {characterID: sent.characterID}});
+    const inumber = sent.imageNumber;
+    await database.Image.update(
+        {imageNumber: imageCount+1},
+        {where: {characterID: sent.characterID, imageNumber: sent.imageNumber}}
+    );
 }
 
 
@@ -142,6 +147,7 @@ async function buttonManager(embed, interaction, msg, queue) {
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'approve':
+                    await moveImage(queue);
                     const image = await database.Image.create({
                         characterID: sent.characterID,
                         imageNumber: sent.imageNumber,

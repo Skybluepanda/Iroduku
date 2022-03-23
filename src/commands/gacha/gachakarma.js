@@ -419,23 +419,30 @@ Gif ID is ${image.gifID} report any errors using ID.
 async function raritySwitch(cid, rngRarity, interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
+    const kity = Math.floor(player.kpity/10)
     await player.increment({karma: -10});
-    if (rngRarity == 999) {
+    if (rngRarity + kity == 9984 || player.kpity >= 240) {
+        if (player.kpity < 240) {
+            await player.update({kpity: 0});
+        } else {
+            await player.increment({kpity:  -240});
+        }
         await createDiaCard(cid, interaction);
-    } else if (rngRarity >= 950) {
+    } else if (rngRarity >= 9684) {
+        await player.increment({kpity: 1});
         await createRedCard(cid, interaction);
-    } else if (rngRarity >= 700) {
-        await player.increment({pity: 10});
+    } else if (rngRarity >= 6000) {
+        await player.increment({kpity: 1});
         await createPurpleCard(cid, interaction);
     } else {
-        await player.increment({pity: 10});
+        await player.increment({kpity: 1});
         await createBlueCard(cid, interaction);
     }
 }
 
 async function gacha(interaction) {
     const user = interaction.user.id;
-    const rngRarity = Math.floor(Math.random() * 1000);
+    const rngRarity = Math.floor(Math.random() * 10000);
     const wlist = await database.Wishlist.findAll({where: {playerID: user}})
     const rngChar = Math.floor(Math.random() * 1000);
     const char = (rngChar%wlist.length);

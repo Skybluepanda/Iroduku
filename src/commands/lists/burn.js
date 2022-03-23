@@ -343,6 +343,9 @@ async function switchRarity(card, rarity, interaction) {
         case 6:
             return interaction.reply("You can't burn Diamond cards.");
 
+        case 10:
+            return interaction.reply("You can't burn Special cards.");
+
         default:
             return interaction.reply("Error");
             //wtf?
@@ -709,6 +712,29 @@ async function diacard(card) {
         return cardString
     }
 }
+
+async function specard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    const special = await database.Special.findOne({where: {cardID: card.cardID}});
+    
+    //find charname
+    const charname = special.characterName;
+    
+    if (tag) {
+        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ${tag}` + charname + `Won't be burnt`;
+        console.log(cardString);
+        return cardString
+    } else {
+        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ` + charname + `Won't be burnt`;
+        console.log(cardString);
+        return cardString
+    }
+}
 async function switchRarity2(card, rarity) {
     switch (rarity) {
         case 1:
@@ -726,9 +752,11 @@ async function switchRarity2(card, rarity) {
         case 5:
             return redcard(card);
             //red
-
         case 6:
             return diacard(card);
+
+        case 10:
+            return specard(card);
         default:
             return "error";
             //wtf?

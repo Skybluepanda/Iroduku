@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
+const { Op } = require("sequelize");
 const color = require('../../color.json');
 var dayjs = require('dayjs')
 var duration = require('dayjs/plugin/duration')
@@ -36,7 +37,7 @@ async function checkDaily(interaction){
             //perfect
         } else if (timeDiff <= 79200000) {
             const timeLeft = 79200000 - timeDiff;
-            const remain = dayjs.duration(timeLeft).format('HH[hr: ]mm[m : ]ss[s]');
+            const remain = dayjs.duration(timeLeft).format('HH[hr : ]mm[m : ]ss[s]');
             //on cooldown
             return `Cooldown for ${remain}`;
         }
@@ -50,20 +51,27 @@ async function checkCollect(interaction){
         const lastCheck = collect.lastcollect;
         const timeNow = Date.now();
         const timeDiff = await timeNow - lastCheck;
+        const timefull = 28800000 - timeDiff;
+        const fulltime = dayjs.duration(timefull).format('HH[hr : ]mm[m : ]ss[s]');
         if (28800000 > timeDiff && timeDiff >= 480000) {
             //some collected show cooldown.
             const amount = 5 * Math.floor(timeDiff/480000);
             const cooltime = (timeDiff%480000);
             const timeLeft = 480000 - cooltime;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(${amount}/300) gems collected. ${remain} until next 5 gems.`;
+            return `(${amount}/300) gems collected. 
+${remain} until next 5 gems.
+${fulltime} until collect is capped`;
         } else if (timeDiff < 480000) {
             const timeLeft = 480000 - timeDiff;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(0/300) gems collected. ${remain} until next 5 gems.`;
+            return `(0/300) gems collected. 
+${remain} until next 5 gems.
+${fulltime} until collect is capped`;
             //none collected show cooldown
         } else {
-            return `(300/300) gems collected. At maximum capacity and collection paused.`;
+            return `(300/300) gems collected. 
+At maximum capacity and collection paused.`;
             //capped out
         }
     }
@@ -74,16 +82,33 @@ async function checkClaim(interaction){
     const timeNow = Date.now();
     const timeDiff = timeNow - time.lastclaim;
     if (timeDiff > 1800000) {
-        return `3/3 Claims Ready! Cannot prepare more claims.`;
+        return `3/3 Claims Ready! 
+Cannot prepare more claims.`;
     } else if (timeDiff > 1200000) {
         const cooldown = dayjs.duration(1800000-timeDiff).format('mm[m : ]ss[s]');
-        return `2/3 Claims Ready. ${cooldown} until next claim`;
+        return `2/3 Claims Ready. 
+${cooldown} until next claim`;
     } else if (timeDiff > 600000) {
         const cooldown = dayjs.duration(1200000-timeDiff).format('mm[m : ]ss[s]');
-        return `1/3 Claims Ready. ${cooldown} until next claim`;
+        return `1/3 Claims Ready. 
+${cooldown} until next claim`;
     } else {
         const cooldown = dayjs.duration(600000-timeDiff).format('mm[m : ]ss[s]');
-        return `0/3 Claims Ready. ${cooldown} until next claim`;
+        return `0/3 Claims Ready. 
+${cooldown} until next claim`;
+    }
+}
+
+async function checkIsvote(interaciton) {
+    console.log("10")
+    const votetrack = await database.Votetrack.findOne({where: {playerID: interaciton.user.id}});
+    console.log(votetrack.imageVote)
+    const isvote = await database.Swapimage.count({where: {imageID: {[Op.gte]: votetrack.imageVote}}});
+    console.log(isvote);
+    if (isvote) {
+        return isvote;
+    } else {
+        return 0;
     }
 }
 
@@ -117,23 +142,37 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
         try {
+            console.log("1")
             const player = await database.Player.findOne({where: {playerID: userId}});
             const daily = await database.Daily.findOne({where: {playerID: userId}});
             const collect = await database.Collect.findOne({where: {playerID: userId}});
+            const votetrack = await database.Votetrack.findOne({where: {playerID: userId}});
+            const ccount = await database.Character.count();
+            console.log("2")
             await checkDaily1(interaction);
             await checkCollect1(interaction);
-            if (player && daily && collect) {
+            console.log("3")
+            if (player && daily && collect && votetrack) {
+                console.log("1")
                 const dailyText = await checkDaily(interaction);
                 const collectText = await checkCollect(interaction);
                 const claimText = await checkClaim(interaction);
+                console.log("2")
+                const isvote = await checkIsvote(interaction);
+                console.log("3")
                 embedDone.setDescription(`
 **Daily:** ${dailyText}
 
 **Collect:** ${collectText}
 
-**Claim:** ${claimText}`);
+**Claim:** ${claimText}
+
+**Cvote:** ${votetrack.charVote-1}/${ccount} characters
+**Isvote:** ${isvote} swaps
+`);
+console.log("4")
             } else {
-                embedDone.setDescription('Player does not exist.')
+                embedDone.setDescription(`To enable cds, you must be a player, try /isekai\nThen do /daily, /collect and /cvote`)
                         .setColor(color.failred);
             }
             return interaction.editReply({ embeds: [embedDone] });
