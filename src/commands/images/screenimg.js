@@ -14,7 +14,7 @@ async function start(interaction) {
 function createEmbed(interaction) {
     const embed = new MessageEmbed();
 
-    embed.setTitle("Starting charvote")
+    embed.setTitle("Starting image screen")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("Starting")
         .setColor(color.failred);
@@ -36,6 +36,14 @@ async function cvoteID(embed, interaction, queue) {
                     characterID: sent.characterID
                 }
             });
+            if (!char) {
+                embed.setDescription("Broken Character, decline.")
+                const row = await createButton();
+        console.log("6");
+        msg = await interaction.editReply( {embeds: [embed], components: [row], fetchReply: true});
+        console.log("7");
+        await buttonManager(embed, interaction, msg, queue);
+            }
             const series = await database.Series.findOne({ where: { seriesID: char.seriesID}});
             console.log("5");
         await embed.setDescription(`
@@ -48,6 +56,7 @@ Uploader: ${sent.uploader}
 Artist: ${sent.artist}
 Nsfw: ${sent.nsfw}
 Selfcrop: ${sent.selfcrop}
+Reason: ${sent.reason}
 
 Bonus: ${sent.bonus} (25gems&1karma/bonus)`).setTitle(`${char.characterName}`)
             .setColor(color.successgreen)
@@ -62,7 +71,7 @@ Bonus: ${sent.bonus} (25gems&1karma/bonus)`).setTitle(`${char.characterName}`)
             return await interaction.editReply( {embeds: [embed]});
         }
     } catch(error) {
-        console.log("error has occured in cinfoID.");
+        console.log("error has occured in cvoteID.");
     }
 }
 
@@ -169,6 +178,13 @@ async function buttonManager(embed, interaction, msg, queue) {
                             characterID: sent.characterID
                         }
                     });
+                    if (!chard) {
+                        await database.Sendqueue.destroy({
+                            where: {imageID: sent.imageID}
+                        });
+                        await i.deferUpdate();
+                        await cvoteID(embed, interaction, queue);
+                    }
                     const seriesd = await database.Series.findOne({ where: { seriesID: chard.seriesID}});
                     const declinech = await interaction.guild.channels.cache.get('954395878016299108');
 		            await declinech.send(`${sent.imageID}| ${chard.characterName} from ${seriesd.seriesName}\nArt by ${sent.artist} and uploaded by ${sent.uploader}`);

@@ -93,13 +93,16 @@ Image Number: ${swaps.imageNumber}
 Artist: ${swaps.artist}
 Nsfw: ${swaps.nsfw}
 Selfcrop: ${swaps.selfcrop}
+Reason: ${swaps.reason}
 
-Vote for image swap. Left is the new image and right is the image being replaced.
+Vote for image swap.
 Once swapped old images will be accessible with old amethyst or ruby cards,
 and diamond cards will be able to set the image to them.
 Choose yes or no based on your opinion on the image, 
 Or another# option is if you think another image slot is a better candidate for the swap.
-Or you may choose to abstain.`)
+Or you may choose to abstain.
+
+**NEW LEFT | OLD RIGHT**`)
             .setTitle(`${char.characterName}`)
             .setColor(color.successgreen)
             .setImage(swaps.previewURL);
@@ -127,15 +130,15 @@ async function createButton() {
         const row = await new MessageActionRow()
             .addComponents(
                 new MessageButton()
-                    .setCustomId('0')
-                    .setLabel('no')
-                    .setStyle('DANGER')
+                    .setCustomId('1')
+                    .setLabel('yes (LEFT)')
+                    .setStyle('SUCCESS')
             )
             .addComponents(
                 new MessageButton()
-                    .setCustomId('1')
-                    .setLabel('yes')
-                    .setStyle('SUCCESS')
+                    .setCustomId('0')
+                    .setLabel('no (RIGHT)')
+                    .setStyle('DANGER')
             )
             .addComponents(
                 new MessageButton()
@@ -164,14 +167,14 @@ async function buttonManager(embed, interaction, msg, voteid) {
                 case '0':
                     await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
                     await database.Player.increment({gems: 4}, {where: {playerID: uid}});
-                    await database.Swapimage.increment({yes: 1}, {where: {imageID: voteid}});
+                    await database.Swapimage.increment({no: 1}, {where: {imageID: voteid}});
                     await isvote(embed, interaction, image);
                     break;
                 
                 case '1':
                     await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
                     await database.Player.increment({gems: 4}, {where: {playerID: uid}});
-                    await database.Swapimage.increment({no: 1}, {where: {imageID: voteid}});
+                    await database.Swapimage.increment({yes: 1}, {where: {imageID: voteid}});
                     await isvote(embed, interaction, image);
                     break;
                 

@@ -12,7 +12,7 @@ module.exports = {
                 .setDescription("The user account")
                 .setRequired(true)
                 )
-        .addIntegerOption(option => 
+        .addStringOption(option => 
             option
                 .setName("lid")
                 .setDescription("The lid")

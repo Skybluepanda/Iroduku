@@ -335,6 +335,10 @@ const Swapimage = sequelize.define('swapimage', {
 		allowNull: false,
 		defaultValue: 0
 	},
+	reason: {
+		type: Sequelize.STRING,
+     	unique: false
+	}
 	
 });
 

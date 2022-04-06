@@ -56,46 +56,30 @@ async function checkCollect(interaction){
         if (28800000 > timeDiff && timeDiff >= 480000) {
             //some collected show cooldown.
             const amount = 5 * Math.floor(timeDiff/480000);
+            let bonus;
+            if (amount >= 25) {
+                bonus = 50;
+            } else {
+                bonus = amount * 2
+            }
             const cooltime = (timeDiff%480000);
             const timeLeft = 480000 - cooltime;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(${amount}/300) gems collected. 
+            return `(${amount+bonus}/350) gems collected. 
 ${remain} until next 5 gems.
 ${fulltime} until collect is capped`;
         } else if (timeDiff < 480000) {
             const timeLeft = 480000 - timeDiff;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(0/300) gems collected. 
+            return `(0/350) gems collected. 
 ${remain} until next 5 gems.
 ${fulltime} until collect is capped`;
             //none collected show cooldown
         } else {
-            return `(300/300) gems collected. 
+            return `(350/350) gems collected. 
 At maximum capacity and collection paused.`;
             //capped out
         }
-    }
-}
-
-async function checkClaim(interaction){
-    const time = await database.Collect.findOne({where: {playerID: interaction.user.id}});
-    const timeNow = Date.now();
-    const timeDiff = timeNow - time.lastclaim;
-    if (timeDiff > 1800000) {
-        return `3/3 Claims Ready! 
-Cannot prepare more claims.`;
-    } else if (timeDiff > 1200000) {
-        const cooldown = dayjs.duration(1800000-timeDiff).format('mm[m : ]ss[s]');
-        return `2/3 Claims Ready. 
-${cooldown} until next claim`;
-    } else if (timeDiff > 600000) {
-        const cooldown = dayjs.duration(1200000-timeDiff).format('mm[m : ]ss[s]');
-        return `1/3 Claims Ready. 
-${cooldown} until next claim`;
-    } else {
-        const cooldown = dayjs.duration(600000-timeDiff).format('mm[m : ]ss[s]');
-        return `0/3 Claims Ready. 
-${cooldown} until next claim`;
     }
 }
 
@@ -156,7 +140,6 @@ module.exports = {
                 console.log("1")
                 const dailyText = await checkDaily(interaction);
                 const collectText = await checkCollect(interaction);
-                const claimText = await checkClaim(interaction);
                 console.log("2")
                 const isvote = await checkIsvote(interaction);
                 console.log("3")
@@ -164,8 +147,6 @@ module.exports = {
 **Daily:** ${dailyText}
 
 **Collect:** ${collectText}
-
-**Claim:** ${claimText}
 
 **Cvote:** ${votetrack.charVote-1}/${ccount} characters
 **Isvote:** ${isvote} swaps

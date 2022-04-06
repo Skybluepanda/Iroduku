@@ -133,7 +133,7 @@ async function checkSeverB(interaction) {
 
 async function checkSeverM(interaction) {
     const embed = embedD(interaction);
-    if (interaction.member.roles.cache.has('908920472295604224')) {
+    if (interaction.member.roles.cache.has('959972417923579904')) {
         await database.Player.increment({Karma: 50}, {where: {playerID: interaction.user.id}});
         embed.setTitle("Mod wage")
             .setDescription(`For doing mod things. +50 karma`);

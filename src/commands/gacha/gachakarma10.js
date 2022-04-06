@@ -393,22 +393,6 @@ Gif ID is ${image.gifID} report any errors using ID.
 }
 
 
-async function raritySwitch(cid, rngRarity, interaction) {
-    const user = interaction.user.id;
-    const player = await database.Player.findOne({where: {playerID: user}});
-    await player.increment({karma: -10});
-    if (rngRarity == 999) {
-        return await createDiaCard(cid, interaction);
-    } else if (rngRarity >= 950) {
-        return await createRedCard(cid, interaction);
-    } else if (rngRarity >= 700) {
-        await player.increment({pity: 10});
-        return createPurpleCard(cid, interaction);
-    } else {
-        await player.increment({pity: 10});
-        return createBlueCard(cid, interaction);
-    }
-}
 
 async function raritySwitch(cid, rngRarity, interaction) {
     const user = interaction.user.id;

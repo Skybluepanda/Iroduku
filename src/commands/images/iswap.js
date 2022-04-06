@@ -136,6 +136,7 @@ async function upload(interaction) {
 		const uploaderid = await interaction.user.id;
 		const bordered = await border(interaction);
 		const player = await database.Player.findOne({where: {playerID: interaction.user.id}});
+		const reason = await interaction.options.getString('reason');
 		
 		
 		
@@ -156,7 +157,8 @@ async function upload(interaction) {
 			nsfw: isnsfw,
 			selfcrop: selfcrop, 
 			uploader: uploader,
-			uploaderid: player.id
+			uploaderid: player.id,
+			reason: reason
 		});
 		// await database.Character.increment({imageCount: 1}, {where: {characterID: cid}})
 		// const char = await database.Character.findOne({where: {characterID:cid}});
@@ -217,7 +219,11 @@ module.exports = {
         .addBooleanOption(option => option
             .setName('selfcrop')
             .setDescription('did you find and crop this image/gif?')
-            .setRequired(true)),
+            .setRequired(true))
+		.addStringOption(option => option
+			.setName('reason')
+			.setDescription('SHORT reason for the swap (no emotes, limit 256 chars.)')
+			.setRequired(true)),
 	async execute(interaction) {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.

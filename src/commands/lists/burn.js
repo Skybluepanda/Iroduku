@@ -293,19 +293,60 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 200 <:datacoin:947388797828612127> | 10 <:waifugem:947388797916700672>`)
+Burn Reward: 200 <:datacoin:947388797828612127> | 20 <:waifugem:947388797916700672>`)
         .setColor(color.purple);
     const row = await createButton();
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`);
-        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg, 200, 10);
-        await interaction.followUp("**Above embed may contain explicit content.**")
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg, 200, 20);
+}
+
+async function viewRedCard(card, interaction) { 
+    const embedCard = new MessageEmbed();
+    //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const cid = await card.characterID;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    let image;
+    let url;
+    if (card.imageID > 0) {
+        image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
+        if (image) {
+            url = await image.imageURL;
+            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
+    } else if (card.imageID < 0){
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
+        if (image){
+            url = await image.gifURL;
+            embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
     } else {
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg, 200, 10);
+        image = database.Image.findOne({where: {imageID: 1}})
+        embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity:** Ruby
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
+
+Burn Reward: 1500 <:datacoin:947388797828612127> | 250 <:waifugem:947388797916700672>`)
+        .setColor(color.red);
+    const row = await createButton();
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg, 1500, 250);
+    
 }
 
 async function switchRarity(card, rarity, interaction) {
@@ -337,7 +378,10 @@ async function switchRarity(card, rarity, interaction) {
             return viewPurpleCard(card, interaction);
             //Purple
         case 5:
-            return interaction.reply("You can't burn ruby cards.");
+            if (quantity) {
+                return interaction.reply("Amethyst Cards Don't have Quantity. Try again without quantity.");
+            }
+            return viewRedCard(card, interaction);
             //red
 
         case 6:
@@ -452,8 +496,17 @@ async function burnList(embed, interaction, page){
             lock: false
         }}
     );
-    const totalCoin = purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
-    const totalGem = purpleCount*10 + blueCount*10+ greenCount*5 + whiteCount*1;
+    const redCount = await database.Card.count(
+        {
+            where: {
+            rarity: 5,
+            tag: tag,
+            playerID: uid,
+            lock: false
+        }}
+    );
+    const totalCoin = redCount*1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
+    const totalGem = redCount*250 + purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
 
     
     const totalPage = Math.ceil(maxPage/20);
@@ -468,7 +521,8 @@ async function burnList(embed, interaction, page){
     Quartz: ${whiteCount} cards for ${whiteCount*10} coins and ${greenCount*1} gems,
     Jade: ${greenCount} cards for ${greenCount*20} coins and ${greenCount*5} gems,
     Lapis: ${blueCount} cards for ${blueCount*50} coins and ${blueCount*10} gems,
-    Amethyst: ${purpleCount} cards for ${purpleCount*200} coins and ${purpleCount*10} gems.
+    Amethyst: ${purpleCount} cards for ${purpleCount*200} coins and ${purpleCount*20} gems.
+    Ruby: ${redCount} cards for ${redCount*1500} coins and ${redCount*250} gems.
     Total: ${totalCoin} coin and ${totalGem} gems.
     `);
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
@@ -535,7 +589,7 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, coins, gem
                     await database.Card.destroy(
                         {
                             where: {
-                            rarity: {[Op.lt]: 5},
+                            rarity: {[Op.lt]: 6},
                             tag: tag,
                             playerID: uid,
                             lock: false
@@ -576,7 +630,7 @@ async function whitecard(card) {
     let quantity = card.quantity;
     
     if (tag) {
-        const cardString =`:white_large_square:` + ID + ` | ${tag}` + charname + ` ×${quantity}`;
+        const cardString =`:white_large_square:` + ID + ` | ${tag} ` + charname + ` ×${quantity}`;
         console.log(cardString);
         return cardString
     } else {
@@ -601,7 +655,7 @@ async function greencard(card) {
     let quantity = card.quantity;
     
     if (tag) {
-        const cardString = `:green_square:`+ ID + ` | ${tag}` + charname + ` ×${quantity}`;
+        const cardString = `:green_square:`+ ID + ` | ${tag} ` + charname + ` ×${quantity}`;
         console.log(cardString);
         return cardString
     } else {
@@ -628,7 +682,7 @@ async function bluecard(card) {
     let quantity = card.quantity;
     
     if (tag) {
-        const cardString = `:blue_square:` +ID + ` | ${tag}` + charname + ` (#${inumber})×${quantity}`;
+        const cardString = `:blue_square:` +ID + ` | ${tag} ` + charname + ` (#${inumber})×${quantity}`;
         console.log(cardString);
         return cardString
     } else {
@@ -653,7 +707,7 @@ async function purplecard(card) {
     const inumber = card.imageNumber;
     
     if (tag) {
-        const cardString = `:purple_square:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
+        const cardString = `:purple_square:` + ID + ` | ${tag} ` + charname + ` (#${inumber})`;
         console.log(cardString);
         return cardString
     } else {
@@ -678,11 +732,11 @@ async function redcard(card) {
     const inumber = card.imageNumber;
     
     if (tag) {
-        const cardString = `:red_square:` + ID + ` | ${tag}` + charname + ` (#${inumber}) Won't be burnt`;
+        const cardString = `:red_square:` + ID + ` | ${tag} ` + charname + ` (#${inumber})`;
         console.log(cardString);
         return cardString
     } else {
-        const cardString = `:red_square:` + ID + ` | ` + charname + `(#${inumber}) Won't be burnt`;
+        const cardString = `:red_square:` + ID + ` | ` + charname + `(#${inumber})`;
         console.log(cardString);
         return cardString
     }
@@ -703,11 +757,36 @@ async function diacard(card) {
     const inumber = card.imageNumber;
     
     if (tag) {
-        const cardString = `:large_blue_diamond:` + ID + ` | ${tag}` + charname + ` (#${inumber}) Won't be burnt`;
+        const cardString = `:large_blue_diamond:` + ID + ` | ${tag} ` + charname + ` (#${inumber}) Won't be burnt`;
         console.log(cardString);
         return cardString
     } else {
         const cardString = `:large_blue_diamond:` + ID + ` | ` + charname + `(#${inumber}) Won't be burnt`;
+        console.log(cardString);
+        return cardString
+    }
+}
+
+async function pinkcard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    
+    if (tag) {
+        const cardString = `:diamonds:` + ID + ` | ${tag} ` + charname + ` (#${inumber}) Won't be burnt`;
+        console.log(cardString);
+        return cardString
+    } else {
+        const cardString = `:diamonds:` + ID + ` | ` + charname + `(#${inumber}) Won't be burnt`;
         console.log(cardString);
         return cardString
     }
@@ -726,7 +805,7 @@ async function specard(card) {
     const charname = special.characterName;
     
     if (tag) {
-        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ${tag}` + charname + `Won't be burnt`;
+        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ${tag} ` + charname + `Won't be burnt`;
         console.log(cardString);
         return cardString
     } else {
@@ -754,6 +833,9 @@ async function switchRarity2(card, rarity) {
             //red
         case 6:
             return diacard(card);
+
+        case 7:
+            return pinkcard(card);
 
         case 10:
             return specard(card);

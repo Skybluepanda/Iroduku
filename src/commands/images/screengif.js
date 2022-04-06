@@ -14,7 +14,7 @@ async function start(interaction) {
 function createEmbed(interaction) {
     const embed = new MessageEmbed();
 
-    embed.setTitle("Starting charvote")
+    embed.setTitle("Starting gif screens")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("Starting")
         .setColor(color.failred);
