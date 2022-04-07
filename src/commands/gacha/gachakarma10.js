@@ -252,7 +252,7 @@ async function createRedCard(cid, interaction) {
     });
     
     let channel = await interaction.guild.channels.cache.get('948507565577367563');
-    await channel.send(`An luck sack got a Ruby ${cid} | ${char.characterName}!`);
+    await channel.send(`A luck sack got a Ruby ${cid} | ${char.characterName}!`);
     await viewRCard(newcard, interaction);
     const gachaString = (`:red_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`);
     
