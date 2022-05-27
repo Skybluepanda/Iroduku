@@ -9,8 +9,8 @@ const { MessageActionRow, MessageButton } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('lu')
-		.setDescription('Sets an Amethyst card to the new image assigned to the image number.')
+		.setName('lupdate')
+		.setDescription('Moves a card to another inventory ID.')
         .addIntegerOption(option => 
             option
                 .setName("startlid")
@@ -19,7 +19,7 @@ module.exports = {
                 )
         .addIntegerOption(option => 
             option
-                .setName("targetlid")
+                .setName("targetlid") 
                 .setDescription("The inventory id of that you want to move it to.")
                 .setRequired(true)
                 ),

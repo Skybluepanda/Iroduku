@@ -496,7 +496,7 @@ async function raritySwitch(cid, rngRarity, interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
     await player.increment({gems: -10});
-    const pity = Math.floor(player.pity/4);
+    const pity = Math.floor(player.pity*3/10);
     if ((rngRarity) >= 9992) {
         await player.increment({pity: 1});
         return createDiaCard(cid, interaction);

@@ -95,6 +95,54 @@ async function buttonManager(interaction, msg, coins, gems) {
     }
 }
 
+async function inventorycheck(uid) {
+    var notfound = true;
+    var i = 1;
+    while (notfound) {
+        const number = await database.Card.findOne({where: {playerID: uid, inventoryID: i}})
+        if (number) {
+            i += 1;
+        } else {
+            notfound = false;
+        }
+    }
+    return i;
+}
+
+async function buttonManager3(interaction, msg, coins, gems) {
+    try {   
+        const filter = i => i.user.id === interaction.user.id;
+        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        collector.on('collect', async i => {
+            switch (i.customId){
+                case 'confirm':
+                    const uid = await interaction.user.id;
+                    const lid = await interaction.options.getInteger('lid');
+                    const newlid = inventorycheck('903935562208141323');
+                    await database.Card.update(
+                        {
+                            playerID: '903935562208141323', inventoryID: newlid
+                        },
+                        {
+                            where: {playerID: uid, inventoryID: lid}
+                        }
+                    )
+                    await database.Player.increment({money: coins, gems: gems}, {where: {playerID: uid}});
+                    await interaction.channel.send(`Card ${lid} Sold to Market for ${coins} coins and ${gems} gems.`)
+                    break;
+                
+                case 'cancel':
+                    await interaction.channel.send("Burn Cancelled")
+                    break;
+            };
+            i.deferUpdate();
+        }
+        );
+    } catch(error) {
+        console.log("Error has occured in button Manager");
+    }
+}
+
 async function viewWhiteCard(card, interaction) { 
     let quantity = await interaction.options.getInteger('quantity');
     if (!quantity) {
@@ -345,8 +393,103 @@ Burn Reward: 1500 <:datacoin:947388797828612127> | 250 <:waifugem:94738879791670
         .setColor(color.red);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager(interaction, msg, 1500, 250);
-    
+    await buttonManager3(interaction, msg, 1500, 250);
+}
+
+async function viewPinkCard(card, interaction) { 
+    const embedCard = new MessageEmbed();
+    //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const cid = await card.characterID;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    let image;
+    let url;
+    if (card.imageID > 0) {
+        image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
+        if (image) {
+            url = await image.imageURL;
+            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
+    } else if (card.imageID < 0){
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
+        if (image){
+            url = await image.gifURL;
+            embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
+    } else {
+        image = database.Image.findOne({where: {imageID: 1}})
+        embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
+    }
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity:** Pink Diamond
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
+
+Burn Reward: 3000 <:datacoin:947388797828612127> | 500 <:waifugem:947388797916700672>`)
+        .setColor(color.pink);
+    const row = await createButton();
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager3(interaction, msg, 3000, 500);
+}
+
+async function viewDiaCard(card, interaction) { 
+    const embedCard = new MessageEmbed();
+    //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const cid = await card.characterID;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    let image;
+    let url;
+    if (card.imageID > 0) {
+        image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
+        if (image) {
+            url = await image.imageURL;
+            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
+    } else if (card.imageID < 0){
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
+        if (image){
+            url = await image.gifURL;
+            embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
+    } else {
+        image = database.Image.findOne({where: {imageID: 1}})
+        embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
+    }
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity:** Diamond
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
+
+Burn Reward: 10000 <:datacoin:947388797828612127> | 1000 <:waifugem:947388797916700672>`)
+        .setColor(color.diamond);
+    const row = await createButton();
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager3(interaction, msg, 10000, 1000);
 }
 
 async function switchRarity(card, rarity, interaction) {
@@ -379,13 +522,22 @@ async function switchRarity(card, rarity, interaction) {
             //Purple
         case 5:
             if (quantity) {
-                return interaction.reply("Amethyst Cards Don't have Quantity. Try again without quantity.");
+                return interaction.reply("Ruby Cards Don't have Quantity. Try again without quantity.");
             }
             return viewRedCard(card, interaction);
             //red
 
         case 6:
-            return interaction.reply("You can't burn Diamond cards.");
+            if (quantity) {
+                return interaction.reply("Diamond Cards Don't have Quantity. Try again without quantity.");
+            }
+            return viewDiaCard(card, interaction);
+
+        case 7:
+            if (quantity) {
+                return interaction.reply("Pink Diamond Cards Don't have Quantity. Try again without quantity.");
+            }
+            return viewPinkCard(card, interaction);
 
         case 10:
             return interaction.reply("You can't burn Special cards.");
@@ -496,17 +648,17 @@ async function burnList(embed, interaction, page){
             lock: false
         }}
     );
-    const redCount = await database.Card.count(
-        {
-            where: {
-            rarity: 5,
-            tag: tag,
-            playerID: uid,
-            lock: false
-        }}
-    );
-    const totalCoin = redCount*1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
-    const totalGem = redCount*250 + purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
+    // const redCount = await database.Card.count(
+    //     {
+    //         where: {
+    //         rarity: 5,
+    //         tag: tag,
+    //         playerID: uid,
+    //         lock: false
+    //     }}
+    // );
+    const totalCoin = purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
+    const totalGem = purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
 
     
     const totalPage = Math.ceil(maxPage/20);
@@ -522,7 +674,6 @@ async function burnList(embed, interaction, page){
     Jade: ${greenCount} cards for ${greenCount*20} coins and ${greenCount*5} gems,
     Lapis: ${blueCount} cards for ${blueCount*50} coins and ${blueCount*10} gems,
     Amethyst: ${purpleCount} cards for ${purpleCount*200} coins and ${purpleCount*20} gems.
-    Ruby: ${redCount} cards for ${redCount*1500} coins and ${redCount*250} gems.
     Total: ${totalCoin} coin and ${totalGem} gems.
     `);
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
@@ -589,7 +740,7 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, coins, gem
                     await database.Card.destroy(
                         {
                             where: {
-                            rarity: {[Op.lt]: 6},
+                            rarity: {[Op.lt]: 5},
                             tag: tag,
                             playerID: uid,
                             lock: false

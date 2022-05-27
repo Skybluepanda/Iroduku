@@ -1,11 +1,104 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
 const color = require('../../color.json');
-const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
+const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton, IntegrationApplication } = require('discord.js');
 const { Op } = require("sequelize");
 var dayjs = require('dayjs')
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
+
+
+async function inventorycheck(uid) {
+    var notfound = true;
+    var i = 1;
+    while (notfound) {
+        const number = await database.Card.findOne({where: {playerID: uid, inventoryID: i}})
+        if (number) {
+            i += 1;
+        } else {
+            notfound = false;
+        }
+    }
+    return i;
+}
+
+async function createButton() {
+    try {
+        const row = await new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setCustomId('accept')
+                    .setLabel('accept')
+                    .setStyle('SUCCESS')
+            )
+            .addComponents(
+                new MessageButton()
+                    .setCustomId('cancel')
+                    .setLabel('cancel')
+                    .setStyle('DANGER')
+            )
+            // .addComponents(
+            //     new MessageButton()
+            //         .setCustomId('search')
+            //         .setLabel('search')
+            //         .setStyle('PRIMARY')
+            // )
+        return row;
+    } catch(error) {
+        console.log("error has occured in crearteButton");
+    }
+}
+
+async function buttonManager(interaction, msg) {
+    try {
+        const target = await interaction.options.getUser('targetuser');
+        const filter = i => i.user.id === interaction.user.id;
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        collector.on('collect', async i => {
+            switch (i.customId){
+                case 'accept':
+                    await buttonManager2(interaction, msg);
+                    await interaction.channel.send(`${target.toString()} come get your gift from ${interaction.user.toString()}`)
+                    break;
+                
+                case 'cancel':
+                    await interaction.channel.send("Gift Cancelled");
+                    break;
+            };
+            i.deferUpdate();
+        }
+        );
+    } catch(error) {
+        console.log("Error has occured in button Manager");
+    }
+}
+
+async function buttonManager2(interaction, msg) {
+    try {   
+        const target = await interaction.options.getUser('targetuser');
+        const filter = i => i.user.id === target.id;
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        collector.on('collect', async i => {
+            switch (i.customId){
+                case 'accept':
+                    const uid = await interaction.user.id;
+                    const lid = await interaction.options.getInteger('lid');
+                    const slot = await inventorycheck(target.id);
+                    await database.Card.update({playerID: target.id, inventoryID: slot}, {where: {playerID: uid, inventoryID: lid}});
+                    await interaction.channel.send(`Gift accepted. Card ${lid} added to ${target.id}'s as card ${slot}`);
+                    break;
+                
+                case 'cancel':
+                    await interaction.channel.send("Gift Rejected");
+                    break;
+            };
+            i.deferUpdate();
+        }
+        );
+    } catch(error) {
+        console.log("Error has occured in button Manager");
+    }
+}
 
 async function viewWhiteCard(card, interaction) { 
     const embedCard = new MessageEmbed();
@@ -39,11 +132,12 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageU
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID: **${cid}
 **Series: **${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity: Quartz**
 **Quantity:** ${card.quantity}`)
         .setColor(color.white);
-    return await interaction.reply({embeds: [embedCard]});
+    const row = await createButton();
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewGreenCard(card, interaction) { 
@@ -78,11 +172,12 @@ async function viewGreenCard(card, interaction) {
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity:** Jade
 **Quantity:** ${card.quantity}`)
         .setColor(color.green);
-    return await interaction.reply({embeds: [embedCard]});
+    const row = await createButton();
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewBlueCard(card, interaction) { 
@@ -121,13 +216,14 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity:** Lapis
 **Quantity:** ${card.quantity}`)
         .setColor(color.blue);
     
+    const row = await createButton();
 
-    return await interaction.reply({embeds: [embedCard]});
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewPurpleCard(card, interaction) { 
@@ -144,8 +240,7 @@ async function viewPurpleCard(card, interaction) {
         if (image) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -155,8 +250,7 @@ Image ID is ${image.imageID} report any errors using ID.
         if (image){
             url = await image.gifURL;
             embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -170,11 +264,13 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
-    return await interaction.reply({embeds: [embedCard]});
+    const row = await createButton();
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewRedCard(card, interaction) { 
@@ -191,8 +287,7 @@ async function viewRedCard(card, interaction) {
         if (image) {
             url = await image.imageURL;
             embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -202,8 +297,7 @@ Image ID is ${image.imageID} report any errors using ID.
         if (image){
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.
-*you can update image with /amethystupdate*`).setImage(url)
+Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -217,11 +311,13 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
-    return await interaction.reply({embeds: [embedCard]});
+    const row = await createButton();
+    
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -264,11 +360,13 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
-    return await interaction.reply({embeds: [embedCard]});
+    const row = await createButton();
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewPinkCard(card, interaction) { 
@@ -311,29 +409,36 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity: Pink Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.pink);
-    return await interaction.reply({embeds: [embedCard]});
+    const row = await createButton();
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function viewSpeCard(card, interaction) { 
-    const special = await database.Special.findOne({where: {cardID: card.cardID}});
+    const special = await database.findOne({where: {cardID: card.cardID}});
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const cname = special.characterName;
+    url = await image.imageURL;
     embedCard.setFooter(`Art by ${special.artist}
 *edit card with /spedit*`).setImage(special.imageURL)
-    embedCard.setTitle(`${special.characterName}`)
+    embedCard.setTitle(`${char.characterName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID}
 **Series:** ${special.seriesName}
-**Rank: **1!
-**Rarity: Special**
+**Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(special.color);
-    return await interaction.reply({embeds: [embedCard]});
+    const row = await createButton();
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg);
 }
 
 async function switchRarity(card, rarity, interaction) {
@@ -352,7 +457,7 @@ async function switchRarity(card, rarity, interaction) {
             //Purple
         case 5:
             return viewRedCard(card, interaction);
-            //red
+        //red
         case 6:
             return viewDiaCard(card, interaction);
 
@@ -361,7 +466,6 @@ async function switchRarity(card, rarity, interaction) {
 
         case 10:
             return viewSpeCard(card, interaction);
-
         default:
             return "error";
             //wtf?
@@ -370,12 +474,18 @@ async function switchRarity(card, rarity, interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('view')
-		.setDescription('views a card')
+		.setName('gift')
+		.setDescription('gifts a card to a user.')
         .addIntegerOption(option => 
             option
                 .setName("lid")
                 .setDescription("The list id for the card you want to view")
+                .setRequired(true)
+                )
+        .addUserOption(option => 
+            option
+                .setName("targetuser")
+                .setDescription("The person you want to gift it to")
                 .setRequired(true)
                 ),
 	async execute(interaction) {
@@ -383,10 +493,16 @@ module.exports = {
             const user = await interaction.user.id
             const lid = await interaction.options.getInteger('lid');
             const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
-            if (card) {
-                switchRarity(card, card.rarity, interaction);
-            } else {
+            const target = await interaction.options.getUser('targetuser');
+            console.log(target);
+            console.log(target.id);
+            const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
+            if (card && targetplayer) {
+                await switchRarity(card, card.rarity, interaction);
+            } else if (!card) {
                 interaction.reply("Error Invalid list ID");
+            } else if (!targetplayer) {
+                interaction.reply("Invalid user");
             }
         } catch(error) {
             await  interaction.reply("Error has occured while performing the command.")

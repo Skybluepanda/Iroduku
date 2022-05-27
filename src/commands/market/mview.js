@@ -39,7 +39,6 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageU
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID: **${cid}
 **Series: **${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity: Quartz**
 **Quantity:** ${card.quantity}`)
         .setColor(color.white);
@@ -78,7 +77,6 @@ async function viewGreenCard(card, interaction) {
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity:** Jade
 **Quantity:** ${card.quantity}`)
         .setColor(color.green);
@@ -121,7 +119,6 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity:** Lapis
 **Quantity:** ${card.quantity}`)
         .setColor(color.blue);
@@ -170,7 +167,6 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
@@ -217,7 +213,6 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
@@ -264,7 +259,6 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
@@ -311,7 +305,6 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rank: **${char.rank}
 **Rarity: Pink Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.pink);
@@ -329,7 +322,6 @@ async function viewSpeCard(card, interaction) {
         .setDescription(`Card Info
 **LID:** ${card.inventoryID}
 **Series:** ${special.seriesName}
-**Rank: **1!
 **Rarity: Special**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(special.color);
@@ -380,7 +372,7 @@ module.exports = {
                 ),
 	async execute(interaction) {
         try {
-            const user = await interaction.user.id
+            const uid = '903935562208141323';
             const lid = await interaction.options.getInteger('lid');
             const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
             if (card) {

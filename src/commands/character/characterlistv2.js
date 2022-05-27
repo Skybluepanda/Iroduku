@@ -241,10 +241,10 @@ async function nopicList(embed, interaction, page){
     const maxPage =  Math.ceil(await database.Character.count({where: {imageCount: 0}})/20);
     const list = await database.Character.findAll(
         {
-        order: ['characterID'],
+        order: [['final', 'DESC']],
         limit: 20,
         offset: (page-1)*20,
-        where: {imageCount: 0}},
+        where: {imageCount: {[Op.lt]: 10}}},
         );
     if (maxPage > 0) {
         deployButton(interaction, embed);

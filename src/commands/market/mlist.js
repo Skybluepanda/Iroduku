@@ -87,29 +87,15 @@ async function whitecard(card) {
     const charname = char.characterName;
     //check quantity
     const quantity = card.quantity;
-    const lock = card.lock;
-    if (lock) {
-        const lockstatus = '**|**';
-        if (tag) {
-            const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
-            return cardString
-        }
+    
+    if (tag) {
+        const cardString =`:white_large_square:` + ID + ` | ${tag}` + charname + ` ×${quantity}`;
+        console.log(cardString);
+        return cardString
     } else {
-        const lockstatus = '|';
-        if (tag) {
-            const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
-            return cardString
-        }
+        const cardString =`:white_large_square:` + ID + ` | ` + charname + `×${quantity}`;
+        console.log(cardString);
+        return cardString
     }
 }
 
@@ -126,29 +112,15 @@ async function greencard(card) {
     const charname = char.characterName;
     //check quantity
     const quantity = card.quantity;
-    const lock = card.lock;
-    if (lock) {
-        const lockstatus = '**|**';
-        if (tag) {
-            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
-            return cardString
-        }
+    
+    if (tag) {
+        const cardString = `:green_square:`+ ID + ` | ${tag}` + charname + ` ×${quantity}`;
+        console.log(cardString);
+        return cardString
     } else {
-        const lockstatus = '|';
-        if (tag) {
-            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
-            return cardString
-        }
+        const cardString = `:green_square:` + ID + ` | ` + charname + `×${quantity}`;
+        console.log(cardString);
+        return cardString
     }
 }
 
@@ -167,29 +139,15 @@ async function bluecard(card) {
     const inumber = card.imageNumber;
     //check quantity
     const quantity = card.quantity;
-    const lock = card.lock;
-    if (lock) {
-        const lockstatus = '**|**';
-        if (tag) {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
-            return cardString
-        }
+    
+    if (tag) {
+        const cardString = `:blue_square:` +ID + ` | ${tag}` + charname + ` (#${inumber})×${quantity}`;
+        console.log(cardString);
+        return cardString
     } else {
-        const lockstatus = '|';
-        if (tag) {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
-            return cardString
-        }
+        const cardString = `:blue_square:` + ID + ` | ` + charname + `(#${inumber})×${quantity}`;
+        console.log(cardString);
+        return cardString
     }
 }
 
@@ -206,29 +164,15 @@ async function purplecard(card) {
     const charname = char.characterName;
     //image number of card
     const inumber = card.imageNumber;
-    const lock = card.lock;
-    if (lock) {
-        const lockstatus = '**|**';
-        if (tag) {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        }
+    
+    if (tag) {
+        const cardString = `:purple_square:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
+        console.log(cardString);
+        return cardString
     } else {
-        const lockstatus = '|';
-        if (tag) {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        }
+        const cardString = `:purple_square:` + ID + ` | ` + charname + `(#${inumber})`;
+        console.log(cardString);
+        return cardString
     }
 }
 
@@ -245,29 +189,15 @@ async function redcard(card) {
     const charname = char.characterName;
     //image number of card
     const inumber = card.imageNumber;
-    const lock = card.lock;
-    if (lock) {
-        const lockstatus = '**|**';
-        if (tag) {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        }
+    
+    if (tag) {
+        const cardString = `:red_square:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
+        console.log(cardString);
+        return cardString
     } else {
-        const lockstatus = '|';
-        if (tag) {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        }
+        const cardString = `:red_square:` + ID + ` | ` + charname + `(#${inumber})`;
+        console.log(cardString);
+        return cardString
     }
 }
 
@@ -284,29 +214,15 @@ async function diacard(card) {
     const charname = char.characterName;
     //image number of card
     const inumber = card.imageNumber;
-    const lock = card.lock;
-    if (lock) {
-        const lockstatus = '**|**';
-        if (tag) {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        }
+    
+    if (tag) {
+        const cardString = `:large_blue_diamond:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
+        console.log(cardString);
+        return cardString
     } else {
-        const lockstatus = '|';
-        if (tag) {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        }
+        const cardString = `:large_blue_diamond:` + ID + ` | ` + charname + `(#${inumber})`;
+        console.log(cardString);
+        return cardString
     }
 }
 
@@ -323,82 +239,20 @@ async function pinkcard(card) {
     const charname = char.characterName;
     //image number of card
     const inumber = card.imageNumber;
-    const lock = card.lock;
-    if (lock) {
-        const lockstatus = '**|**';
-        if (tag) {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        }
-    } else {
-        const lockstatus = '|';
-        if (tag) {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
-            return cardString
-        }
-    }
-}
-
-async function specard(card) {
-    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
-    const ID = card.inventoryID;
-    //white block :white_large_square:
-
-    //check for tag 
-    const tag = card.tag;
-    const special = await database.Special.findOne({where: {cardID: card.cardID}});
     
-    //find charname
-    const charname = special.characterName;
-    const lock = card.lock;
-    if (lock) {
-        const lockstatus = '**|**';
-        if (tag) {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
-            console.log(cardString);
-            return cardString
-        }
+    if (tag) {
+        const cardString = `:diamonds:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
+        console.log(cardString);
+        return cardString;
     } else {
-        const lockstatus = '|';
-        if (tag) {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
-            console.log(cardString);
-            return cardString
-        } else {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
-            console.log(cardString);
-            return cardString
-        }
+        const cardString = `:diamonds:` + ID + ` | ` + charname + `(#${inumber})`;
+        console.log(cardString);
+        return cardString;
     }
 }
+
 async function switchRarity(card, rarity) {
     switch (rarity) {
-        case 1:
-            return whitecard(card);
-            //white
-        case 2:
-            return greencard(card);
-            //green
-        case 3:
-            return bluecard(card);
-            //Blue
-        case 4:
-            return purplecard(card);
-            //Purple
         case 5:
             return redcard(card);
             //red
@@ -408,8 +262,6 @@ async function switchRarity(card, rarity) {
         case 7:
             return pinkcard(card);
 
-        case 10:
-            return specard(card);
         default:
             return "error";
             //wtf?
@@ -460,28 +312,18 @@ async function listSwitch(embed, interaction, page){
 
 async function order(interaction) {
     const order = interaction.options.getInteger("order");
-    switch (order){
-        case 1:
-            return ['rarity','DESC'];
-        
-        case 2:
-            return ['inventoryID','DESC'];
-
-        case 3:
-            return ['createdAt','DESC'];
-        case 4:
-            return ['createdAt','ASC'];
-        case 5:
-            return ['characterID', 'ASC']
-        default:
-            return ['inventoryID','ASC']
+    if (order == 1){
+        return ['rarity','DESC'];
+    } else if (order == 2) {
+        return ['inventoryID','DESC'];
+    } else {
+        return ['inventoryID','ASC']
     }
 }
 
 async function cnameList(embed, interaction, page){
-    const uid = await interaction.user.id;
+    const uid = '903935562208141323';
     let rarity = await interaction.options.getInteger("rarity");
-    let tag = await interaction.options.getString("tag");
     const orderOpt = await order(interaction)
     
     const cname = await interaction.options.getString('name');
@@ -499,29 +341,7 @@ async function cnameList(embed, interaction, page){
     }
     let cardList;
     let maxPage;
-    if (rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-    } else if(rarity && !tag) {
+    if (rarity) {
         cardList = await database.Card.findAll(
             {
                 order: [orderOpt],
@@ -537,26 +357,6 @@ async function cnameList(embed, interaction, page){
             {
                 where: {
                 rarity: rarity,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-    } else if (!rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                tag: tag,
                 playerID: uid,
                 characterID: {[Op.or]: cidList}
             }}
@@ -593,36 +393,13 @@ async function cnameList(embed, interaction, page){
 }
 
 async function cidList(embed, interaction, page){
-    const uid = await interaction.user.id;
+    const uid = '903935562208141323';
     const cid = await interaction.options.getInteger('id');
     let rarity = await interaction.options.getInteger("rarity");
-    let tag = await interaction.options.getString("tag");
     const orderOpt = await order(interaction)
     let maxPage;
     let cardList;
-    if (rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: cid
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: cid
-            }}
-        );
-    } else if (rarity && !tag) {
+    if (rarity) {
         cardList = await database.Card.findAll(
             {
                 order: [orderOpt],
@@ -638,26 +415,6 @@ async function cidList(embed, interaction, page){
             {
                 where: {
                 rarity: rarity,
-                playerID: uid,
-                characterID: cid
-            }}
-        );
-    } else if (!rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                tag: tag,
-                playerID: uid,
-                characterID: cid
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                tag: tag,
                 playerID: uid,
                 characterID: cid
             }}
@@ -695,13 +452,9 @@ async function cidList(embed, interaction, page){
 }
 
 async function snameList(embed, interaction, page){
-    console.log(1);
-    const uid = await interaction.user.id;
+    const uid = '903935562208141323';
     let rarity = await interaction.options.getInteger("rarity");
-    let tag = await interaction.options.getString("tag");
     const orderOpt = await order(interaction)
-    console.log(rarity);
-    console.log(5);
     const sname = await interaction.options.getString('sname');
     const seriesList = await database.Series.findAll({
         where: {
@@ -709,31 +462,26 @@ async function snameList(embed, interaction, page){
         }}
             );
     var sidList = [];
-    console.log(6);
     for (let i = 0; i < seriesList.length; i++) {
         const sid = seriesList[i].seriesID;
         sidList[i] = sid;
     }
-    console.log(7);
     const charList = await database.Character.findAll({
         where: {
             seriesID: {[Op.or]: sidList}
         }}
     );
-    console.log(8);
     var cidList = [];
     for (let i = 0; i < charList.length; i++) {
         const cid = charList[i].characterID;
         cidList[i] = cid;
     }
-    console.log(9);
     if (!cidList[0]) {
         return interaction.channel.send("No results found for sname used.")
     }
     let cardList;
     let maxPage;
-    console.log(cidList);
-    if (rarity && tag) {
+    if (rarity) {
         cardList = await database.Card.findAll(
             {
                 order: [orderOpt],
@@ -741,7 +489,6 @@ async function snameList(embed, interaction, page){
                 offset: (page-1)*20,
                 where: {
                 rarity: rarity,
-                tag: tag,
                 playerID: uid,
                 characterID: {[Op.or]: cidList}
             }}
@@ -750,47 +497,6 @@ async function snameList(embed, interaction, page){
             {
                 where: {
                 rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-    } else if (rarity && !tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                characterID: {[Op.or]: cidList},
-                rarity: rarity,
-                playerID: uid,
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                rarity: rarity,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-    } else if (!rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                tag: tag,
                 playerID: uid,
                 characterID: {[Op.or]: cidList}
             }}
@@ -818,10 +524,8 @@ async function snameList(embed, interaction, page){
     if (totalPage > 1) {
         await deployButton(interaction, embed);
     }
-    console.log(12);
     const listString = await makeList(cardList);
     const fullList = await listString.join(`\n`);
-    console.log(13);
     await embed.setDescription(`**List of ${interaction.user.username} Cards**\n${fullList}`);
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
     const msg = await updateReply(interaction, embed);
@@ -829,9 +533,8 @@ async function snameList(embed, interaction, page){
 }
 
 async function sidList(embed, interaction, page){
-    const uid = await interaction.user.id;
+    const uid = '903935562208141323';
     let rarity = await interaction.options.getInteger("rarity");
-    let tag = await interaction.options.getString("tag");
     const orderOpt = await order(interaction)
     const sid = await interaction.options.getInteger('sid');
     const charList = await database.Character.findAll(
@@ -847,29 +550,7 @@ async function sidList(embed, interaction, page){
     let cardList;
     let maxPage;
     console.log(cidList);
-    if (rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-    } else if (rarity && !tag) {
+    if (rarity) {
         cardList = await database.Card.findAll(
             {
                 order: [orderOpt],
@@ -885,27 +566,6 @@ async function sidList(embed, interaction, page){
             {
                 where: {
                 rarity: rarity,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-    } else if (!rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: cidList}
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                tag: tag,
                 playerID: uid,
                 characterID: {[Op.or]: cidList}
             }}
@@ -942,7 +602,7 @@ async function sidList(embed, interaction, page){
 }
 
 async function wishList(embed, interaction, page){
-    const uid = await interaction.user.id;
+    const uid = '903935562208141323';
     const user = await interaction.options.getUser("user");
     const player = await database.Player.findOne({where: {playerID: user.id}});
     let wishlist;
@@ -963,34 +623,11 @@ async function wishList(embed, interaction, page){
     }
     
     let rarity = await interaction.options.getInteger("rarity");
-    let tag = await interaction.options.getString("tag");
     const orderOpt = await order(interaction)
     let cardList;
     let maxPage;
 
-    if (rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: wishid}
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: wishid}
-            }}
-        );
-    } else if (rarity && !tag) {
+    if (rarity) {
         cardList = await database.Card.findAll(
             {
                 order: [orderOpt],
@@ -1006,26 +643,6 @@ async function wishList(embed, interaction, page){
             {
                 where: {
                 rarity: rarity,
-                playerID: uid,
-                characterID: {[Op.or]: wishid}
-            }}
-        );
-    } else if (!rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                tag: tag,
-                playerID: uid,
-                characterID: {[Op.or]: wishid}
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                tag: tag,
                 playerID: uid,
                 characterID: {[Op.or]: wishid}
             }}
@@ -1061,33 +678,12 @@ async function wishList(embed, interaction, page){
     await buttonManager(embed, interaction, msg, page, totalPage);
 }
 async function justList(embed, interaction, page){
-    const uid = await interaction.user.id;
+    const uid = '903935562208141323';
     let rarity = await interaction.options.getInteger("rarity");
-    let tag = await interaction.options.getString("tag");
     const orderOpt = await order(interaction)
     let cardList;
     let maxPage;
-    if (rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                rarity: rarity,
-                tag: tag,
-                playerID: uid,
-            }}
-        );
-    } else if (rarity && !tag) {
+    if (rarity) {
         cardList = await database.Card.findAll(
             {
                 order: [orderOpt],
@@ -1102,24 +698,6 @@ async function justList(embed, interaction, page){
             {
                 where: {
                 rarity: rarity,
-                playerID: uid,
-            }}
-        );
-    } else if (!rarity && tag) {
-        cardList = await database.Card.findAll(
-            {
-                order: [orderOpt],
-                limit: 20,
-                offset: (page-1)*20,
-                where: {
-                tag: tag,
-                playerID: uid,
-            }}
-        );
-        maxPage = await database.Card.count(
-            {
-                where: {
-                tag: tag,
                 playerID: uid,
             }}
         );
@@ -1163,7 +741,7 @@ async function justList(embed, interaction, page){
  */
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('list')
+		.setName('mlist')
 		.setDescription('Advanced list command if you use subcommands and add options it adds filters and orders.')
         .addSubcommand(subcommand =>
             subcommand
@@ -1180,20 +758,9 @@ module.exports = {
                         .setName("rarity")
                         .setDescription("Filters cards with certain rarity")
                         .setRequired(false)
-                        .addChoice('quartz',1)
-                        .addChoice('jade',2)
-                        .addChoice('lapis',3)
-                        .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
-                        .addChoice('special',10)
-                        )
-                .addStringOption(option => 
-                    option
-                        .setName("tag")
-                        .setDescription("Filter cards by tag")
-                        .setRequired(false)
                         )
                 .addIntegerOption(option => 
                     option
@@ -1202,9 +769,6 @@ module.exports = {
                         .setRequired(false)
                         .addChoice('rarity',1)
                         .addChoice('reverse',2)
-                        .addChoice('newest',3)
-                        .addChoice('oldest',4)
-                        .addChoice('cid',5)
                         ))
         .addSubcommand(subcommand =>
             subcommand
@@ -1221,20 +785,9 @@ module.exports = {
                         .setName("rarity")
                         .setDescription("Filters cards with certain rarity")
                         .setRequired(false)
-                        .addChoice('quartz',1)
-                        .addChoice('jade',2)
-                        .addChoice('lapis',3)
-                        .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
-                        .addChoice('special',10)
-                        )
-                .addStringOption(option => 
-                    option
-                        .setName("tag")
-                        .setDescription("Filter cards by tag")
-                        .setRequired(false)
                         )
                 .addIntegerOption(option => 
                     option
@@ -1243,9 +796,6 @@ module.exports = {
                         .setRequired(false)
                         .addChoice('rarity',1)
                         .addChoice('reverse',2)
-                        .addChoice('newest',3)
-                        .addChoice('oldest',4)
-                        .addChoice('cid',5)
                         ))
         .addSubcommand(subcommand =>
             subcommand
@@ -1262,20 +812,9 @@ module.exports = {
                         .setName("rarity")
                         .setDescription("Filters cards with certain rarity")
                         .setRequired(false)
-                        .addChoice('quartz',1)
-                        .addChoice('jade',2)
-                        .addChoice('lapis',3)
-                        .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
-                        .addChoice('special',10)
-                        )
-                .addStringOption(option => 
-                    option
-                        .setName("tag")
-                        .setDescription("Filter cards by tag")
-                        .setRequired(false)
                         )
                 .addIntegerOption(option => 
                     option
@@ -1284,9 +823,6 @@ module.exports = {
                         .setRequired(false)
                         .addChoice('rarity',1)
                         .addChoice('reverse',2)
-                        .addChoice('newest',3)
-                        .addChoice('oldest',4)
-                        .addChoice('cid',5)
                         ))
         .addSubcommand(subcommand =>
             subcommand
@@ -1303,20 +839,9 @@ module.exports = {
                         .setName("rarity")
                         .setDescription("Filters cards with certain rarity")
                         .setRequired(false)
-                        .addChoice('quartz',1)
-                        .addChoice('jade',2)
-                        .addChoice('lapis',3)
-                        .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
-                        .addChoice('special',10)
-                        )
-                .addStringOption(option => 
-                    option
-                        .setName("tag")
-                        .setDescription("Filter cards by tag")
-                        .setRequired(false)
                         )
                 .addIntegerOption(option => 
                     option
@@ -1325,9 +850,6 @@ module.exports = {
                         .setRequired(false)
                         .addChoice('rarity',1)
                         .addChoice('reverse',2)
-                        .addChoice('newest',3)
-                        .addChoice('oldest',4)
-                        .addChoice('cid',5)
                         ))
         .addSubcommand(subcommand =>
             subcommand
@@ -1344,20 +866,9 @@ module.exports = {
                         .setName("rarity")
                         .setDescription("Filters cards with certain rarity")
                         .setRequired(false)
-                        .addChoice('quartz',1)
-                        .addChoice('jade',2)
-                        .addChoice('lapis',3)
-                        .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
-                        .addChoice('special',10)
-                        )
-                .addStringOption(option => 
-                    option
-                        .setName("tag")
-                        .setDescription("Filter cards by tag")
-                        .setRequired(false)
                         )
                 .addIntegerOption(option => 
                     option
@@ -1366,9 +877,6 @@ module.exports = {
                         .setRequired(false)
                         .addChoice('rarity',1)
                         .addChoice('reverse',2)
-                        .addChoice('newest',3)
-                        .addChoice('oldest',4)
-                        .addChoice('cid',5)
                         ))
         .addSubcommand(subcommand =>
             subcommand
@@ -1379,20 +887,9 @@ module.exports = {
                         .setName("rarity")
                         .setDescription("Filters cards with certain rarity")
                         .setRequired(false)
-                        .addChoice('quartz',1)
-                        .addChoice('jade',2)
-                        .addChoice('lapis',3)
-                        .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
-                        .addChoice('special',10)
-                        )
-                .addStringOption(option => 
-                    option
-                        .setName("tag")
-                        .setDescription("Filter cards by tag")
-                        .setRequired(false)
                         )
                 .addIntegerOption(option => 
                     option
@@ -1401,9 +898,6 @@ module.exports = {
                         .setRequired(false)
                         .addChoice('rarity',1)
                         .addChoice('reverse',2)
-                        .addChoice('newest',3)
-                        .addChoice('oldest',4)
-                        .addChoice('cid',5)
                         )),
 	async execute(interaction) {
 		const embed = embedSucess(interaction);

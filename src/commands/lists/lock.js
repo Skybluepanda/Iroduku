@@ -46,7 +46,12 @@ async function lockTag(interaction){
     const card = await database.Card.findAll({where: {playerID: uid, tag: tag}});
     const lock = await interaction.options.getBoolean('lock');
     await database.Card.update({lock: lock}, {where: {playerID: uid, tag: tag}});
-    return await interaction.reply(`Cards tagged with ${tag} locked.`);
+    if (lock) {
+        return await interaction.reply(`Cards tagged with ${tag} locked.`);
+    } else {
+        return await interaction.reply(`Cards tagged with ${tag} unlocked.`);
+    }
+    
 }
 
 

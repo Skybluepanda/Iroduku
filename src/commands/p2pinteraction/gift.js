@@ -85,7 +85,7 @@ async function buttonManager2(interaction, msg) {
                     const lid = await interaction.options.getInteger('lid');
                     const slot = await inventorycheck(target.id);
                     await database.Card.update({playerID: target.id, inventoryID: slot}, {where: {playerID: uid, inventoryID: lid}});
-                    await interaction.channel.send(`Gift accepted. Card ${lid} added to ${target.id}'s as card ${slot}`);
+                    await interaction.channel.send(`Gift accepted. Card ${lid} added to ${target.toString()}'s as card ${slot}`);
                     break;
                 
                 case 'cancel':

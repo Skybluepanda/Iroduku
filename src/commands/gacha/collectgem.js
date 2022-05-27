@@ -56,7 +56,7 @@ async function checkTime(interaction, player){
         const lastCheck = collect.lastcollect;
         const timeNow = Date.now();
         const timeDiff = await timeNow - lastCheck;
-        if (28800000 > timeDiff && timeDiff >= 480000) {
+        if (43200000 > timeDiff && timeDiff >= 480000) {
             const amount = 5 * Math.floor(timeDiff/480000);
             const timeLeft = (timeDiff%480000);
             await normalCollect(interaction, player, amount);
@@ -107,9 +107,9 @@ async function normalCollect(interaction, player, amount){
 
 async function maxCollect(interaction, player){
     const embedDone = await embedD(interaction);
-    await player.increment('gems', {by: 350});
+    await player.increment('gems', {by: 500});
     await embedDone.setDescription(`
-    Gems Collected: (Capped! +350) ${player.gems+350}`);
+    Gems Collected: (Capped! +500) ${player.gems+500}`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
 }
 

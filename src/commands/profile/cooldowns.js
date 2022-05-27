@@ -51,9 +51,9 @@ async function checkCollect(interaction){
         const lastCheck = collect.lastcollect;
         const timeNow = Date.now();
         const timeDiff = await timeNow - lastCheck;
-        const timefull = 28800000 - timeDiff;
+        const timefull = 43200000 - timeDiff;
         const fulltime = dayjs.duration(timefull).format('HH[hr : ]mm[m : ]ss[s]');
-        if (28800000 > timeDiff && timeDiff >= 480000) {
+        if (43200000 > timeDiff && timeDiff >= 480000) {
             //some collected show cooldown.
             const amount = 5 * Math.floor(timeDiff/480000);
             let bonus;
@@ -65,18 +65,18 @@ async function checkCollect(interaction){
             const cooltime = (timeDiff%480000);
             const timeLeft = 480000 - cooltime;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(${amount+bonus}/350) gems collected. 
+            return `(${amount+bonus}/500) gems collected. 
 ${remain} until next 5 gems.
 ${fulltime} until collect is capped`;
         } else if (timeDiff < 480000) {
             const timeLeft = 480000 - timeDiff;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(0/350) gems collected. 
+            return `(0/500) gems collected. 
 ${remain} until next 5 gems.
 ${fulltime} until collect is capped`;
             //none collected show cooldown
         } else {
-            return `(350/350) gems collected. 
+            return `(500/500) gems collected. 
 At maximum capacity and collection paused.`;
             //capped out
         }

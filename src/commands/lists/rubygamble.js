@@ -145,17 +145,17 @@ async function buttonManager(embed, interaction, msg, card, attempts) {
             i.deferUpdate();
             switch (i.customId){
                 case 'gone':
-                    if (player.money < 150) {
-                        return interaction.followUp(`You need at least 150 coins to start rubygamble.`)
+                    if (player.money < 500) {
+                        return interaction.followUp(`You need at least 500 coins to start rubygamble.`)
                     }
                     attempts += 1;
-                    await player.increment('money', {by: -150});
+                    await player.increment('money', {by: -500});
                     const gamble = Math.floor(Math.random() * 1000);
-                    if (gamble > 980) {
+                    if (gamble + attempts > 980) {
                         await success(embed, card, interaction, attempts);
                         attempts = -1;
                         break;
-                    } else if (gamble < 45) {
+                    } else if (gamble - attempts < 45) {
                         await fail(embed, card, interaction);
                         attempts = -1;
                         break;
@@ -166,18 +166,18 @@ async function buttonManager(embed, interaction, msg, card, attempts) {
                 
                 case 'gten':
                     var i = 0;
+                    if (player.money < 5000) {
+                        return interaction.followUp(`You need at least 5000 coins to roll 10 times.`)
+                    }
                     while (i < 10){
-                        if (player.money < 1500) {
-                            return interaction.followUp(`You need at least 1500 coins to roll 10 times.`)
-                        }
-                        await player.increment('money', {by: -150});
+                        await player.increment('money', {by: -500});
                         attempts += 1;
                         const gamble = Math.floor(Math.random() * 1000);
-                        if (gamble > 980) {
+                        if (gamble + attempts > 980) {
                             await success(embed, card, interaction, attempts);
                             attempts = -1;
                             break;
-                        } else if (gamble < 45) {
+                        } else if (gamble - attempts < 45) {
                             await fail(embed, card, interaction);
                             attempts = -1;
                             break;
@@ -222,8 +222,8 @@ module.exports = {
             const player = await database.Player.findOne({where: {playerID: uid}});
             if (card) {
                 if (card.rarity == 5) {
-                    if (player.money < 150) {
-                        return interaction.reply(`You need at least 150 coins to start rubygamble.`)
+                    if (player.money < 500) {
+                        return interaction.reply(`You need at least 500 coins to start rubygamble.`)
                     } else {
                         await gamble(card, interaction);
                     }
