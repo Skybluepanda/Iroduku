@@ -171,22 +171,22 @@ async function bluecard(card) {
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
+            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
             console.log(cardString);
             return cardString
         } else {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
+            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
             console.log(cardString);
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
+            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
             console.log(cardString);
             return cardString
         } else {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
+            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
             console.log(cardString);
             return cardString
         }

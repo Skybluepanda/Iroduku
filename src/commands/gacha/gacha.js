@@ -182,7 +182,7 @@ async function createBlueCard(cid, interaction) {
     if (total == 0) {
         imageRng = 1;
     } else {
-        imageRng = ((Math.floor(Math.random() * 100))%total)+1;
+        imageRng = await ((Math.floor(Math.random() * 100))%total)+1;
         if (imageRng > imageCap) {
             imageRng = -(imageRng-imageCap);
         }

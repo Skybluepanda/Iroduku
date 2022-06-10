@@ -35,6 +35,9 @@ module.exports = {
             const lid = interaction.options.getInteger('lid');
             const iNumber = interaction.options.getInteger('imagenumber');
             const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}});
+            if (iNumber == 0) {
+                return interaction.reply(`0 is not a valid image number.`)
+            }
             if (card) {
                 if (card.rarity >= 6) {
                     if (iNumber > 0) {
