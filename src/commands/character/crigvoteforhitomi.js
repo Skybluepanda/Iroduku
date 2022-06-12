@@ -79,7 +79,7 @@ module.exports = {
                 .setRequired(true))
             .addIntegerOption(option => option
                 .setName("votes")
-                .setDescription("The link of the character")
+                .setDescription("The votes of the character")
                 .setRequired(true))),
 	async execute(interaction) {
         const id = interaction.options.getInteger('id');

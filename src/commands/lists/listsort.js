@@ -23,17 +23,9 @@ const { MessageActionRow, MessageButton } = require('discord.js');
  *  */
 
 //We want to recursively activate cards in the order after the filter, then start filling from the point
-async function lstart(){
-    const uid = interaction.user.id;
-    const lstart = interaction.options.getInteger('startlid')
-    cardList = await database.Card.findAll({})
-
-
-}
-
-async function inventorycheck(uid) {
+async function inventorycheck(uid, start) {
     var notfound = true;
-    var i = 1;
+    var i = start;
     while (notfound) {
         const number = await database.Card.findOne({where: {playerID: uid, inventoryID: i}})
         if (number) {
@@ -46,27 +38,64 @@ async function inventorycheck(uid) {
 }
 
 async function order(interaction) {
-    const order = interaction.options.getInteger("order");
+    const order = await interaction.options.getInteger("order");
     switch (order){
         case 1:
             return ['rarity','DESC'];
-        
-        case 2:
-            return ['inventoryID','DESC'];
 
         case 3:
             return ['createdAt','DESC'];
+
         case 4:
             return ['createdAt','ASC'];
+
         case 5:
             return ['characterID', 'ASC']
+
         default:
-            return ['inventoryID','ASC']
+            return ['cardID','ASC']
     }
 }
 
-async function lsort(interaction, progress){
-
+async function lsort(interaction){
+    console.log(4)
+    const uid = interaction.user.id;
+    const orderOpt = await order(interaction);
+    console.log(1)
+    var lid = interaction.options.getInteger('startlid');
+    console.log(2)
+    const sortlist = await database.Card.findAll({order: [orderOpt], where: {playerID: uid, lock: 0}})
+    await database.Card.update({inventoryID: 0}, {where: {playerID: uid, lock: 0}});
+    console.log(3)
+    var total = await database.Card.count({where: {playerID: uid, lock: 0}});
+    console.log(5)
+    await interaction.reply(`${total} cards being sorted in order ${orderOpt}, starting from LID ${lid}.
+Please do not execute or interact with any other commands until the commmand has finished. Any cards that are lost cannot be recovered.
+Please wait, you will be alerted once sorting is complete.`)
+    console.log(6)
+    for (let i = 0; i < total; i++) {
+        console.log(7)
+        lid = await inventorycheck(uid, lid);
+        console.log(lid);
+        console.log(8)
+        await database.Card.update(
+            {
+                inventoryID: lid
+            },
+            {
+                limit: 1,
+                where:  {
+                    cardID: sortlist[i].cardID,
+                    inventoryID: 0,
+                    playerID: uid,
+                    lock: 0
+                }
+            }
+        )
+        console.log(9)
+        lid += 1;
+    }
+    await interaction.channel.send(`${interaction.user} sorting complete, you may use other commands.`)
 }
 
 
@@ -79,7 +108,7 @@ module.exports = {
             option
                 .setName("startlid")
                 .setDescription("The starting lid for the list to fill up from.")
-                .setRequired(false)
+                .setRequired(true)
                 )
         .addIntegerOption(option => 
             option
@@ -87,25 +116,31 @@ module.exports = {
                 .setDescription("Order cards to a standard")
                 .setRequired(false)
                 .addChoice('rarity',1)
-                .addChoice('reverse',2)
                 .addChoice('newest',3)
                 .addChoice('oldest',4)
                 .addChoice('cid',5)
                 ),
 	async execute(interaction) {
         try {
+            console.log(1)
             const uid = interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: uid}});
+            console.log(2)
             if (player) {
+                const startlid = await interaction.options.getInteger('startlid')
+                if (startlid <= 0){
+                    return interaction.reply("Start LID cannot be less than 1.");
+                }
                 //do list sort
-                await lstart();
+                console.log(3)
+                await lsort(interaction);
 
             } else {
-                return interaction.reply("You are not a registered player, do /isekai to get started!");
+                return interaction.channel.reply("You are not a registered player, do /isekai to get started!");
             }
             
         } catch (error) {
-            return interaction.reply("Error has occured");
+            return interaction.channel.send("Error has occured");
         }
 	},
 };

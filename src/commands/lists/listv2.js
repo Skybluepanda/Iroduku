@@ -453,6 +453,10 @@ async function listSwitch(embed, interaction, page){
         case "wishlist":
             wishList(embed, interaction, page);
             break;
+
+        case "locked":
+            lockList(embed, interaction, page);
+            break;
     }
 }
 
@@ -1152,6 +1156,106 @@ async function justList(embed, interaction, page){
     await buttonManager(embed, interaction, msg, page, totalPage);
 }
 
+async function lockList(embed, interaction, page){
+    const uid = await interaction.user.id;
+    let rarity = await interaction.options.getInteger("rarity");
+    let tag = await interaction.options.getString("tag");
+    const orderOpt = await order(interaction)
+    let cardList;
+    let maxPage;
+    if (rarity && tag) {
+        cardList = await database.Card.findAll(
+            {
+                order: [orderOpt],
+                limit: 20,
+                offset: (page-1)*20,
+                where: {
+                rarity: rarity,
+                lock: 1,
+                tag: tag,
+                playerID: uid,
+            }}
+        );
+        maxPage = await database.Card.count(
+            {
+                where: {
+                rarity: rarity,
+                tag: tag,
+                lock: 1,
+                playerID: uid,
+            }}
+        );
+    } else if (rarity && !tag) {
+        cardList = await database.Card.findAll(
+            {
+                order: [orderOpt],
+                limit: 20,
+                offset: (page-1)*20,
+                where: {
+                rarity: rarity,
+                lock: 1,
+                playerID: uid,
+            }}
+        );
+        maxPage = await database.Card.count(
+            {
+                where: {
+                rarity: rarity,
+                lock: 1,
+                playerID: uid,
+            }}
+        );
+    } else if (!rarity && tag) {
+        cardList = await database.Card.findAll(
+            {
+                order: [orderOpt],
+                limit: 20,
+                offset: (page-1)*20,
+                where: {
+                tag: tag,
+                lock: 1,
+                playerID: uid,
+            }}
+        );
+        maxPage = await database.Card.count(
+            {
+                where: {
+                tag: tag,
+                lock: 1,
+                playerID: uid,
+            }}
+        );
+    } else {
+        cardList = await database.Card.findAll(
+            {
+                order: [orderOpt],
+                limit: 20,
+                offset: (page-1)*20,
+                where: {
+                playerID: uid,
+                lock: 1,
+            }}
+        );
+        maxPage = await database.Card.count(
+            {
+                where: {
+                playerID: uid,
+                lock: 1,
+            }}
+        );
+    }
+    const totalPage = Math.ceil(maxPage/20);
+    if (totalPage > 1) {
+        await deployButton(interaction, embed);
+    }
+    const listString = await makeList(cardList);
+    const fullList = await listString.join(`\n`);
+    await embed.setDescription(`**List of ${interaction.user.username} Cards**\n${fullList}`);
+    await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
+    const msg = await updateReply(interaction, embed);
+    await buttonManager(embed, interaction, msg, page, totalPage);
+}
+
 /**
  * cname
  * cid
@@ -1374,6 +1478,41 @@ module.exports = {
             subcommand
                 .setName("base")
                 .setDescription("Lists cards")
+                .addIntegerOption(option => 
+                    option
+                        .setName("rarity")
+                        .setDescription("Filters cards with certain rarity")
+                        .setRequired(false)
+                        .addChoice('quartz',1)
+                        .addChoice('jade',2)
+                        .addChoice('lapis',3)
+                        .addChoice('amethyst',4)
+                        .addChoice('ruby',5)
+                        .addChoice('diamond',6)
+                        .addChoice('pink_diamond',7)
+                        .addChoice('special',10)
+                        )
+                .addStringOption(option => 
+                    option
+                        .setName("tag")
+                        .setDescription("Filter cards by tag")
+                        .setRequired(false)
+                        )
+                .addIntegerOption(option => 
+                    option
+                        .setName("order")
+                        .setDescription("Order cards to a standard")
+                        .setRequired(false)
+                        .addChoice('rarity',1)
+                        .addChoice('reverse',2)
+                        .addChoice('newest',3)
+                        .addChoice('oldest',4)
+                        .addChoice('cid',5)
+                        ))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("locked")
+                .setDescription("Lists locked cards")
                 .addIntegerOption(option => 
                     option
                         .setName("rarity")

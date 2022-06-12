@@ -29,6 +29,7 @@ module.exports = {
         database.Swapimage.sync();
         database.Swapgif.sync();
         database.Special.sync();
+        database.Cvotetrack.sync();
         console.log('database sync complete!');
     },
 };

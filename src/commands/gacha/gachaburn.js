@@ -564,9 +564,9 @@ async function allPool(interaction, rarity) {
 
 async function sideofftrashoff(interaction, rarity) {
     const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 95) {
+    if (rngPool >= 97) {
         await wlPool(interaction, rarity);
-    } else if (rngPool >= 38) {
+    } else if (rngPool >= 70) {
         await mainPool(interaction, rarity);
     } else {
         await sidePool(interaction, rarity);
@@ -576,9 +576,9 @@ async function sideofftrashoff(interaction, rarity) {
 }
 async function sideontrashoff(interaction, rarity) {
     const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 90) {
+    if (rngPool >= 91) {
         await wlPool(interaction, rarity);
-    } else if (rngPool >= 45) {
+    } else if (rngPool >= 80) {
         await mainPool(interaction, rarity);
     } else {
         await sidePool(interaction, rarity);

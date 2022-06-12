@@ -604,11 +604,25 @@ const Votetrack = sequelize.define('votetrack', {
 		allowNull: false,
 		defaultValue: 2,
 	},
+	charVote2: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 1,
+	},
 	imageVote: {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
 		defaultValue: 1,
+	},
+});
+
+const Cvotetrack = sequelize.define('cvotetrack', {
+	characterID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
 	},
 });
 
@@ -737,3 +751,4 @@ exports.Collect = Collect;
 exports.Trade = Trade;
 exports.Votetrack = Votetrack;
 exports.Special = Special;
+exports.Cvotetrack = Cvotetrack
