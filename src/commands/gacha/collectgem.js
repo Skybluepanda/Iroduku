@@ -107,7 +107,7 @@ async function normalCollect(interaction, player, amount){
 
 async function maxCollect(interaction, player){
     const embedDone = await embedD(interaction);
-    await player.increment('gems', {by: 500});
+    await player.increment('gems', {by: 650});
     await embedDone.setDescription(`
     Gems Collected: (Capped! +650) ${player.gems+650}`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});

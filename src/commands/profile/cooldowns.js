@@ -132,6 +132,7 @@ module.exports = {
             const collect = await database.Collect.findOne({where: {playerID: userId}});
             const votetrack = await database.Votetrack.findOne({where: {playerID: userId}});
             const ccount = await database.Character.count();
+            const cvount = await database.Cvotetrack.count();
             console.log("2")
             await checkDaily1(interaction);
             await checkCollect1(interaction);
@@ -149,6 +150,7 @@ module.exports = {
 **Collect:** ${collectText}
 
 **Cvote:** ${votetrack.charVote-1}/${ccount} characters
+**Cvote:** ${votetrack.charVote2-1}/${cvount} characters
 **Isvote:** ${isvote} swaps
 `);
 console.log("4")

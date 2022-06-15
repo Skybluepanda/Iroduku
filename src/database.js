@@ -750,5 +750,5 @@ exports.Card = Card;
 exports.Collect = Collect;
 exports.Trade = Trade;
 exports.Votetrack = Votetrack;
+exports.Cvotetrack = Cvotetrack;
 exports.Special = Special;
-exports.Cvotetrack = Cvotetrack
