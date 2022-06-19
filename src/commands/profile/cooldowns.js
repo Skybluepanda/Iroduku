@@ -150,7 +150,7 @@ module.exports = {
 **Collect:** ${collectText}
 
 **Cvote:** ${votetrack.charVote-1}/${ccount} characters
-**Cvote:** ${votetrack.charVote2-1}/${cvount} characters
+**Cvote2:** ${votetrack.charVote2-1}/${cvount} characters
 **Isvote:** ${isvote} swaps
 `);
 console.log("4")

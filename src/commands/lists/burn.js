@@ -116,12 +116,13 @@ async function buttonManager3(interaction, msg, coins, gems) {
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'confirm':
+                    const mid = '903935562208141323'
                     const uid = await interaction.user.id;
                     const lid = await interaction.options.getInteger('lid');
-                    const newlid = inventorycheck('903935562208141323');
+                    const newlid = await inventorycheck(mid);
                     await database.Card.update(
                         {
-                            playerID: '903935562208141323', inventoryID: newlid
+                            playerID: '903935562208141323', inventoryID: newlid, tag: null
                         },
                         {
                             where: {playerID: uid, inventoryID: lid}
@@ -648,17 +649,17 @@ async function burnList(embed, interaction, page){
             lock: false
         }}
     );
-    // const redCount = await database.Card.count(
-    //     {
-    //         where: {
-    //         rarity: 5,
-    //         tag: tag,
-    //         playerID: uid,
-    //         lock: false
-    //     }}
-    // );
-    const totalCoin = purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
-    const totalGem = purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
+    const redCount = await database.Card.count(
+        {
+            where: {
+            rarity: 5,
+            tag: tag,
+            playerID: uid,
+            lock: false
+        }}
+    );
+    const totalCoin = redCount* 1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
+    const totalGem = redCount*250 + purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
 
     
     const totalPage = Math.ceil(maxPage/20);
@@ -670,10 +671,11 @@ async function burnList(embed, interaction, page){
     const fullList = await listString.join(`\n`);
     await embed.setDescription(`**List of ${interaction.user.username} Cards**\n${fullList}
     Burning total of:
-    Quartz: ${whiteCount} cards for ${whiteCount*10} coins and ${greenCount*1} gems,
+    Quartz: ${whiteCount} cards for ${whiteCount*10} coins and ${whiteCount*1} gems,
     Jade: ${greenCount} cards for ${greenCount*20} coins and ${greenCount*5} gems,
     Lapis: ${blueCount} cards for ${blueCount*50} coins and ${blueCount*10} gems,
     Amethyst: ${purpleCount} cards for ${purpleCount*200} coins and ${purpleCount*20} gems.
+    Ruby: ${redCount} cards for ${redCount*1500} coins and ${redCount*250} gems.
     Total: ${totalCoin} coin and ${totalGem} gems.
     `);
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
@@ -735,6 +737,7 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, coins, gem
                     break;
 
                 case 'confirm':
+                    const mid = '903935562208141323';
                     const uid = await interaction.user.id;
                     const tag = await interaction.options.getString('tag');
                     await database.Card.destroy(
@@ -746,6 +749,41 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, coins, gem
                             lock: false
                         }}
                     );
+                    const redCount = await database.Card.count(
+                        {
+                            where: {
+                            rarity: 5,
+                            tag: tag,
+                            playerID: uid,
+                            lock: false
+                        }}
+                    );
+                    const redList = await database.Card.findAll(
+                        {
+                            where: {
+                            rarity: 5,
+                            tag: tag,
+                            playerID: uid,
+                            lock: false
+                        }}
+                    );
+                    for (let i = 0; i < redCount; i++) {
+                        const newlid = await inventorycheck(mid)
+                        await database.Card.update(
+                            {
+                                playerID: mid, inventoryID: newlid, tag: null
+                            },
+                            {
+                                limit: 1,
+                                where: {
+                                    cardID: redList[i].cardID,
+                                    tag: tag,
+                                    playerID: uid,
+                                    lock: 0
+                                }
+                            }
+                        )
+                    }
                     await database.Player.increment({money: coins, gems: gems}, {where: {playerID: uid}});
                     await interaction.channel.send(`Cards with ${tag} burnt. ${coins} coins and ${gems} gems refunded.`)
                     break;

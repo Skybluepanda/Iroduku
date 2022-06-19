@@ -74,107 +74,6 @@ async function buttonManager(embed, interaction, msg, page, maxPage) {
     }
 }
 
-async function whitecard(card) {
-    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
-    const ID = card.inventoryID;
-    //white block :white_large_square:
-
-    //check for tag 
-    const tag = card.tag;
-    
-    //find charname
-    const char = await database.Character.findOne({where: {characterID: card.characterID}});
-    const charname = char.characterName;
-    //check quantity
-    const quantity = card.quantity;
-    
-    if (tag) {
-        const cardString =`:white_large_square:` + ID + ` | ${tag}` + charname + ` ×${quantity}`;
-        console.log(cardString);
-        return cardString
-    } else {
-        const cardString =`:white_large_square:` + ID + ` | ` + charname + `×${quantity}`;
-        console.log(cardString);
-        return cardString
-    }
-}
-
-async function greencard(card) {
-    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
-    const ID = card.inventoryID;
-    //white block :white_large_square:
-
-    //check for tag 
-    const tag = card.tag;
-    
-    //find charname
-    const char = await database.Character.findOne({where: {characterID: card.characterID}});
-    const charname = char.characterName;
-    //check quantity
-    const quantity = card.quantity;
-    
-    if (tag) {
-        const cardString = `:green_square:`+ ID + ` | ${tag}` + charname + ` ×${quantity}`;
-        console.log(cardString);
-        return cardString
-    } else {
-        const cardString = `:green_square:` + ID + ` | ` + charname + `×${quantity}`;
-        console.log(cardString);
-        return cardString
-    }
-}
-
-async function bluecard(card) {
-    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
-    const ID = card.inventoryID;
-    //white block :white_large_square:
-
-    //check for tag 
-    const tag = card.tag;
-    
-    //find charname
-    const char = await database.Character.findOne({where: {characterID: card.characterID}});
-    const charname = char.characterName;
-    //image number of card
-    const inumber = card.imageNumber;
-    //check quantity
-    const quantity = card.quantity;
-    
-    if (tag) {
-        const cardString = `:blue_square:` +ID + ` | ${tag}` + charname + ` (#${inumber})×${quantity}`;
-        console.log(cardString);
-        return cardString
-    } else {
-        const cardString = `:blue_square:` + ID + ` | ` + charname + `(#${inumber})×${quantity}`;
-        console.log(cardString);
-        return cardString
-    }
-}
-
-async function purplecard(card) {
-    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
-    const ID = card.inventoryID;
-    //white block :white_large_square:
-
-    //check for tag 
-    const tag = card.tag;
-    
-    //find charname
-    const char = await database.Character.findOne({where: {characterID: card.characterID}});
-    const charname = char.characterName;
-    //image number of card
-    const inumber = card.imageNumber;
-    
-    if (tag) {
-        const cardString = `:purple_square:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
-        console.log(cardString);
-        return cardString
-    } else {
-        const cardString = `:purple_square:` + ID + ` | ` + charname + `(#${inumber})`;
-        console.log(cardString);
-        return cardString
-    }
-}
 
 async function redcard(card) {
     //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
@@ -851,6 +750,7 @@ module.exports = {
                         .addChoice('rarity',1)
                         .addChoice('reverse',2)
                         ))
+                        
         .addSubcommand(subcommand =>
             subcommand
                 .setName("wishlist")
@@ -866,9 +766,20 @@ module.exports = {
                         .setName("rarity")
                         .setDescription("Filters cards with certain rarity")
                         .setRequired(false)
+                        .addChoice('quartz',1)
+                        .addChoice('jade',2)
+                        .addChoice('lapis',3)
+                        .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
+                        .addChoice('special',10)
+                        )
+                .addStringOption(option => 
+                    option
+                        .setName("tag")
+                        .setDescription("Filter cards by tag")
+                        .setRequired(false)
                         )
                 .addIntegerOption(option => 
                     option
@@ -877,6 +788,9 @@ module.exports = {
                         .setRequired(false)
                         .addChoice('rarity',1)
                         .addChoice('reverse',2)
+                        .addChoice('newest',3)
+                        .addChoice('oldest',4)
+                        .addChoice('cid',5)
                         ))
         .addSubcommand(subcommand =>
             subcommand

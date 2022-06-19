@@ -8,12 +8,16 @@ var dayjs = require('dayjs')
 dayjs().format()
 
 
-async function inventorycheck(uid) {
+
+async function tradeidcheck(interaction) {
+    const user = await interaction.user.id
+    const target = await interaction.options.getUser('targetuser');
     var notfound = true;
     var i = 1;
     while (notfound) {
-        const number = await database.Card.findOne({where: {playerID: uid, inventoryID: i}})
-        if (number) {
+        const number1 = await database.Trade.findOne({where: {tradeID: i, player1ID: user, player2ID: target.id}})
+        const number2 = await database.Trade.findOne({where: {tradeID: i, player2ID: user, player1ID: target.id}})
+        if (number1 || number2) {
             i += 1;
         } else {
             notfound = false;
@@ -22,13 +26,14 @@ async function inventorycheck(uid) {
     return i;
 }
 
+
 async function createButton() {
     try {
         const row = await new MessageActionRow()
             .addComponents(
                 new MessageButton()
-                    .setCustomId('buy')
-                    .setLabel('buy')
+                    .setCustomId('add')
+                    .setLabel('add')
                     .setStyle('SUCCESS')
             )
             .addComponents(
@@ -49,37 +54,29 @@ async function createButton() {
     }
 }
 
-
-async function buttonManager3(interaction, msg, coins) {
-    try {   
+async function buttonManager(interaction, msg, card) {
+    try {
         const filter = i => i.user.id === interaction.user.id;
-        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+       
         collector.on('collect', async i => {
             switch (i.customId){
-                case 'buy':
-                    const mid = '903935562208141323'
-                    const uid = await interaction.user.id;
-                    const buyer = await database.Player.findOne({where: {playerID: uid}});
-                    if (buyer.money < coins) {
-                        return interaction.channel.send(`${interaction.user} doesn't have enough money.`)
-                    }
-                    const lid = await interaction.options.getInteger('lid');
-                    const newlid = await inventorycheck(uid);
-                    await database.Card.update(
-                        {
-                            playerID: uid, inventoryID: newlid, tag: null
-                        },
-                        {
-                            where: {playerID: '903935562208141323', inventoryID: lid}
-                        }
-                    )
-                    await database.Player.increment({money: coins}, {where: {playerID: uid}});
-                    await interaction.channel.send(`Card ${lid} purchased from market for ${-coins} coins.
-The card id is ${newlid} in your inventory.`)
+                case 'add':
+                    const tid = await tradeidcheck(interaction)
+                    const uid = await interaction.user.id
+                    const target = await interaction.options.getUser('targetuser');
+                    await database.Trade.create({
+                        tradeID: tid,
+                        player1ID: uid,
+                        player2ID: target.id,
+                        inventoryID: card.cardID
+                    })
+                    await database.Card.update({playerID: 0}, {where: {playerID: uid, inventoryID: card.inventoryID}});
+                    await interaction.channel.send(`${interaction.user} added card ${card.inventory} to the trade with ${target}.`)
                     break;
                 
                 case 'cancel':
-                    await interaction.channel.send("Purchase Cancelled")
+                    await interaction.channel.send("Trade Add Cancelled");
                     break;
             };
             i.deferUpdate();
@@ -90,11 +87,57 @@ The card id is ${newlid} in your inventory.`)
     }
 }
 
+async function viewPurpleCard(card, interaction) { 
+    const embedCard = new MessageEmbed();
+    //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const cid = await card.characterID;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    let image;
+    let url;
+    if (card.imageID > 0) {
+        image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
+        if (image) {
+            url = await image.imageURL;
+            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
+    } else if (card.imageID < 0){
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
+        if (image){
+            url = await image.gifURL;
+            embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
+        } else {
+            image = database.Image.findOne({where: {imageID: 1}})
+            embedCard.addField("no image found", "Send an official image for this character.");
+        }
+    } else {
+        image = database.Image.findOne({where: {imageID: 1}})
+        embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
+    }
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity:** Amethyst
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+        .setColor(color.purple);
+    const row = await createButton();
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg, card);
+}
+
 async function viewRedCard(card, interaction) { 
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
-    const uid = await interaction.user.id;
-    const player = await database.Player.findOne({where: {playerID: uid}});
+    const player = await interaction.user.id;
     const cid = await card.characterID;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
@@ -130,25 +173,18 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Ruby**
-**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
-
-**Cost**
-**Money:** 20000
-
-**Your Balance**
-**Money:** ${player.money}`)
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
     const row = await createButton();
     
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, -20000);
+    await buttonManager(interaction, msg, card);
 }
 
 async function viewDiaCard(card, interaction) { 
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
-    const uid = await interaction.user.id;
-    const player = await database.Player.findOne({where: {playerID: uid}});
+    const player = await interaction.user.id;
     const cid = await card.characterID;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
@@ -186,25 +222,18 @@ Gif ID is ${image.gifID} report any errors using ID.
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Diamond**
-**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
-
-**Cost**
-**Money:** 200000
-
-**Your Balance**
-**Money:** ${player.money}`)
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
     const row = await createButton();
 
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, -200000);
+    await buttonManager(interaction, msg, card);
 }
 
 async function viewPinkCard(card, interaction) { 
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
-    const uid = await interaction.user.id;
-    const player = await database.Player.findOne({where: {playerID: uid}});
+    const player = await interaction.user.id;
     const cid = await card.characterID;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
@@ -242,23 +271,29 @@ Gif ID is ${image.gifID} report any errors using ID.
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Pink Diamond**
-**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
-
-**Cost**
-**Money:** 40000
-
-**Your Balance**
-**Money:** ${player.money}
-`)
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.pink);
     const row = await createButton();
 
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, -40000);
+    await buttonManager(interaction, msg, card);
 }
+
 
 async function switchRarity(card, rarity, interaction) {
     switch (rarity) {
+        case 1:
+            interaction.reply("You cannot trade quartz cards.");
+            //white
+        case 2:
+            interaction.reply("You cannot trade jade cards.");
+            //green
+        case 3:
+            interaction.reply("You cannot trade lapis cards.");
+            //Blue
+        case 4:
+            return viewPurpleCard(card, interaction);
+            //Purple
         case 5:
             return viewRedCard(card, interaction);
         //red
@@ -268,6 +303,8 @@ async function switchRarity(card, rarity, interaction) {
         case 7:
             return viewPinkCard(card, interaction);
 
+        case 10:
+            interaction.reply("You cannot trade special cards.");
         default:
             return "error";
             //wtf?
@@ -276,28 +313,34 @@ async function switchRarity(card, rarity, interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('mbuy')
-		.setDescription('buys a card from market.')
+		.setName('tadd')
+		.setDescription('Adds a card to a trade.')
         .addIntegerOption(option => 
             option
                 .setName("lid")
-                .setDescription("The list id for the card you want to view")
+                .setDescription("The list id for the card you want to add")
+                .setRequired(true)
+                )
+        .addUserOption(option => 
+            option
+                .setName("targetuser")
+                .setDescription("The person you want to trade it with.")
                 .setRequired(true)
                 ),
 	async execute(interaction) {
         try {
-            const uid = await interaction.user.id;
-            const player = await database.Player.findOne({where:{playerID: uid}});
-            if (!player) {
-                return interaction.reply(`You are not registered use command /isekai to get started.`);
-            }
-            const mid = '903935562208141323'
+            const user = await interaction.user.id
             const lid = await interaction.options.getInteger('lid');
-            const card = await database.Card.findOne({where: {playerID: mid, inventoryID: lid}});
-            if (card) {
+            const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
+            const target = await interaction.options.getUser('targetuser');
+            const player = await database.Player.findOne({where: {playerID: user}});
+            const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
+            if (card && targetplayer && player) {
                 await switchRarity(card, card.rarity, interaction);
             } else if (!card) {
                 interaction.reply("Error Invalid list ID");
+            } else if (!targetplayer) {
+                interaction.reply("Invalid user");
             }
         } catch(error) {
             await  interaction.reply("Error has occured while performing the command.")

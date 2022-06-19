@@ -280,17 +280,6 @@ async function justTag(interaction){
     return interaction.reply(`Cards have been tagged with ${tag}`);
 }
 
-async function gacha(interaction) {
-    const user = interaction.user.id;
-    const rngRarity = Math.floor(Math.random() * 1000);
-    const wlist = await database.Wishlist.findAll({where: {playerID: user}})
-    const rngChar = Math.floor(Math.random() * 1000);
-    const char = (rngChar%wlist.length);
-    const cid = await wlist[char].characterID;
-    await raritySwitch(cid, rngRarity, interaction);
-}
-
-
 
 async function wlTag(interaction){
     const uid = await interaction.user.id;

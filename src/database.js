@@ -627,6 +627,11 @@ const Cvotetrack = sequelize.define('cvotetrack', {
 });
 
 const Trade = sequelize.define('trade', {
+	tradeID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
 	player1ID: {
 		type: Sequelize.INTEGER,
 		unique: false,
@@ -640,13 +645,13 @@ const Trade = sequelize.define('trade', {
 	inventoryID: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: true,
+		allowNull: false,
 	},
 	locked: {
 		type: Sequelize.BOOLEAN,
 		allowNull: false,
 		defaultValue: false,
-	},
+	}
 });
 
 const Card = sequelize.define('card', {
@@ -730,6 +735,8 @@ const Special = sequelize.define('special', {
 		unique: false,
 	},
 });
+
+const Tradetable = 
 
 
 exports.sequelize = sequelize;
