@@ -1,13 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
-const { MessageEmbed, Guild } = require('discord.js');
+const { MessageEmbed, Guild, Collection } = require('discord.js');
 const { Op } = require("sequelize");
 const color = require('../../color.json');
 const { MessageActionRow, MessageButton } = require('discord.js');
 var dayjs = require('dayjs')
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
-
 async function gamble(card, interaction) { 
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
@@ -91,7 +90,7 @@ async function fail(embed, card, interaction) {
 <:pepesalute:959659655783673997>
 Unfortunately your card was destroyed`)
         .setColor('#4e0505');
-    await interaction.editReply({embeds: [embed], fetchReply: true})
+    await interaction.editReply({embeds: [embed], fetchReply: true});
     card.destroy();
 }
 
@@ -109,7 +108,7 @@ async function success(embed, card, interaction, attempts) {
 Congratulations <:pepog:959660462625132564>
 Your Ruby Card was upgraded to Pink Diamond after ${attempts} attempts.`)
     .setColor(color.pink);
-    await interaction.editReply({embeds: [embed], fetchReply: true})
+    await interaction.editReply({embeds: [embed], fetchReply: true});
 }
 
 async function createButton() {
@@ -135,6 +134,7 @@ async function createButton() {
 
 async function buttonManager(embed, interaction, msg, card, attempts) {
     try {
+        const uid = interaction.user.id;
         if(attempts == -1) {
             return;
         }
@@ -187,11 +187,7 @@ async function buttonManager(embed, interaction, msg, card, attempts) {
                     }
                     buttonManager(embed, interaction, msg, card, attempts);
                     break;
-            };
-            
-        }
-        );
-
+            }});
     } catch(error) {
         console.log("Error has occured in button Manager");
     }

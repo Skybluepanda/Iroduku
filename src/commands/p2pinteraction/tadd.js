@@ -336,7 +336,12 @@ module.exports = {
             const player = await database.Player.findOne({where: {playerID: user}});
             const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
             if (card && targetplayer && player) {
-                await switchRarity(card, card.rarity, interaction);
+                const tcount = await database.Trade.count({where: {player1ID: user, player2ID: target.id}});
+                if (tcount >= 10) {
+                    interaction.reply("You already have 10 items in the trade. Remove items or make multiple trades.");
+                }
+                switchRarity(card, card.rarity, interaction);
+                
             } else if (!card) {
                 interaction.reply("Error Invalid list ID");
             } else if (!targetplayer) {

@@ -4,7 +4,7 @@ const { MessageEmbed } = require('discord.js');
 const color = require('../../color.json');
 
 
-function embedNew(interaction) {
+async function embedNew(interaction) {
     const embedNew = new MessageEmbed();
     embedNew.setTitle("Character Created")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
@@ -13,7 +13,7 @@ function embedNew(interaction) {
     return embedNew;
 };
 
-function embedError(interaction) {
+async function embedError(interaction) {
     const embedError = new MessageEmbed();
     embedError.setTitle("Unknown Error")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
@@ -22,7 +22,7 @@ function embedError(interaction) {
     return embedError;
 };
 
-function embedDupe(interaction) {
+async function embedDupe(interaction) {
     const embedDupe = new MessageEmbed();
     embedDupe.setTitle("Character with same name Exists")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
@@ -49,23 +49,20 @@ module.exports = {
             .setDescription('Enter the series id that the character is part of.')
             .setRequired(true)),
 	async execute(interaction) {
-		const name = interaction.options.getString('cname');
-        const link = interaction.options.getString('clink');
-        const sid = interaction.options.getInteger('sid');
+		const name = await interaction.options.getString('cname');
+        const link = await interaction.options.getString('clink');
+        const sid = await interaction.options.getInteger('sid');
         
-        const embedN = embedNew(interaction);
-        const embedD = embedDupe(interaction);
-        const embedE = embedError(interaction);
-        
-     
-        
+        const embedN = await embedNew(interaction);
+        const embedD = await embedDupe(interaction);
+        const embedE = await embedError(interaction);
         
         try {
             await interaction.reply({ embeds: [embedN] });
             if (!interaction.member.roles.cache.has('947640601564819516')) {
                 embedE.setTitle("Insufficient Permissions")
                     .setDescription("You don't have the librarian role!");
-                return interaction.reply({ embeds: [embedE] }, {ephemeral: true});
+                return interaction.editReply({ embeds: [embedE] }, {ephemeral: true});
             };
             if (interaction.channel.id === '947136227126177872') {
                 const character = await database.Character.create({
@@ -80,7 +77,7 @@ module.exports = {
                 await database.Player.increment({gems: 25}, {where: {playerID: interaction.user.id}})
                 return interaction.editReply({ embeds: [embedN] });
             } else {
-                interaction.reply("Please use #series and characters channel for this command.")
+                interaction.channel.send("Please use #series and characters channel for this command.")
             }
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {

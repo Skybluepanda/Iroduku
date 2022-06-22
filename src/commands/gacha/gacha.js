@@ -1,11 +1,12 @@
 const { SlashCommandBuilder, channelMention } = require('@discordjs/builders');
 const database = require('../../database.js');
 const color = require('../../color.json');
-const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
+const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton, Collection } = require('discord.js');
 const { Op } = require("sequelize");
 var dayjs = require('dayjs')
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
+
 /**
  * Creates an embed for the command.
  * @param {*} interaction the interaction that the bot uses to reply.
@@ -16,20 +17,9 @@ async function embedError(interaction) {
     const embed = new MessageEmbed();
 
     embed.setTitle("Creation failed.")
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription("Remember to set description.")
         .setColor(color.failred);
-    
-    return embed;
-}
-
-async function embedSucess(interaction) {
-    const embed = new MessageEmbed();
-
-    embed.setTitle("Card created")
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription("Followup should be the card embed.")
-        .setColor(color.successgreen);
     
     return embed;
 }
@@ -86,7 +76,7 @@ Image ID is ${image1.imageID} report any errors using ID.`})
         embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID: **${cid}
 **Series: **${char.seriesID} | ${series.seriesName}
@@ -119,7 +109,6 @@ async function createGreenCard(cid, interaction) {
         });
         await viewGCard(newcard, interaction);
     }
-    
 }
 
 
@@ -136,14 +125,14 @@ Image ID is ${image1.imageID} report any errors using ID.`})
         embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity:** Jade
 **Quantity:** ${card.quantity}`)
         .setColor(color.green);
-    return await interaction.reply({embeds: [embedCard]});
+    await interaction.reply({embeds: [embedCard]});
 }
 
 //Blue Card Zone
@@ -182,7 +171,7 @@ async function createBlueCard(cid, interaction) {
     if (total == 0) {
         imageRng = 1;
     } else {
-        imageRng = await ((Math.floor(Math.random() * 100))%total)+1;
+        imageRng = ((Math.floor(Math.random() * 100)) % total)+1;
         if (imageRng > imageCap) {
             imageRng = -(imageRng-imageCap);
         }
@@ -205,7 +194,7 @@ async function createBlueCard(cid, interaction) {
         });
         
     }
-    return await viewBCard(newcard, interaction);
+    await viewBCard(newcard, interaction);
 }
 
 async function viewBCard(card, interaction) { 
@@ -237,14 +226,14 @@ Gif ID is ${image.gifID} report any errors using ID.`}).setImage(url)
         }
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity:** Lapis
 **Quantity:** ${card.quantity}`)
         .setColor(color.blue);
-    return await interaction.reply({embeds: [embedCard]});
+    await interaction.reply({embeds: [embedCard]});
 }
 
 ///Purple Zone
@@ -325,14 +314,14 @@ Gif ID is ${image.gifID} report any errors using ID.
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);    
-    return await interaction.reply({embeds: [embedCard]});
+    await interaction.reply({embeds: [embedCard]});
 }
 
 
@@ -415,14 +404,14 @@ Gif ID is ${image.gifID} report any errors using ID.
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
-    return await interaction.reply({embeds: [embedCard]});
+    await interaction.reply({embeds: [embedCard]});
 }
 
 async function rngImgID(cid, interaction) {
@@ -474,7 +463,7 @@ async function createDiaCard(cid, interaction) {
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
     channel.send(`An extra lucky luck sack got a Diamond ${cid} | ${char.characterName}!`)
-    return await viewDiaCard(newcard, interaction);
+    await viewDiaCard(newcard, interaction);
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -510,15 +499,15 @@ Gif ID is ${image.gifID} report any errors using ID
         image = database.Image.findOne({where: {imageID: 1}})
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
-    (embedCard.setTitle(`${char.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
-        .setColor(color.diamond));
-    return await interaction.reply({embeds: [embedCard]});
+        .setColor(color.diamond);
+    await interaction.reply({embeds: [embedCard]});
 }
 
 
@@ -608,7 +597,7 @@ async function sideofftrashoff(interaction) {
     } else if (rngPool >= 70) {
         await mainPool(interaction);
     } else {
-        await sidePool;
+        await sidePool(interaction);
     }
 }
 async function sideontrashoff(interaction) {
@@ -679,7 +668,7 @@ module.exports = {
 		.setDescription('Spend gems to do gacha'),
 	async execute(interaction) {
         try {
-            const user = interaction.user.id;
+            const user = await interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: user}});
             const embedE = await embedError(interaction);
             if(player) {
@@ -691,7 +680,7 @@ module.exports = {
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
                     if (wlist >= 5) {
                         await gacha(interaction);
-                    }else {
+                    } else {
                         (embedE).setDescription("You need 5 or more waifus in wishlist to use gacha. use /wa to add to your wishlist!")
                         return await interaction.reply({embeds: [embedE]});
                     }
@@ -706,7 +695,7 @@ module.exports = {
                 return await interaction.reply({embeds: [embedE]});
             }
         } catch(error) {
-            await  interaction.reply("Error has occured while performing the command.")
+            await interaction.channel.send(`Error ${error} has occured.`)
         }        
     }
 }

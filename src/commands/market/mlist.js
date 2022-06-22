@@ -10,9 +10,9 @@ const { MessageActionRow, MessageButton } = require('discord.js');
 function embedSucess(interaction) {
     const embed = new MessageEmbed();
 
-    embed.setTitle("Listing Inventory")
+    embed.setTitle("Listing Market Inventory")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`List of ${interaction.user.username} Cards`)
+        .setDescription(`List of Cards in Market.`)
         .setColor(color.aqua)
     
     return embed;

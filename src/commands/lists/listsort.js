@@ -1,10 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
-const { MessageEmbed, Guild } = require('discord.js');
+const { MessageEmbed, Guild, Collection } = require('discord.js');
 const { Op } = require("sequelize");
 const color = require('../../color.json');
 const { MessageActionRow, MessageButton } = require('discord.js');
 
+const sortCooldown = new Collection();
 //how to do lsort
 /**
  * We want to check all cards. So lets scan by lid.
@@ -95,7 +96,7 @@ Please wait, you will be alerted once sorting is complete.`)
         console.log(9)
         lid += 1;
     }
-    await interaction.channel.send(`${interaction.user} sorting complete, you may use other commands.`)
+    await interaction.channel.send(`${interaction.user} sorting complete, you may use other commands.`).then(sortCooldown.delete(uid));
 }
 
 
@@ -124,6 +125,11 @@ module.exports = {
         try {
             console.log(1)
             const uid = interaction.user.id;
+            if (sortCooldown.get(uid)) {
+                return interaction.reply("Sort command already in progress")
+            } else {
+                sortCooldown.set(uid);
+            }
             const player = await database.Player.findOne({where: {playerID: uid}});
             console.log(2)
             if (player) {

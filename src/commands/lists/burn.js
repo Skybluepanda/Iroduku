@@ -1,12 +1,14 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
-const { MessageEmbed, Guild } = require('discord.js');
+const { MessageEmbed, Guild, Client, Collection } = require('discord.js');
 const { Op } = require("sequelize");
 const color = require('../../color.json');
 const { MessageActionRow, MessageButton } = require('discord.js');
 var dayjs = require('dayjs');
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
+
+const burnCooldown = new Collection();
 
 function embedSucess(interaction) {
     const embed = new MessageEmbed();
@@ -26,7 +28,6 @@ async function subSwitch(interaction){
             break;
         
         case "tag":
-            console.log("1");
             burnTag(interaction);
             break;
     }
@@ -90,6 +91,9 @@ async function buttonManager(interaction, msg, coins, gems) {
             i.deferUpdate();
         }
         );
+        collector.on('end', collected => {
+            burnCooldown.delete(uid)
+            });
     } catch(error) {
         console.log("Error has occured in button Manager");
     }
@@ -131,14 +135,17 @@ async function buttonManager3(interaction, msg, coins, gems) {
                     await database.Player.increment({money: coins, gems: gems}, {where: {playerID: uid}});
                     await interaction.channel.send(`Card ${lid} Sold to Market for ${coins} coins and ${gems} gems.`)
                     break;
-                
+                    
                 case 'cancel':
                     await interaction.channel.send("Burn Cancelled")
                     break;
             };
             i.deferUpdate();
-        }
-        );
+        });
+
+        collector.on('end', collected => {
+        burnCooldown.delete(uid)
+        });
     } catch(error) {
         console.log("Error has occured in button Manager");
     }
@@ -582,7 +589,6 @@ async function burnTag(interaction){
 async function burnList(embed, interaction, page){
     console.log("5");
     const uid = await interaction.user.id;
-    let rarity = await interaction.options.getInteger("rarity");
     let tag = await interaction.options.getString("tag");
     console.log("6");
     const cardList = await database.Card.findAll(
@@ -720,11 +726,65 @@ async function deployButton2(interaction, embed){
     await interaction.editReply({ embeds: [embed], components: [row]});
 }
 
-async function buttonManager2(embed, interaction, msg, page, maxPage, coins, gems) {
+async function countCard(interaction){
+    const uid = await interaction.user.id;
+    let tag = await interaction.options.getString("tag");
+    const whiteCount = await database.Card.sum('quantity',
+        {
+            where: {
+            rarity: 1,
+            tag: tag,
+            playerID: uid,
+            lock: false
+        }}
+    );
+    const greenCount = await database.Card.sum('quantity',
+        {
+            where: {
+            rarity: 2,
+            tag: tag,
+            playerID: uid,
+            lock: false
+        }}
+    );
+    const blueCount = await database.Card.sum('quantity',
+        {
+            where: {
+            rarity: 3,
+            tag: tag,
+            playerID: uid,
+            lock: false
+        }}
+    );
+    const purpleCount = await database.Card.count(
+        {
+            where: {
+            rarity: 4,
+            tag: tag,
+            playerID: uid,
+            lock: false
+        }}
+    );
+    const redCount = await database.Card.count(
+        {
+            where: {
+            rarity: 5,
+            tag: tag,
+            playerID: uid,
+            lock: false
+        }}
+    );
+    const totalCoin = redCount* 1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
+    const totalGem = redCount*250 + purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
+    return totalGem;
+}
+
+async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, addgems) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
         collector.on('collect', async i => {
+            i.deferUpdate();
             switch (i.customId){
                 case 'prev':
                     const prevPage = await checkPage(-1, page, maxPage);
@@ -737,9 +797,13 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, coins, gem
                     break;
 
                 case 'confirm':
-                    const mid = '903935562208141323';
                     const uid = await interaction.user.id;
+                    const player = database.Player.findOne({where: {playerID: uid}});
+                    await interaction.channel.send('Burn processing plaese wait.');
+                    const mid = '903935562208141323';
                     const tag = await interaction.options.getString('tag');
+                    await database.Player.increment({money: addcoins, gems: addgems}, {where: {playerID: uid}});
+                    await interaction.channel.send(`Cards with ${tag} burnt. ${addcoins} coins and ${addgems} gems refunded.`)
                     await database.Card.destroy(
                         {
                             where: {
@@ -784,8 +848,6 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, coins, gem
                             }
                         )
                     }
-                    await database.Player.increment({money: coins, gems: gems}, {where: {playerID: uid}});
-                    await interaction.channel.send(`Cards with ${tag} burnt. ${coins} coins and ${gems} gems refunded.`)
                     break;
                 
                 case 'cancel':
@@ -795,9 +857,13 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, coins, gem
                 default:
                     break;
             };
-            i.deferUpdate();
+            
         }
         );
+
+        collector.on('end', collected => {
+            burnCooldown.delete(uid)
+            });
     } catch(error) {
         console.log("Error has occured in button Manager");
     }
@@ -1098,10 +1164,18 @@ module.exports = {
 		//then lets embed.
         //rarity filter
         //
+        const uid = interaction.user.id;
         try {
+            if (burnCooldown.get(uid)) {
+                return interaction.reply("Existing Burn Command in Progress.");
+            } else {
+                burnCooldown.set(uid, true);
+            }
             subSwitch(interaction);
         } catch (error) {
+            burnCooldown.delete(uid);
             return interaction.editReply("Error has occured");
+            
         }
 	},
 };
