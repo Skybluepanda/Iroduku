@@ -50,7 +50,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Ruby Gamble will cost 1000 coins and will attempt
+Ruby Gamble will cost 500 coins and will attempt
 To gamble your ruby cards for a chance to upgrade them to
 Pink Diamonds. [ 2% Success : 4.5% Fail ]
 If successful, your card will become a Pink Diamond Card

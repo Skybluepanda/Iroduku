@@ -68,6 +68,7 @@ async function buttonManager(interaction, msg, coins, gems) {
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'confirm':
+                    await interaction.followUp("Burning in progress, may take up to 15 seconds.");
                     const uid = await interaction.user.id;
                     const lid = await interaction.options.getInteger('lid');
                     let quantity = await interaction.options.getInteger('quantity');
@@ -91,8 +92,8 @@ async function buttonManager(interaction, msg, coins, gems) {
             i.deferUpdate();
         }
         );
-        collector.on('end', collected => {
-            burnCooldown.delete(uid)
+        collector.on('end', (collected, reason) => {
+            burnCooldown.delete(interaction.user.id);
             });
     } catch(error) {
         console.log("Error has occured in button Manager");
@@ -113,38 +114,45 @@ async function inventorycheck(uid) {
     return i;
 }
 
-async function buttonManager3(interaction, msg, coins, gems) {
+async function marketCheck() {
+    const mid = '903935562208141323'
+    const lastCard = await database.Card.max('inventoryID', {where: {playerID: mid}})
+    return await lastCard + 1;
+}
+
+async function buttonManager3(interaction, msg, coins, gems, card) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
         const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
         collector.on('collect', async i => {
+            i.deferUpdate();
             switch (i.customId){
                 case 'confirm':
                     const mid = '903935562208141323'
                     const uid = await interaction.user.id;
                     const lid = await interaction.options.getInteger('lid');
-                    const newlid = await inventorycheck(mid);
-                    await database.Card.update(
+                    const newlid = await marketCheck();
+                    await card.update(
                         {
-                            playerID: '903935562208141323', inventoryID: newlid, tag: null
-                        },
-                        {
-                            where: {playerID: uid, inventoryID: lid}
+                            playerID: mid, inventoryID: newlid, tag: null
                         }
                     )
+                    console.log(7);
                     await database.Player.increment({money: coins, gems: gems}, {where: {playerID: uid}});
+                    console.log(8);
                     await interaction.channel.send(`Card ${lid} Sold to Market for ${coins} coins and ${gems} gems.`)
                     break;
                     
                 case 'cancel':
+
                     await interaction.channel.send("Burn Cancelled")
                     break;
             };
-            i.deferUpdate();
+            
         });
 
-        collector.on('end', collected => {
-        burnCooldown.delete(uid)
+        collector.on('end', (collected, reason) => {
+            burnCooldown.delete(interaction.user.id)
         });
     } catch(error) {
         console.log("Error has occured in button Manager");
@@ -401,7 +409,7 @@ Burn Reward: 1500 <:datacoin:947388797828612127> | 250 <:waifugem:94738879791670
         .setColor(color.red);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 1500, 250);
+    await buttonManager3(interaction, msg, 1500, 250, card);
 }
 
 async function viewPinkCard(card, interaction) { 
@@ -449,7 +457,7 @@ Burn Reward: 3000 <:datacoin:947388797828612127> | 500 <:waifugem:94738879791670
         .setColor(color.pink);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 3000, 500);
+    await buttonManager3(interaction, msg, 3000, 500, card);
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -497,39 +505,44 @@ Burn Reward: 10000 <:datacoin:947388797828612127> | 1000 <:waifugem:947388797916
         .setColor(color.diamond);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 10000, 1000);
+    await buttonManager3(interaction, msg, 10000, 1000, card);
 }
 
 async function switchRarity(card, rarity, interaction) {
-    
+    const uid = interaction.user.id
     let quantity = await interaction.options.getInteger('quantity');
     switch (rarity) {
         case 1:
             if (card.quantity < quantity) {
+                burnCooldown.delete(uid);
                 return interaction.reply("Insufficient Quantity. Enter a smaller quantity.");
             }
             return viewWhiteCard(card, interaction);
             //white
         case 2:
             if (card.quantity < quantity) {
+                burnCooldown.delete(uid);
                 return interaction.reply("Insufficient Quantity. Enter a smaller quantity.");
             }
             return viewGreenCard(card, interaction);
             //green
         case 3:
             if (card.quantity < quantity) {
+                burnCooldown.delete(uid);
                 return interaction.reply("Insufficient Quantity. Enter a smaller quantity.");
             }
             return viewBlueCard(card, interaction);
             //Blue
         case 4:
             if (quantity) {
+                burnCooldown.delete(uid);
                 return interaction.reply("Amethyst Cards Don't have Quantity. Try again without quantity.");
             }
             return viewPurpleCard(card, interaction);
             //Purple
         case 5:
             if (quantity) {
+                burnCooldown.delete(uid);
                 return interaction.reply("Ruby Cards Don't have Quantity. Try again without quantity.");
             }
             return viewRedCard(card, interaction);
@@ -537,20 +550,24 @@ async function switchRarity(card, rarity, interaction) {
 
         case 6:
             if (quantity) {
+                burnCooldown.delete(uid);
                 return interaction.reply("Diamond Cards Don't have Quantity. Try again without quantity.");
             }
             return viewDiaCard(card, interaction);
 
         case 7:
             if (quantity) {
+                burnCooldown.delete(uid);
                 return interaction.reply("Pink Diamond Cards Don't have Quantity. Try again without quantity.");
             }
             return viewPinkCard(card, interaction);
 
         case 10:
+            burnCooldown.delete(uid);
             return interaction.reply("You can't burn Special cards.");
 
         default:
+            burnCooldown.delete(uid);
             return interaction.reply("Error");
             //wtf?
     }
@@ -562,10 +579,12 @@ async function burnLid(interaction){
     const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}})
     if (card) {
         if (card.lock) {
+            burnCooldown.delete(uid);
             return interaction.reply(`Card ${lid} is locked. Unlock the card before burning.`)
         }
-        return switchRarity(card, card.rarity, interaction);
+        return await switchRarity(card, card.rarity, interaction);
     } else {
+        burnCooldown.delete(uid);
         return interaction.reply("Invalid List ID.")
     }
 }
@@ -582,6 +601,7 @@ async function burnTag(interaction){
         return burnList(embed, interaction, 1);
     } else {
         console.log("4");
+        burnCooldown.delete(uid);
         return interaction.reply("Invalid List ID.")
     }
 }
@@ -597,6 +617,7 @@ async function burnList(embed, interaction, page){
             limit: 20,
             offset: (page-1)*20,
             where: {
+            rarity: {[Op.lt]: 6}, 
             tag: tag,
             playerID: uid,
             lock: false
@@ -606,6 +627,7 @@ async function burnList(embed, interaction, page){
     const totalList = await database.Card.findAll(
         {
             where: {
+            rarity: {[Op.lt]: 6},
             tag: tag,
             playerID: uid,
             lock: false
@@ -614,6 +636,7 @@ async function burnList(embed, interaction, page){
     const maxPage = await database.Card.count(
         {
             where: {
+            rarity: {[Op.lt]: 6},
             tag: tag,
             playerID: uid,
             lock: false
@@ -664,8 +687,8 @@ async function burnList(embed, interaction, page){
             lock: false
         }}
     );
-    const totalCoin = redCount* 1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
-    const totalGem = redCount*250 + purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
+    const totalCoin = redCount * 1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
+    const totalGem = redCount * 250 + purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
 
     
     const totalPage = Math.ceil(maxPage/20);
@@ -726,58 +749,6 @@ async function deployButton2(interaction, embed){
     await interaction.editReply({ embeds: [embed], components: [row]});
 }
 
-async function countCard(interaction){
-    const uid = await interaction.user.id;
-    let tag = await interaction.options.getString("tag");
-    const whiteCount = await database.Card.sum('quantity',
-        {
-            where: {
-            rarity: 1,
-            tag: tag,
-            playerID: uid,
-            lock: false
-        }}
-    );
-    const greenCount = await database.Card.sum('quantity',
-        {
-            where: {
-            rarity: 2,
-            tag: tag,
-            playerID: uid,
-            lock: false
-        }}
-    );
-    const blueCount = await database.Card.sum('quantity',
-        {
-            where: {
-            rarity: 3,
-            tag: tag,
-            playerID: uid,
-            lock: false
-        }}
-    );
-    const purpleCount = await database.Card.count(
-        {
-            where: {
-            rarity: 4,
-            tag: tag,
-            playerID: uid,
-            lock: false
-        }}
-    );
-    const redCount = await database.Card.count(
-        {
-            where: {
-            rarity: 5,
-            tag: tag,
-            playerID: uid,
-            lock: false
-        }}
-    );
-    const totalCoin = redCount* 1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
-    const totalGem = redCount*250 + purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
-    return totalGem;
-}
 
 async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, addgems) {
     try {   
@@ -799,7 +770,7 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                 case 'confirm':
                     const uid = await interaction.user.id;
                     const player = database.Player.findOne({where: {playerID: uid}});
-                    await interaction.channel.send('Burn processing plaese wait.');
+                    await interaction.followUp("Burning in progress, may take up to 15 seconds.");
                     const mid = '903935562208141323';
                     const tag = await interaction.options.getString('tag');
                     await database.Player.increment({money: addcoins, gems: addgems}, {where: {playerID: uid}});
@@ -831,11 +802,11 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                             lock: false
                         }}
                     );
+                    const marketlid = await marketCheck();
                     for (let i = 0; i < redCount; i++) {
-                        const newlid = await inventorycheck(mid)
                         await database.Card.update(
                             {
-                                playerID: mid, inventoryID: newlid, tag: null
+                                playerID: mid, inventoryID: marketlid+i, tag: null
                             },
                             {
                                 limit: 1,
@@ -861,8 +832,8 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
         }
         );
 
-        collector.on('end', collected => {
-            burnCooldown.delete(uid)
+        collector.on('end', (collected, reason) => {
+            burnCooldown.delete(interaction.user.id);
             });
     } catch(error) {
         console.log("Error has occured in button Manager");
@@ -1171,7 +1142,7 @@ module.exports = {
             } else {
                 burnCooldown.set(uid, true);
             }
-            subSwitch(interaction);
+            await subSwitch(interaction);
         } catch (error) {
             burnCooldown.delete(uid);
             return interaction.editReply("Error has occured");

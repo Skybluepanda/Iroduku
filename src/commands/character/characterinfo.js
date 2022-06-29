@@ -43,8 +43,8 @@ async function createButton() {
             )
             .addComponents(
                 new MessageButton()
-                    .setCustomId('wladd')
-                    .setLabel('wladd')
+                    .setCustomId('wadd')
+                    .setLabel('wadd')
                     .setStyle('SUCCESS')
             )
         return row;
@@ -54,18 +54,12 @@ async function createButton() {
 }
 
 async function wlCheck(interaction, cid, row) {
-    console.log(cid);
-    console.log(row);
     const wl = await database.Wishlist.findOne({where: {playerID: interaction.user.id, characterID: cid}});
     if (wl){
-        
-        console.log("7.6");
-        row.components[3].setCustomId('wlremove').setLabel('wlremove').setDisabled(false);
+        row.components[3].setCustomId('wremove').setLabel('wremove').setDisabled(false);
         return row;
     } else {
-        
-        console.log("7.7");
-        row.components[3].setCustomId('wladd').setLabel('wladd').setDisabled(false);
+        row.components[3].setCustomId('wadd').setLabel('wadd').setDisabled(false);
         return row;
     }
 }
@@ -91,7 +85,6 @@ async function countGif(cid) {
 
 async function checkInumber(embed, interaction, msg,  direction, currentImage, totalImage, imageC, cid, row){
     try {
-        console.log("1");
         if (currentImage == 1 && direction == -1){
             currentImage = totalImage;
             //going to end of page. If there is a gif view gif, else view image.
@@ -100,22 +93,15 @@ async function checkInumber(embed, interaction, msg,  direction, currentImage, t
         } else {
             currentImage += direction;
         }
-        console.log("2");
         await currentImage;
-        console.log("3");
         if (currentImage <= imageC) {
-            console.log("4");
             await viewImage(embed, interaction, currentImage, cid);
         } else {
-            console.log("5");
             const image = currentImage - imageC;
             await viewGif(embed, interaction, image, cid);
         }
-        console.log("6");
         await updateEmbed(embed, interaction);
-        console.log("7");
         await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row);
-        console.log("8");
     } catch(error) {
         console.log("Error has occured in checkInumber");
     }
@@ -137,14 +123,10 @@ async function scan(interaction, cid) {
 
 async function buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row) {
     try {
-        console.log("7.1");
         row = await wlCheck(interaction, cid, row);
-        console.log("7.2");
         await updateButton(embed, interaction, row);
-        console.log("7.3");
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
-        console.log("7.4");
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'prev':
@@ -223,7 +205,6 @@ async function cinfoName(embed, interaction) {
             const charCount = await database.Character.count({ 
                 where: { characterName: {[Op.like]: '%' + cname + '%'},}
             })
-            console.log(charCount);
             switch (charCount) {
                 case 0:
                     interaction.reply({embeds: [embed]});

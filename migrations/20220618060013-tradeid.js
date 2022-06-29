@@ -2,10 +2,10 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-      await queryInterface.addColumn('players', 'kpity' ,{ 
-        type: Sequelize.INTEGER,
-        unique: false,
-        defaultValue: 0 });
+    await queryInterface.addColumn('trades', 'tradeID' ,{ 
+      type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,});
     /**
      * Add altering commands here.
      *

@@ -54,6 +54,7 @@ async function createButton() {
     }
 }
 
+
 async function buttonManager(interaction, msg, card) {
     try {
         const filter = i => i.user.id === interaction.user.id;
@@ -72,7 +73,9 @@ async function buttonManager(interaction, msg, card) {
                         inventoryID: card.cardID
                     })
                     await database.Card.update({playerID: 0}, {where: {playerID: uid, inventoryID: card.inventoryID}});
-                    await interaction.channel.send(`${interaction.user} added card ${card.inventory} to the trade with ${target}.`)
+                    await database.Trade.update({lock: false}, {where: {player1ID: uid, player2ID: target.id}});
+                    await database.Trade.update({lock: false}, {where: {player1ID: target.id, player2ID: uid}});
+                    await interaction.channel.send(`${interaction.user} added card (cardID:${card.cardID}) to the trade with ${target} with trade id ${tid}.`)
                     break;
                 
                 case 'cancel':
@@ -330,6 +333,7 @@ module.exports = {
 	async execute(interaction) {
         try {
             const user = await interaction.user.id
+            console.log(1);
             const lid = await interaction.options.getInteger('lid');
             const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
             const target = await interaction.options.getUser('targetuser');

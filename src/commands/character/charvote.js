@@ -195,7 +195,7 @@ async function buttonManager(embed, interaction, msg, cid) {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('cvote')
-		.setDescription('vote for the character pools to earn gems!'),
+		.setDescription('vote for the character pools to earn karma!'),
 	async execute(interaction) { 
         try {
             const uid = interaction.user.id;

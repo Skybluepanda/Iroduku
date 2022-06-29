@@ -92,22 +92,18 @@ async function whitecard(card) {
         const lockstatus = '**|**';
         if (tag) {
             const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
             const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
             return cardString
         }
     }
@@ -131,22 +127,18 @@ async function greencard(card) {
         const lockstatus = '**|**';
         if (tag) {
             const cardString =`:green_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:green_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
             const cardString =`:green_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:green_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
-            console.log(cardString);
             return cardString
         }
     }
@@ -172,22 +164,18 @@ async function bluecard(card) {
         const lockstatus = '**|**';
         if (tag) {
             const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
-            console.log(cardString);
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
             const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
-            console.log(cardString);
             return cardString
         }
     }
@@ -211,22 +199,18 @@ async function purplecard(card) {
         const lockstatus = '**|**';
         if (tag) {
             const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
             const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         }
     }
@@ -250,22 +234,18 @@ async function redcard(card) {
         const lockstatus = '**|**';
         if (tag) {
             const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
             const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         }
     }
@@ -289,22 +269,18 @@ async function diacard(card) {
         const lockstatus = '**|**';
         if (tag) {
             const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
             const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         }
     }
@@ -328,22 +304,18 @@ async function pinkcard(card) {
         const lockstatus = '**|**';
         if (tag) {
             const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
             const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
-            console.log(cardString);
             return cardString
         }
     }
@@ -365,22 +337,18 @@ async function specard(card) {
         const lockstatus = '**|**';
         if (tag) {
             const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
-            console.log(cardString);
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
             const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
-            console.log(cardString);
             return cardString
         } else {
             const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
-            console.log(cardString);
             return cardString
         }
     }
@@ -699,13 +667,10 @@ async function cidList(embed, interaction, page){
 }
 
 async function snameList(embed, interaction, page){
-    console.log(1);
     const uid = await interaction.user.id;
     let rarity = await interaction.options.getInteger("rarity");
     let tag = await interaction.options.getString("tag");
     const orderOpt = await order(interaction)
-    console.log(rarity);
-    console.log(5);
     const sname = await interaction.options.getString('sname');
     const seriesList = await database.Series.findAll({
         where: {
@@ -713,30 +678,25 @@ async function snameList(embed, interaction, page){
         }}
             );
     var sidList = [];
-    console.log(6);
     for (let i = 0; i < seriesList.length; i++) {
         const sid = seriesList[i].seriesID;
         sidList[i] = sid;
     }
-    console.log(7);
     const charList = await database.Character.findAll({
         where: {
             seriesID: {[Op.or]: sidList}
         }}
     );
-    console.log(8);
     var cidList = [];
     for (let i = 0; i < charList.length; i++) {
         const cid = charList[i].characterID;
         cidList[i] = cid;
     }
-    console.log(9);
     if (!cidList[0]) {
         return interaction.channel.send("No results found for sname used.")
     }
     let cardList;
     let maxPage;
-    console.log(cidList);
     if (rarity && tag) {
         cardList = await database.Card.findAll(
             {
@@ -822,10 +782,8 @@ async function snameList(embed, interaction, page){
     if (totalPage > 1) {
         await deployButton(interaction, embed);
     }
-    console.log(12);
     const listString = await makeList(cardList);
     const fullList = await listString.join(`\n`);
-    console.log(13);
     await embed.setDescription(`**List of ${interaction.user.username} Cards**\n${fullList}`);
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
     const msg = await updateReply(interaction, embed);
@@ -850,7 +808,6 @@ async function sidList(embed, interaction, page){
     }
     let cardList;
     let maxPage;
-    console.log(cidList);
     if (rarity && tag) {
         cardList = await database.Card.findAll(
             {
