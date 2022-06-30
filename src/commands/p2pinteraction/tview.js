@@ -42,14 +42,17 @@ async function buttonManager(interaction, msg, card, trade) {
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'remove':
-                    await interaction.followUp(`Trade id ${trade.tradeID} was removed in the trade between ${user} and ${target}`)
+                    
                     const lastCard = await database.Card.max('inventoryID', {where: {playerID: uid}});
+                    await interaction.followUp(`Trade id ${trade.tradeID} was removed in the trade between ${user} and ${target}
+Card returned to ${player1}'s inventory id ${lastCard}.`)
                     await database.Card.update({playerID: uid, inventoryID: lastCard+1},{
                         where: {
-                            cardID: card.inventoryID,
+                            cardID: trade.inventoryID,
                         }
                     })
                     await trade.destroy();
+                    
                     break;
                 
                 case 'cancel':
