@@ -98,16 +98,16 @@ async function streakDaily(interaction, player, daily){
     await checkKarma(interaction, daily);
     if (streak > 10) {
         await player.increment('gems', {by: 500});
-        await player.increment('karma', {by: 10});
+        await player.increment('karma', {by: 5});
         await embedDone.setDescription(`
-    Streak: (max) ${streak+1}\nGems: ${player.gems+500} (+500)\nKarma: ${player.karma+10} (+10)\nUse daily again within two days to continue the streak.`);
+    Streak: (max) ${streak+1}\nGems: ${player.gems+500} (+500)\nKarma: ${player.karma+5} (+5)\nUse daily again within two days to continue the streak.`);
         return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
     } else {
         const reward = 250 + streak*25;
         await player.increment('gems', {by: reward});
-        await player.increment('karma', {by: 10});
+        await player.increment('karma', {by: 5});
         await embedDone.setDescription(`
-    Streak: ${streak+1}\nGems: ${player.gems+reward} (+${reward})\nKarma: ${player.karma+10} (+10)\nUse daily again within two days to continue the streak.`);
+    Streak: ${streak+1}\nGems: ${player.gems+reward} (+${reward})\nKarma: ${player.karma+5} (+5)\nUse daily again within two days to continue the streak.`);
         return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
     }
 }

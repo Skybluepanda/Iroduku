@@ -152,10 +152,12 @@ async function buttonManager(embed, interaction, msg, card, attempts) {
                     await player.increment('money', {by: -500});
                     const gamble = Math.floor(Math.random() * 1000);
                     if (gamble + attempts > 980) {
+                        await player.update({rpity: 0});
                         await success(embed, card, interaction, attempts);
                         attempts = -1;
                         break;
-                    } else if (gamble - attempts < 45) {
+                    } else if (gamble - attempts < 45- player.rpity*5) {
+                        await player.increment('rpity', {by: 1});
                         await fail(embed, card, interaction);
                         attempts = -1;
                         break;
@@ -173,11 +175,14 @@ async function buttonManager(embed, interaction, msg, card, attempts) {
                         await player.increment('money', {by: -500});
                         attempts += 1;
                         const gamble = Math.floor(Math.random() * 1000);
+                        console.log(gamble);
                         if (gamble + attempts > 980) {
+                            await player.update({rpity: 0});
                             await success(embed, card, interaction, attempts);
                             attempts = -1;
                             break;
-                        } else if (gamble - attempts < 45) {
+                        } else if (gamble - attempts < 45 - player.rpity * 15) {
+                            await player.increment('rpity', {by: 1});
                             await fail(embed, card, interaction);
                             attempts = -1;
                             break;
@@ -216,6 +221,7 @@ module.exports = {
             const lid = interaction.options.getInteger('lid');
             const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}});
             const player = await database.Player.findOne({where: {playerID: uid}});
+            console.log(player.rpity);
             if (card) {
                 if (card.rarity == 5) {
                     if (player.money < 500) {

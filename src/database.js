@@ -520,6 +520,11 @@ const Player = sequelize.define('player', {
 		unique: false,
 		defaultValue: 0,
 	},
+	rpity: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+	},
 });
 
 const Daily = sequelize.define('daily', { 
@@ -557,6 +562,11 @@ const Collect = sequelize.define('collect', {
 		allowNull: false,
 	},
 	lastclaim: {
+		type: Sequelize.DATE,
+		unique: false,
+		allowNull: true,
+	},
+	lastvote: {
 		type: Sequelize.DATE,
 		unique: false,
 		allowNull: true,
@@ -736,7 +746,24 @@ const Special = sequelize.define('special', {
 	},
 });
 
-const Tradetable = 
+const Azurite = sequelize.define('azurite', {
+	cardID: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+	},
+	imageURL: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+	artist: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	season: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+});
 
 
 exports.sequelize = sequelize;
@@ -759,3 +786,4 @@ exports.Trade = Trade;
 exports.Votetrack = Votetrack;
 exports.Cvotetrack = Cvotetrack;
 exports.Special = Special;
+exports.Azurite = Azurite;

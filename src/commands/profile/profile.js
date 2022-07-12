@@ -30,8 +30,6 @@ module.exports = {
             .setDescription(`Please report the error if it persists.`)
             .setColor("#ff0000")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
-
-        await interaction.reply({ embeds: [embed] });
         try {
             const player = await database.Player.findOne({ where: { playerID: userId } });
             if (player) {
@@ -58,9 +56,9 @@ module.exports = {
                 embedDone.setDescription('Player does not exist.')
                         .setColor(color.aqua);
             }
-            return interaction.editReply({ embeds: [embedDone] });
+            return interaction.reply({ embeds: [embedDone] });
         } catch (error) {
-            return interaction.editReply({ embeds: [embedError] });
+            return interaction.reply({ embeds: [embedError] });
         }
     },
 };

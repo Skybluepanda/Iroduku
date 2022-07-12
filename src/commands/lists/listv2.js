@@ -336,19 +336,19 @@ async function specard(card) {
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname;
             return cardString
         } else {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname;
             return cardString
         } else {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname;
             return cardString
         }
     }

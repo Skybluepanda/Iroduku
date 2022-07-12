@@ -26,6 +26,7 @@ module.exports = {
         database.Swapgif.sync();
         database.Special.sync();
         database.Cvotetrack.sync();
+        database.Azurite.sync();
         console.log('database sync complete!');
     },
 };

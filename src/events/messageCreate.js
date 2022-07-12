@@ -182,9 +182,37 @@ async function buttonManager3(message, msg, row) {
     }
 }
 
+async function voteReward(uid) {
+    const user = await database.Player.findOne({where: {playerID: uid}});
+    const timeNow = Date.now();
+    if (user) {
+        //reward
+        await user.increment('karma', {by: 5});
+        console.log(`5 karma added to ${user}'s account.`)
+        const collect = await database.Collect.findOne({where: {playerID: uid}});
+        if (collect) {
+            await database.Collect.update({lastvote: timeNow}, {where: {playerID: uid}});
+        }
+    } else {
+        return;
+    }
+}
+
 module.exports = {
 	name: 'messageCreate',
 	async execute(message) {
+        if (message.channel.id === '949217377776726116') {
+            console.log('message found.');
+            if (message.webhookId) {
+                const uid = await message.mentions.users.first().id;
+                await voteReward(uid)
+            } else {
+                return;
+            }
+        } else {
+            return
+        }
+
 		if (message.author.bot) {
 			return;
 		}
@@ -208,41 +236,5 @@ module.exports = {
             }, 10000);
             
         }
-            //  else if (rng >= 91) {
-            //     const embed = createEmbed();
-            //     const row = await createButton();
-            //     const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
-            //     await buttonManager(channel, msg, row);
-            //     cooldown = true;
-            //     setTimeout(() => {
-            //         cooldown = false
-            //     }, 30000);
-            // }
-
-        // if (cooldown2) {
-		// 	return;
-		// } else {
-        //     let channel2 = await message.guild.channels.cache.get('950948047985188884');
-        //     const embed = createEmbed();
-        //     embed.setDescription(`Claim to gain 100 gems.`).setColor(color.purple).setTitle('Epic Loot Box');
-        //     const row = await createButton();
-        //     const msg = await channel2.send({ embeds: [embed], components: [row], fetchReply: true });
-        //     await buttonManager2(channel2, msg, row);
-        //     cooldown2 = true;
-        //     const rng3 = Math.floor(Math.random()*300000 + 600000);
-        //     setTimeout(() => {
-        //         cooldown2 = false
-        //     }, rng3);
-        //     //  else if (rng >= 91) {
-        //     //     const embed = createEmbed();
-        //     //     const row = await createButton();
-        //     //     const msg = await channel.send({ embeds: [embed], components: [row], fetchReply: true });
-        //     //     await buttonManager(channel, msg, row);
-        //     //     cooldown2 = true;
-        //     //     setTimeout(() => {
-        //     //         cooldown2 = false
-        //     //     }, 30000);
-        //     // }
-		// }
 	},
 };

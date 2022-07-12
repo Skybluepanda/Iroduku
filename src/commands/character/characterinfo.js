@@ -14,7 +14,7 @@ function createEmbed(interaction) {
 
     embed.setTitle("Char Search")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription("Character Not Found. It's possible that the character doesn't exist.")
+        .setDescription("Character Not Found. It's possible that the character doesn't exist in the database.")
         .setColor(color.failred);
     
     return embed;
@@ -125,6 +125,7 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
     try {
         row = await wlCheck(interaction, cid, row);
         await updateButton(embed, interaction, row);
+        console.log('button manager ready.');
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
         collector.on('collect', async i => {
@@ -145,7 +146,7 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
                         interaction.followUp("Please use scan in <#947689297618812928>");
                     }
                     break;
-                case 'wladd':
+                case 'wadd':
                     const wlcount = await database.Wishlist.count({where: {playerID: interaction.user.id}});
                     if (wlcount >= 20) {
                         await interaction.channel.send(`You already have ${wlcount} wishlisted characters, max wishlist is 20. Initial embed has been disabled.`);
@@ -160,15 +161,15 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
                         await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row);
                         break;
                     }
-                case 'wlremove':
-                    const wish = await database.Wishlist.destroy({
+                case 'wremove':
+                    await database.Wishlist.destroy({
                         where: {
                         playerID: interaction.user.id,
                         characterID: cid
                     }});
                     row = await wlCheck(interaction, cid, row);
                     await updateButton(embed, interaction, row);
-                    buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row);
+                    await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row);
                     break;
             };
             i.deferUpdate();
@@ -420,6 +421,7 @@ module.exports = {
 	async execute(interaction) {
 		const embed = await createEmbed(interaction);
         try {
+            console.log('Wew')
             await subcommandProcess(embed, interaction);
         } catch(error) {
             await  interaction.reply("Error has occured while performing the command.")

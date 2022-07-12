@@ -96,6 +96,27 @@ async function checkIsvote(interaciton) {
     }
 }
 
+
+async function checkVote(interaction){
+    const userId = interaction.user.id;
+    const collect = await database.Collect.findOne({where : { playerID: userId}});
+    if (collect) {
+        const lastCheck = collect.lastvote;
+        const timeNow = Date.now();
+        const timeDiff = await timeNow - lastCheck;
+        const timefull = 43200000 - timeDiff;
+        if (timeDiff >= 43200000 || lastCheck == null) {
+            //some collected show cooldown.
+            return `Ready (5/5 Karma)`;
+        } else {
+            const timeLeft = 43200000 - timeDiff;
+            const remain = dayjs.duration(timeLeft).format('HH[hr : ]mm[m : ]ss[s]');
+            return `Cooldown for ${remain}`;
+            //none collected show cooldown
+        }
+    }
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('cds')
@@ -123,8 +144,6 @@ module.exports = {
             .setDescription(`Please report the error if it persists.`)
             .setColor(color.failred)
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
-
-        await interaction.reply({ embeds: [embed] });
         try {
             console.log("1")
             const player = await database.Player.findOne({where: {playerID: userId}});
@@ -141,6 +160,7 @@ module.exports = {
                 console.log("1")
                 const dailyText = await checkDaily(interaction);
                 const collectText = await checkCollect(interaction);
+                const voteText = await checkVote(interaction);
                 console.log("2")
                 const isvote = await checkIsvote(interaction);
                 console.log("3")
@@ -149,8 +169,9 @@ module.exports = {
 
 **Collect:** ${collectText}
 
+**Vote:** ${voteText}
+
 **Cvote:** ${votetrack.charVote-1}/${ccount} characters
-**Cvote2:** ${votetrack.charVote2-1}/${cvount} characters
 **Isvote:** ${isvote} swaps
 `);
 console.log("4")
@@ -158,9 +179,9 @@ console.log("4")
                 embedDone.setDescription(`To enable cds, you must be a player, try /isekai\nThen do /daily, /collect and /cvote`)
                         .setColor(color.failred);
             }
-            return interaction.editReply({ embeds: [embedDone] });
+            return await interaction.reply({ embeds: [embedDone] });
         } catch (error) {
-            return interaction.editReply({ embeds: [embedError] });
+            return interaction.reply({ embeds: [embedError] });
         }
     },
 };
