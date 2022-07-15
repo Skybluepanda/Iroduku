@@ -297,6 +297,7 @@ async function createRedCard(cid, interaction) {
     const uid = await interaction.user.id;
     const inventory = await inventorycheck(uid);
     const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const imageCap = await rngImage(cid, interaction);
     const gifCap = await rngGif(cid, interaction);
     const total = await (imageCap + gifCap);
@@ -330,7 +331,7 @@ async function createRedCard(cid, interaction) {
         rarity: 5,
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`A luck sack got a Ruby ${cid} | ${char.characterName}!`);
+    channel.send(`A lucky player got a **Ruby :red_square: ${cid} | ${char.characterName} from ${series.seriesName}!**`);
     await viewRCard(newcard, interaction);
 }
 
@@ -402,6 +403,7 @@ async function createDiaCard(cid, interaction) {
     const uid = await interaction.user.id;
     const inventory = await inventorycheck(uid);
     const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const imageRng = await rngImgID(cid, interaction);
     let image;
     let imgID;
@@ -424,7 +426,7 @@ async function createDiaCard(cid, interaction) {
         rarity: 6,
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`An extra lucky luck sack got a Diamond ${cid} | ${char.characterName}!`);
+    channel.send(`A luck sack got a **Diamond :large_blue_diamond: ${cid} | ${char.characterName} from ${series.seriesName}!**`);
     await viewDiaCard(newcard, interaction);
 }
 
@@ -474,6 +476,95 @@ Gif ID is ${image.gifID} report any errors using ID.
 }
 
 
+async function createAzurCard(interaction) {
+    const cid = await azurchar(interaction);
+    const uid = await interaction.user.id;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
+    const image = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
+    const inumber = await inventorycheck(uid);
+    const newcard = await database.Card.create({
+        playerID: uid,
+        characterID: cid,
+        inventoryID: inumber,
+        rarity: 9,
+    });
+    await database.Azurite.create({
+        cardID: newcard.cardID,
+        imageURL: image.imageURL,
+        artist: image.artist,
+        season: 1
+    })
+    let channel = interaction.guild.channels.cache.get('948507565577367563');
+    channel.send(`A Legendary luck sack got a **Azurite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!!!**`)
+    await viewAzurCard(newcard, interaction);
+}
+
+
+async function azurchar(interaction) {
+    const user = interaction.user.id;
+    const player = await database.Player.findOne({where: {playerID: user}});
+    const rngChar = Math.floor(Math.random() * 20);
+    const wcount = await database.Wishlist.count({where: {playerID: user}})
+    let cid;
+    if (wcount >= 5 && (rngChar >= 10 || player.apity == 1) && (azurWishlist(interaction))) {
+        const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+        await player.update({apity: 0});
+        const rngChar = Math.floor(Math.random() * 1000);
+        const char = (rngChar%wlist.length);
+        cid = await wlist[char].characterID;
+    } else {
+        const rngChar = Math.floor(Math.random() * 10000);
+        const count = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
+        const offset = (rngChar%count);
+        await player.update({apity: 1});
+        const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
+        cid = await char.characterID;
+    }
+    const exists = await database.Card.findOne({where: {rarity: 9, characterID: cid}});
+    if (exists) {
+        return azurchar(interaction);
+    } else {
+        return cid;
+    }
+}
+
+async function azurWishlist(interaction) {
+    const user = interaction.user.id;
+    const wishlist = await database.Wishlist.findAll({where: {playerID: user}});
+    for (let i; i < wishlist.length; i++) {
+        const exists = await database.Card.findOne({where: {rarity: 9, characterID: wishlist.characterID}});
+        if (!exists) {
+            return true;
+        }
+    }
+    return false;
+}
+
+async function viewAzurCard(card, interaction) { 
+    const embedCard = new MessageEmbed();
+    const cid = await card.characterID
+    const char = await database.Character.findOne({where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
+    const azur = await database.Azurite.findOne({where: {cardID: card.cardID}});
+    const url = azur.imageURL;
+    const artist = azur.artist;
+    url = await image.imageURL;
+    embedCard.setFooter({text: `Art by ${artist}
+Upload your choice of image using /azuriteupload`}).setImage(url);
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity: Azurite**
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+        .setColor(color.azur);
+    await interaction.reply({embeds: [embedCard]});
+}
+
+
+
 async function rarityCreate(cid, rarity, interaction) {
     switch (rarity) {
         case 1:
@@ -498,6 +589,10 @@ async function rarityCreate(cid, rarity, interaction) {
 
         case 6:
             await createDiaCard(cid, interaction);
+            break;
+
+        case 9:
+            await createAzurCard(interaction);
             break;
         
         default:
@@ -528,10 +623,24 @@ async function rarityBurn(interaction, rarity) {
 
 async function wlPool(interaction, rarity) {
     const user = interaction.user.id;
-    const wlist = await database.Wishlist.findAll({where: {playerID: user}});
-    const rngChar = Math.floor(Math.random() * 1000);
-    const char = (rngChar%wlist.length);
-    const cid = await wlist[char].characterID;
+    const wcount = await database.Wishlist.count({where: {playerID: user}})
+    if (wcount >= 5) {
+        const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+        const rngChar = Math.floor(Math.random() * 1000);
+        const char = (rngChar%wlist.length);
+        const cid = await wlist[char].characterID;
+        return await rarityCreate(cid, rarity, interaction);
+    } else {
+        await mainPool(interaction, rarity);
+    }
+}
+
+async function majorPool(interaction, rarity) {
+    const sideChar = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
+    const rngChar = Math.floor(Math.random() * 10000);
+    const offset = (rngChar%sideChar);
+    const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
+    const cid = await char.characterID;
     return await rarityCreate(cid, rarity, interaction);
 }
 
@@ -578,10 +687,8 @@ async function sideontrashoff(interaction, rarity) {
     const rngPool = Math.floor(Math.random() * 100);
     if (rngPool >= 91) {
         await wlPool(interaction, rarity);
-    } else if (rngPool >= 80) {
-        await mainPool(interaction, rarity);
     } else {
-        await sidePool(interaction, rarity);
+        await majorPool(interaction, rarity);
     }
 }
 async function sideontrashon(interaction, rarity) {
@@ -610,28 +717,31 @@ async function poolswitch(interaction, rarity) {
 //sides on trash off 20%wl, 40%tops, 40%sides
 //sides on trash on  30%wl, 70% normal.
 async function raritySwitch(interaction) {
-    const rngRarity = Math.floor(Math.random() * 10000);
+    // const rngRarity = 99999;
+    const rngRarity = Math.floor(Math.random() * 100000);
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
     await player.increment({gems: -10});
     const pity = Math.floor(player.pity*3/10);
-    if ((rngRarity) >= 9992) {
+    if ((rngRarity) >= 99995) {
+        return 9;
+    }else if ((rngRarity) >= 99900) {
         await player.increment({pity: 1});
         return 6;
-    } else if (rngRarity + pity >= 9922) {
+    } else if (rngRarity + pity >= 99200) {
         if (player.pity < 400) {
             await player.update({pity: 0});
         } else {
             await player.increment({pity: -400});
         }
         return 5;
-    } else if (rngRarity >= 9592) {
+    } else if (rngRarity >= 95000) {
         await player.increment({pity: 1});
         return 4;
-    } else if (rngRarity >= 8092) {
+    } else if (rngRarity >= 80000) {
         await player.increment({pity: 1});
         return 3;
-    } else if (rngRarity >= 6000) {
+    } else if (rngRarity >= 60000) {
         await player.increment({pity: 1});
         return 2;
     } else {
@@ -640,17 +750,14 @@ async function raritySwitch(interaction) {
     }
 }
 
-
-
-
-
 async function gacha(interaction, embed) {
     const amount = interaction.options.getInteger('amount');
     const setRarity = interaction.options.getInteger('rarity');
     const rarityName = await returnRarityName(setRarity);
     const burnArray = [0,0,0,0,0];
-    const gachaArray = [0,0,0,0,0,0,0];
+    const gachaArray = [0,0,0,0,0,0,0,0,0,0];
     const burnRewards = [0,0];//coin, gems
+    const timeStart = Date.now();
     embed.setTitle('Processing Gacha');
     for (let i = 0; i < amount; i++) {
         const rarity = await raritySwitch(interaction);
@@ -676,6 +783,7 @@ async function gacha(interaction, embed) {
 **Amethyst:** ${gachaArray[4]}
 **Ruby:** ${gachaArray[5]}
 **Diamond:** ${gachaArray[6]}
+**Azurite:** ${gachaArray[9]}
 
 
 **Burn Stats**
@@ -687,8 +795,498 @@ async function gacha(interaction, embed) {
 **Gems:** ${burnRewards[1]}`)
         await interaction.editReply({embeds: [embed]});
     }
-    await interaction.followUp("End of gacha.");
+    await interaction.followUp({embeds: [embed]});
+    //we do a list here.
+    const endping = interaction.options.getBoolean('endping');
+    const embed2 = embedFinalList(interaction);
+    const msg = await interaction.followUp({embeds: [embed2]});
+    await justList(msg, embed2, interaction, 1, timeStart);
+    if (endping) {
+        await interaction.followUp(`${interaction.user}`)
+    }
 }
+
+
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+
+function embedFinalList(interaction) {
+    const embed = new MessageEmbed();
+
+    embed.setTitle("Listing Inventory")
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`List of ${interaction.user.username} Cards`)
+        .setColor(color.aqua)
+    
+    return embed;
+}
+
+async function justList(msg, embed, interaction, page, timeStart){
+    const uid = await interaction.user.id;
+    const cardList = await database.Card.findAll(
+        {
+            order: [['rarity','DESC']],
+            limit: 20,
+            offset: (page-1)*20,
+            where: {
+            playerID: uid,
+            createdAt: {[Op.gt]: timeStart}
+        }}
+    );
+    const maxPage = await database.Card.count(
+        {
+            where: {
+            playerID: uid,
+            createdAt: {[Op.gt]: timeStart}
+        }}
+    );
+    const totalPage = Math.ceil(maxPage/20);
+    if (totalPage > 1) {
+        await deployButton(interaction, embed);
+    }
+    const listString = await makeList(cardList);
+    const fullList = await listString.join(`\n`);
+    await embed.setDescription(`**List of ${interaction.user.username} Cards**\n${fullList}`);
+    await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
+    await msg.edit({embeds: [embed]});
+    await buttonManagerList(msg, embed, interaction, page, timeStart, totalPage);
+}
+
+async function makeList(list) {
+    const listRef = [];
+    for (let i = 0;i < list.length; i++) {
+        //ID|Rarity ImageNumber Name Quantity if white, green or blue and there's more than 1.
+        const rarity = await list[i].rarity;
+        const cardString = await switchRarity(list[i], rarity);
+        listRef[i] = cardString;
+    }
+    return listRef;
+}
+
+async function checkPage(direction, page, maxPage) {
+    if (direction == 1 && page == maxPage) {
+        return 1;
+    } else if (direction == -1 && page == 1) {
+        return maxPage;
+    } else {
+        return page + direction;
+    }
+}
+
+async function deployButton(interaction, embed){
+    const row = new MessageActionRow()
+        .addComponents(
+            new MessageButton()
+                .setCustomId('prev')
+                .setLabel('previous')
+                .setStyle('PRIMARY'),
+            new MessageButton()
+                .setCustomId('next')
+                .setLabel('next')
+                .setStyle('PRIMARY'),
+        );
+    await interaction.editReply({ embeds: [embed], components: [row]});
+}
+
+async function buttonManagerList(msg, embed, interaction, page, maxPage) {
+    try {   
+        const filter = i => i.user.id === interaction.user.id;
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
+        collector.on('collect', async i => {
+            switch (i.customId){
+                case 'prev':
+                    const prevPage = await checkPage(-1, page, maxPage);
+                    await justList(msg, embed, interaction, prevPage);
+                    break;
+                
+                case 'next':
+                    const nextPage = await checkPage(1, page, maxPage);
+                    await justList(msg, embed, interaction, nextPage);
+                    break;
+                
+                default:
+                    break;
+            };
+            i.deferUpdate();
+        }
+        );
+    } catch(error) {
+        console.log("Error has occured in button Manager");
+    }
+}
+
+async function whitecard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //check quantity
+    const quantity = card.quantity;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
+            return cardString
+        } else {
+            const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
+            return cardString
+        } else {
+            const cardString =`:white_large_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
+            return cardString
+        }
+    }
+}
+
+async function greencard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //check quantity
+    const quantity = card.quantity;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
+            return cardString
+        } else {
+            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + tag + charname + ` ×${quantity}`;
+            return cardString
+        } else {
+            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + charname + `×${quantity}`;
+            return cardString
+        }
+    }
+}
+
+async function bluecard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    //check quantity
+    const quantity = card.quantity;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
+            return cardString
+        } else {
+            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
+            return cardString
+        } else {
+            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
+            return cardString
+        }
+    }
+}
+
+async function purplecard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            return cardString
+        } else {
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            return cardString
+        } else {
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            return cardString
+        }
+    }
+}
+
+async function redcard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            return cardString
+        } else {
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            return cardString
+        } else {
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            return cardString
+        }
+    }
+}
+
+async function diacard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            return cardString
+        } else {
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            return cardString
+        } else {
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            return cardString
+        }
+    }
+}
+
+async function pinkcard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            return cardString
+        } else {
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            return cardString
+        } else {
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            return cardString
+        }
+    }
+}
+
+async function azurcard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    const azurite = await database.Azurite.findOne({where: {cardID: card.cardID}});
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
+            return cardString
+        } else {
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
+            return cardString
+        } else {
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
+            return cardString
+        }
+    }
+}
+
+async function specard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    const special = await database.Special.findOne({where: {cardID: card.cardID}});
+    
+    //find charname
+    const charname = special.characterName;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname;
+            return cardString
+        } else {
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname;
+            return cardString
+        } else {
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname;
+            return cardString
+        }
+    }
+}
+
+async function switchRarity(card, rarity) {
+    switch (rarity) {
+        case 1:
+            return whitecard(card);
+            //white
+        case 2:
+            return greencard(card);
+            //green
+        case 3:
+            return bluecard(card);
+            //Blue
+        case 4:
+            return purplecard(card);
+            //Purple
+        case 5:
+            return redcard(card);
+            //red
+        case 6:
+            return diacard(card);
+
+        case 7:
+            return pinkcard(card);
+
+        case 9:
+            return azurcard(card);
+
+        case 10:
+            return specard(card);
+        default:
+            return "error";
+            //wtf?
+    }
+}
+
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+// END OF END OF GACHA LIST FUNCTIONS
+
 
 async function returnRarityName(rarity) {
     switch(rarity) {
@@ -789,7 +1387,7 @@ module.exports = {
 		.setDescription('does gacha for set amount of times while auto burning equal and below selected rarity.')
         .addIntegerOption(option => 
             option.setName('amount')
-                .setDescription('amount')
+                .setDescription('number of gacha you want to do.')
                 .setRequired(true))
         .addIntegerOption(option => 
             option.setName('rarity')
@@ -799,25 +1397,24 @@ module.exports = {
                 .addChoice('quartz', 1)
                 .addChoice('jade', 2)
                 .addChoice('lapis', 3)
-                .addChoice('amethyst', 4)),
+                .addChoice('amethyst', 4))
+        .addBooleanOption(option => 
+            option.setName('endping')
+                .setDescription('set true to ping when gacha is finished.')
+                .setRequired(false)),
 	async execute(interaction) {
         try {
-            const amount = interaction.options.getInteger('amount');
+            let amount = interaction.options.getInteger('amount');
             const user = interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: user}});
             if(player) {
                 if (player.gems >= 10*amount){
-                    const inventory = await database.Card.count({where: {playerID: user}});
-                    if (inventory > 1000) {
-                        return interaction.reply("you have more than 1000 cards. Burn some before doing more gacha.")
-                    }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
                     if (wlist >= 5) {
                         await confirmGacha(interaction);
                     }else {
-                        const embedE = await embedError(interaction);
-                        (embedE).setDescription("You need 5 or more waifus in wishlist to use gacha. use /wa to add to your wishlist!")
-                        return await interaction.reply({embeds: [embedE]});
+                        await interaction.channel.send("Characters in your wishlist have a higher chance of appearing in gacha. It is recommended to have at least 5 characters in your wishlist.")
+                        await confirmGacha(interaction);
                     }
                     
                 } else {

@@ -756,11 +756,11 @@ const Azurite = sequelize.define('azurite', {
 		unique: false,
 	},
 	artist: {
-		type: Sequelize.INTEGER,
+		type: Sequelize.STRING,
 		unique: false,
 	},
 	season: {
-		type: Sequelize.STRING,
+		type: Sequelize.INTEGER,
 		unique: false,
 	},
 });

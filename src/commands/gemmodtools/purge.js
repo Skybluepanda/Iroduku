@@ -12,7 +12,7 @@ module.exports = {
                 .setDescription("The user account")
                 .setRequired(true)
                 )
-        .addStringOption(option => 
+        .addIntegerOption(option => 
             option
                 .setName("lid")
                 .setDescription("The lid")
@@ -63,11 +63,15 @@ module.exports = {
             const reason = await interaction.options.getString('reason');
             embedDone.setDescription(`${target.toString()}'s card ${lid} was destroyed...?
             Reason: ${reason}`);
-            await database.Card.destroy({where: {playerID: target.id, inventoryID: lid}});
+            const card = await database.Card.findOne({where: {playerID: target.id, inventoryID: lid}});
+            await database.Azurite.destroy({where: {cardID: card.cardID}});
+            await database.Special.destroy({where: {cardID: card.cardID}});
+            await card.destroy();
             await interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
             
             
         } catch (error) {
+            embedError.setDescription(`Error occured: ${error}`)
             return interaction.editReply({ embeds: [embedError] }, {ephemeral: true});
         }
     }

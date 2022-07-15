@@ -6,7 +6,6 @@ module.exports = {
     execute(client) {
         client.application.commands.set([]);
         console.log(`Ready! Logged in as ${client.user.tag}`);
-        client.userstatus = new
         database.Player.sync();
         database.Character.sync();
         database.Image.sync();

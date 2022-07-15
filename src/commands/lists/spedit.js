@@ -22,7 +22,6 @@ async function checkAll(interaction, cardID){
         await database.Special.update({artist: artist}, {where: {cardID: cardID}})
     }
     return;
-
 }
 
 async function checkImage(interaction, cardID){

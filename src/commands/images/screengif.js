@@ -129,8 +129,8 @@ async function buttonManager(embed, interaction, msg, queue) {
                         uploaderid: sent.uploaderid
                     })
                     const sender = await database.Player.findOne({where: {id: sent.uploaderid}}); 
-                    await sender.increment({ gems: 25*(sent.bonus+1), karma: (sent.bonus+1)});
-                    await checker.increment({ gems: 25, karma: 1});
+                    await sender.increment({ gems: 50*(sent.bonus+1), karma: (sent.bonus+1)});
+                    await checker.increment({ gems: 50, karma: 1});
                     const char = await database.Character.findOne({
                         where: {
                             characterID: sent.characterID
@@ -141,7 +141,7 @@ async function buttonManager(embed, interaction, msg, queue) {
                     const series = await database.Series.findOne({ where: { seriesID: char.seriesID}});
                     const channel = await interaction.guild.channels.cache.get('953095690869948516');
 		            await channel.send(`${gif.gifID}| ${char.characterName} from ${series.seriesName}\nArt by ${sent.artist} and uploaded by ${sent.uploader}
-${interaction.user.username} awarded ${25*(sent.bonus+1)} gems and ${sent.bonus+1} karma to uploader`);
+${interaction.user.username} awarded ${50*(sent.bonus+1)} gems and ${sent.bonus+1} karma to uploader`);
                     await channel.send(`${sent.gifURL}`);
                     await database.Gifqueue.destroy({
                         where: {gifID: sent.gifID}

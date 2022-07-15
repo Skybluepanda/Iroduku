@@ -562,6 +562,11 @@ async function switchRarity(card, rarity, interaction) {
             }
             return viewPinkCard(card, interaction);
 
+        case 9:
+            burnCooldown.delete(uid);
+            return interaction.reply("You can't burn Azurite cards.");
+        
+        
         case 10:
             burnCooldown.delete(uid);
             return interaction.reply("You can't burn Special cards.");
@@ -1031,6 +1036,27 @@ async function specard(card) {
     const charname = special.characterName;
     
     if (tag) {
+        const cardString = `:large_orange_diamond:` + ID + ` | ${tag} ` + charname + `Won't be burnt`;
+        console.log(cardString);
+        return cardString
+    } else {
+        const cardString = `:large_orange_diamond:` + ID + ` | ` + charname + `Won't be burnt`;
+        console.log(cardString);
+        return cardString
+    }
+}
+
+async function azurcard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    
+    if (tag) {
         const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ${tag} ` + charname + `Won't be burnt`;
         console.log(cardString);
         return cardString
@@ -1062,6 +1088,9 @@ async function switchRarity2(card, rarity) {
 
         case 7:
             return pinkcard(card);
+
+        case 7:
+            return azurcard(card);
 
         case 10:
             return specard(card);

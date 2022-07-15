@@ -11,15 +11,11 @@ async function checkIDS(interaction) {
 		if (char) {
 			console.log(iNumber);
 			console.log(1 <= iNumber && iNumber <= 10);
-			const total = await database.Sendqueue.count();
-			if (total >= 50) {
-				return interaction.reply("Send queue is at max capacity, annoy the image mods to complete their screening.")
-			}
 			if (1 <= iNumber && iNumber <= 10) {
 				const exist = await database.Image.findOne({ where: {characterID: cid, imageNumber: iNumber}});
 				const queue = await database.Sendqueue.findOne({ where: {characterID: cid, imageNumber: iNumber}});
 				if (exist || queue) {
-					await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 10.`)
+					await interaction.reply(`Character ${cid} already has an image ${iNumber} or sent image is queued, maximum is 10.`)
 				} else {
 					upload(interaction);
 				};
@@ -39,14 +35,8 @@ function imageFilename(interaction) {
 		const cid = interaction.options.getInteger('cid');
 		const char = database.Character.findOne({where: {characterID: cid}});
 		const charname = char.characterName
-		const nsfw = interaction.options.getBoolean('nsfw');
-		if (nsfw) {
-			const imgName = 'SPOILER_'+ charname + '.png';
-			return imgName;
-		} else {
-			const imgName = charname + '.png';
-			return imgName;
-		}
+		const imgName = charname + '.png';
+		return imgName;
 	} catch(error) {
 		console.log(error + " @imageupload/imagefilename.");
 	}
@@ -55,13 +45,12 @@ function imageFilename(interaction) {
 async function border(interaction) {
 	try {
 		const imagelink = await interaction.options.getString('image_link')
-		const canvas = await createCanvas(225, 350);
+		const canvas = await createCanvas(450, 700);
 		const context = await canvas.getContext('2d');
 		const pic = await loadImage(imagelink);
-		const nsfw = await interaction.options.getBoolean('nsfw');
 		context.drawImage(pic, 0, 0, canvas.width, canvas.height);
 		context.strokeStyle = '#ffffff';
-		context.lineWidth = 4;
+		context.lineWidth = 8;
 
 	// Draw a rectangle with the dimensions of the entire canvas
 		context.strokeRect(0, 0, canvas.width, canvas.height);
@@ -80,15 +69,6 @@ async function border(interaction) {
 	}
 }
 
-// function checkNSFW(interaction){
-// 	const nsfw = interaction.options.getBoolean('nsfw');
-// 	const iNumber = interaction.options.getInteger('image_number');
-// 	if ((nsfw && 25 > iNumber > 9) || (!nsfw && 0 <= iNumber < 10)) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// }
 
 
 async function upload(interaction) {
@@ -98,15 +78,10 @@ async function upload(interaction) {
 		const char = await database.Character.findOne({where: {characterID: cid}})
 		const iNumber = await interaction.options.getInteger('image_number');
 		const art = await interaction.options.getString('artist_name');
-		const isnsfw = await interaction.options.getBoolean('nsfw');
-		const selfcrop = await interaction.options.getBoolean('selfcrop');
 		const uploader = await interaction.user.username;
 		const uploaderid = await interaction.user.id;
 		const bordered = await border(interaction);
 		const player = await database.Player.findOne({where: {playerID: interaction.user.id}});
-		
-		
-		
 		if (!bordered) {
 			return interaction.channel.send("image failed.")
 		}
@@ -119,8 +94,8 @@ async function upload(interaction) {
 			imageNumber: iNumber,
 			imageURL: link,
 			artist: art,
-			nsfw: isnsfw,
-			selfcrop: selfcrop, 
+			nsfw: false,
+			selfcrop: true, 
 			uploader: uploader,
 			uploaderid: player.id
 		});
@@ -130,18 +105,16 @@ async function upload(interaction) {
 		// await database.Player.increment({gems: 75, karma: 3}, {where: {playerID: interaction.user.id}})
 		const channel = await interaction.guild.channels.cache.get('950318845430726686');
 		await channel.send(`${cid} | ${char.characterName}'s image ${iNumber}
-uploaded by ${uploader} and art by ${art}.
-Self crop: ${selfcrop}`);
+uploaded by ${uploader} and art by ${art}.`);
 		await channel.send(`${imagelink}`);
 		return await interaction.channel.send(`Image for ${char.characterName} added!
-Image ID (One u use for delete and edit): ${image.imageID}
+Image ID (used for delete and edit): ${image.imageID}
 Image Number: ${iNumber}
 Artist: ${art}
 Image has entered the send queue and will be reviewed by image mods.
-You will recieve minimum of 25 gems and 1 karma for pictures taken from other bots or MAL.
-There will be bonus rewards based on image and crop quality.`);
+You will recieve minimum of 50 gems and 1 karma and more depending on submition quality!`);
 	} catch(error) {
-		interaction.channel.send("Something went wrong. Dw if image got uploaded u got the rewards.");
+		interaction.channel.send("Something went wrong. Ask an image mod if the image got uploaded.");
 	}
 }
 
@@ -159,7 +132,7 @@ async function embedSucess(interaction) {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('isend')
-		.setDescription('Adding image to the database for the character, image should be 225x350px in size.')
+		.setDescription('Adding image to the database for the character, image should be 450x700px in size.')
 		.addIntegerOption(option => option
 			.setName('cid')
 			.setDescription('Id of the character')
@@ -175,15 +148,7 @@ module.exports = {
 		.addStringOption(option => option
 			.setName('artist_name')
 			.setDescription('name of the artist')
-			.setRequired(true))
-		.addBooleanOption(option => option
-			.setName('nsfw')
-			.setDescription('is this an nsfw image or gif?')
-			.setRequired(true))
-        .addBooleanOption(option => option
-            .setName('selfcrop')
-            .setDescription('did you find and crop this image/gif?')
-            .setRequired(true)),
+			.setRequired(true)),
 	async execute(interaction) {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.
@@ -193,11 +158,6 @@ module.exports = {
             };
 			try {
 				checkIDS(interaction);
-				// if (checkNSFW(interaction)){
-				// 	checkIDS(interaction);
-				// } else {
-				// 	return await interaction.reply("None NSFW images have number 0-9, NSFW images have number 10-24")
-				// }
 			} catch(error){
 				await interaction.channel.send("Error has occured");
 			}

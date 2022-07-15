@@ -112,7 +112,7 @@ Gif ID is ${image.gifID} report any errors using ID.
     }
     embedCard.setTitle(`${char.characterName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Market Card Info
+        .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Ruby**
@@ -167,7 +167,7 @@ Gif ID is ${image.gifID} report any errors using ID.
     }
     embedCard.setTitle(`${char.characterName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Market Card Info
+        .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Diamond**
@@ -221,12 +221,42 @@ Gif ID is ${image.gifID} report any errors using ID.
     }
     embedCard.setTitle(`${char.characterName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Market Card Info
+        .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Pink Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.pink);
+    if (own) {
+        const row = await createButton();
+        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+        await buttonManager(interaction, msg, card, trade);
+    } else {
+        await interaction.reply({embeds: [embedCard]});
+        tviewCooldown.delete(uid);
+    }
+}
+
+async function viewAzurCard(card, interaction, own, trade) { 
+    const embedCard = new MessageEmbed();
+    //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const uid = interaction.user.id;
+    const cid = await card.characterID;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    const Azurite = await database.Azurite.findOne({where: {cardID: card.cardID}});
+    //all we get is inventory id and player id
+    embedCard.setFooter(`Art by ${Azurite.artist}
+*Upload with /azuriteupload*`).setImage(Azurite.imageURL)
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity: Azurite**
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+        .setColor(color.azur);
     if (own) {
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
@@ -247,6 +277,9 @@ async function switchRarity(card, rarity, interaction, own, trade) {
 
         case 7:
             return viewPinkCard(card, interaction, own, trade);
+
+        case 9:
+            return viewAzurCard(card, interaction, own, trade);
 
         default:
             return "error";

@@ -67,6 +67,9 @@ module.exports = {
                     name: username,
                     karma: 300
                 });
+                await database.Votetrack.create({
+                    playerID: user
+                });
                 const reference = await interaction.options.getUser('reference');
                 if (reference) {
                     const refplayer = await database.Player.findOne({whhere: {playerID: reference.id}});

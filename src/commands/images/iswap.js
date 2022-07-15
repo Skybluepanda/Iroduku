@@ -54,13 +54,13 @@ function imageFilename(interaction) {
 async function border(interaction) {
 	try {
 		const imagelink = await interaction.options.getString('image_link')
-		const canvas = await createCanvas(225, 350);
+		const canvas = await createCanvas(450, 700);
 		const context = await canvas.getContext('2d');
 		const pic = await loadImage(imagelink);
 		const nsfw = await interaction.options.getBoolean('nsfw');
 		context.drawImage(pic, 0, 0, canvas.width, canvas.height);
 		context.strokeStyle = '#ffffff';
-		context.lineWidth = 4;
+		context.lineWidth = 8;
 
 	// Draw a rectangle with the dimensions of the entire canvas
 		context.strokeRect(0, 0, canvas.width, canvas.height);
@@ -91,13 +91,13 @@ async function previewswap(interaction) {
                 imageNumber: iNumber
             }
         });
-		const canvas = await createCanvas(450, 350);
+		const canvas = await createCanvas(900, 700);
 		const context = await canvas.getContext('2d');
 		const pic1 = await loadImage(imagelink);
         const pic2 = await loadImage(previous.imageURL);
 		const nsfw = await interaction.options.getBoolean('nsfw');
-		context.drawImage(pic1, 0, 0, 225, canvas.height);
-        context.drawImage(pic2, 226, 0, 225, canvas.height);
+		context.drawImage(pic1, 0, 0, 450, canvas.height);
+        context.drawImage(pic2, 451, 0, 450, canvas.height);
 		
 		const attachment = await new MessageAttachment(canvas.toBuffer(), 'swap.png');
 		if (attachment) {
@@ -130,8 +130,7 @@ async function upload(interaction) {
 		const char = await database.Character.findOne({where: {characterID: cid}})
 		const iNumber = await interaction.options.getInteger('image_number');
 		const art = await interaction.options.getString('artist_name');
-		const isnsfw = await interaction.options.getBoolean('nsfw');
-		const selfcrop = await interaction.options.getBoolean('selfcrop');
+		let selfcrop = await interaction.options.getBoolean('edit');
 		const uploader = await interaction.user.username;
 		const uploaderid = await interaction.user.id;
 		const bordered = await border(interaction);
@@ -154,7 +153,7 @@ async function upload(interaction) {
 			imageURL: link,
 			previewURL: link2,
 			artist: art,
-			nsfw: isnsfw,
+			nsfw: false,
 			selfcrop: selfcrop, 
 			uploader: uploader,
 			uploaderid: player.id,
@@ -167,7 +166,7 @@ async function upload(interaction) {
 		const channel = await interaction.guild.channels.cache.get('950318845430726686');
 		await channel.send(`${cid} | ${char.characterName}'s image ${iNumber}
 uploaded by ${uploader} and art by ${art}.
-Self crop: ${selfcrop}`);
+Small Edit: ${selfcrop}`);
 		await channel.send(`${imagelink}`);
 		return await interaction.channel.send(`Image for ${char.characterName} added!
 Image ID (One u use for delete and edit): ${image.imageID}
@@ -175,7 +174,7 @@ Image Number: ${iNumber}
 Artist: ${art}
 Image has entered the send queue and will be reviewed by players and image mods.
 Once the swap has enough votes, it'll be approved or declined by an image mod.
-You will recieve minimum of 25 gems and 1 karma for a successful swap, and bonuses for selfcrop and quality.`);
+You will recieve minimum of 50 gems and 1 karma for a successful swap, and bonuses for selfcrop and quality.`);
 	} catch(error) {
 		interaction.channel.send("Something went wrong.");
 	}
@@ -195,7 +194,7 @@ async function embedSucess(interaction) {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('iswap')
-		.setDescription('Replacing an image in the database for the character, image should be 225x350px in size.')
+		.setDescription('Replacing an image in the database for the character, image should be 450x700px in size.')
 		.addIntegerOption(option => option
 			.setName('cid')
 			.setDescription('Id of the character')
@@ -212,17 +211,13 @@ module.exports = {
 			.setName('artist_name')
 			.setDescription('name of the artist')
 			.setRequired(true))
-		.addBooleanOption(option => option
-			.setName('nsfw')
-			.setDescription('is this an nsfw image or gif?')
-			.setRequired(true))
-        .addBooleanOption(option => option
-            .setName('selfcrop')
-            .setDescription('did you find and crop this image/gif?')
-            .setRequired(true))
 		.addStringOption(option => option
 			.setName('reason')
 			.setDescription('SHORT reason for the swap (no emotes, limit 256 chars.)')
+			.setRequired(true))
+		.addBooleanOption(option => option
+			.setName('edit')
+			.setDescription('Is this swap a small edit to the existing image?')
 			.setRequired(true)),
 	async execute(interaction) {
 		//check if character exists, and image number is empty

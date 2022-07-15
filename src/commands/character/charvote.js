@@ -12,6 +12,15 @@ async function start(interaction) {
     });
     if (track) {
         cid = await track.charVote;
+        if (cid == 2) {
+            await interaction.channel.send(`Thanks for doing cvote.
+    This is a voting system for characters.
+    You'll be able to vote a score between 0 and 2 inclusive,
+    with 2 being the highest rating you can give.
+    Each vote will reward you with 1 karma, and all votes
+    will be considered for calculating a characters rank!
+    Be honest as it is annonymous.`);
+        }
     } else {
         await database.Votetrack.create({
             playerID: user

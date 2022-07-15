@@ -92,7 +92,7 @@ Series: ${char.seriesID} | ${series.seriesName}
 Image Number: ${swaps.imageNumber}
 Artist: ${swaps.artist}
 Nsfw: ${swaps.nsfw}
-Selfcrop: ${swaps.selfcrop}
+Small Edit: ${swaps.selfcrop}
 Reason: ${swaps.reason}
 
 Vote for image swap.

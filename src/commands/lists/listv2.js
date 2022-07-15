@@ -321,6 +321,40 @@ async function pinkcard(card) {
     }
 }
 
+async function azurcard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    const azurite = await database.Azurite.findOne({where: {cardID: card.cardID}});
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    const lock = card.lock;
+    if (lock) {
+        const lockstatus = '**|**';
+        if (tag) {
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
+            return cardString
+        } else {
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
+            return cardString
+        }
+    } else {
+        const lockstatus = '|';
+        if (tag) {
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
+            return cardString
+        } else {
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
+            return cardString
+        }
+    }
+}
+
 async function specard(card) {
     //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
     const ID = card.inventoryID;
@@ -353,6 +387,7 @@ async function specard(card) {
         }
     }
 }
+
 async function switchRarity(card, rarity) {
     switch (rarity) {
         case 1:
@@ -375,6 +410,9 @@ async function switchRarity(card, rarity) {
 
         case 7:
             return pinkcard(card);
+
+        case 9:
+            return azurcard(card);
 
         case 10:
             return specard(card);

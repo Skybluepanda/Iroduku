@@ -354,6 +354,29 @@ async function pinkcard(card, ID) {
     }
 }
 
+async function azurcard(card, ID) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    
+    if (tag) {
+        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ${tag}` + charname;
+        console.log(cardString);
+        return cardString;
+    } else {
+        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | + ` + charname;
+        console.log(cardString);
+        return cardString;
+    }
+}
+
 async function switchRarity(card, rarity, tradeID) {
     switch (rarity) {
         case 4:
@@ -367,6 +390,9 @@ async function switchRarity(card, rarity, tradeID) {
 
         case 7:
             return pinkcard(card, tradeID);
+
+        case 9:
+            return azurcard(card, tradeID);
 
         default:
             return "error";

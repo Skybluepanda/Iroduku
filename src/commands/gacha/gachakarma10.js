@@ -440,10 +440,6 @@ module.exports = {
             const embedS = await embedSucess(interaction);
             if(player) {
                 if (player.karma >= 100){
-                    const inventory = await database.Card.count({where: {playerID: user}});
-                    if (inventory > 1000) {
-                        return interaction.reply("you have more than 1000 cards. Burn some before doing more gacha.")
-                    }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
                     if (wlist >= 5) {
                         await interaction.reply({embeds: [embedS]});
@@ -456,8 +452,7 @@ module.exports = {
                             await interaction.editReply({embeds: [embedS]});
                         }
                     }else {
-                        (await embedE).setDescription("You need 5 or more waifus in wishlist to use karma gacha. use /wa to add to your wishlist!")
-                        return await interaction.reply({embeds: [embedE]});
+                        await interaction.channel.send("Karma Gacha uses your wishlist as the character pool. Please add at least 5 characters to your wishlist before continuing.")
                     }
                 } else {
                     //not enough gems embed.

@@ -469,8 +469,7 @@ module.exports = {
                     if (wlist >= 5) {
                         await gacha(interaction);
                     }else {
-                        (await embedE).setDescription("You need 5 or more waifus in wishlist to use karma gacha. use /wa to add to your wishlist!")
-                        return await interaction.reply({embeds: [embedE]});
+                        await interaction.channel.send("Karma Gacha uses your wishlist as the character pool. Please add at least 5 characters to your wishlist before continuing.")
                     }
                 } else {
                     //not enough gems embed.

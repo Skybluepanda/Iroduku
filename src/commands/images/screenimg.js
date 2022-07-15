@@ -54,8 +54,6 @@ Series: ${char.seriesID} | ${series.seriesName}
 Image Number: ${sent.imageNumber}
 Uploader: ${sent.uploader}
 Artist: ${sent.artist}
-Nsfw: ${sent.nsfw}
-Selfcrop: ${sent.selfcrop}
 Reason: ${sent.reason}
 
 Bonus: ${sent.bonus} (25gems&1karma/bonus)`).setTitle(`${char.characterName}`)
@@ -148,8 +146,8 @@ async function buttonManager(embed, interaction, msg, queue) {
                     })
                     
                     const sender = await database.Player.findOne({where: {id: sent.uploaderid}}); 
-                    await sender.increment({ gems: 25*(sent.bonus+1), karma: (sent.bonus+1)});
-                    await checker.increment({ gems: 25, karma: 1});
+                    await sender.increment({ gems: 50*(sent.bonus+1), karma: (sent.bonus+1)});
+                    await checker.increment({ gems: 50, karma: 1});
                     
                     const char = await database.Character.findOne({
                         where: {
@@ -161,7 +159,7 @@ async function buttonManager(embed, interaction, msg, queue) {
                     const series = await database.Series.findOne({ where: { seriesID: char.seriesID}});
                     const channel = await interaction.guild.channels.cache.get('949952119052578877');
 		            await channel.send(`${image.imageID}| ${char.characterName} from ${series.seriesName}\nArt by ${sent.artist} and uploaded by ${sent.uploader}`)
-                    await channel.send(`${interaction.user.username} awarded ${25*(sent.bonus+1)}gems and ${sent.bonus+1}karma to uploader. There will be some delays in reward.`)
+                    await channel.send(`${interaction.user.username} awarded ${50*(sent.bonus+1)}gems and ${sent.bonus+1}karma to uploader.`)
                     await channel.send(`${sent.imageURL}`);
                     
                     await database.Sendqueue.destroy({
@@ -189,7 +187,7 @@ async function buttonManager(embed, interaction, msg, queue) {
                     const declinech = await interaction.guild.channels.cache.get('954395878016299108');
 		            await declinech.send(`${sent.imageID}| ${chard.characterName} from ${seriesd.seriesName}\nArt by ${sent.artist} and uploaded by ${sent.uploader}`);
                     await declinech.send(`${sent.imageURL}`);
-                    await checker.increment({ gems: 25, karma: 1});
+                    await checker.increment({ gems: 50, karma: 1});
                     await database.Sendqueue.destroy({
                         where: {imageID: sent.imageID}
                     });

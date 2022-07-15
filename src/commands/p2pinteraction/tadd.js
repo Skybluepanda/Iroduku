@@ -282,6 +282,30 @@ Gif ID is ${image.gifID} report any errors using ID.
     await buttonManager(interaction, msg, card);
 }
 
+async function viewAzurCard(card, interaction) { 
+    const embedCard = new MessageEmbed();
+    const Azurite = database.Azurite.findOne({where: {cardID: card.cardID}});
+    //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const cid = await card.characterID;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    embedCard.setFooter(`Art by ${Azurite.artist}
+*Upload with /azuriteupload*`).setImage(Azurite.imageURL)
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity: Azurite**
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+        .setColor(color.azur);
+    const row = await createButton();
+
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg, card);
+}
+
 
 async function switchRarity(card, rarity, interaction) {
     switch (rarity) {
@@ -305,6 +329,9 @@ async function switchRarity(card, rarity, interaction) {
 
         case 7:
             return viewPinkCard(card, interaction);
+
+        case 9:
+            return viewAzurCard(card, interaction);
 
         case 10:
             interaction.reply("You cannot trade special cards.");

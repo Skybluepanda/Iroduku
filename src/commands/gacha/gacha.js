@@ -17,9 +17,20 @@ async function embedError(interaction) {
     const embed = new MessageEmbed();
 
     embed.setTitle("Creation failed.")
-        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription("Remember to set description.")
         .setColor(color.failred);
+    
+    return embed;
+}
+
+async function embedCreating(interaction) {
+    const embed = new MessageEmbed();
+
+    embed.setTitle("Creating Card...")
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription("Please be patient")
+        .setColor(color.white);
     
     return embed;
 }
@@ -70,20 +81,21 @@ async function viewWCard(card, interaction) {
     const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const image1 = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
     if (image1) {
-        embedCard.setImage(image1.imageURL).setFooter({text: `#${image1.imageNumber} Art by ${image1.artist} | Uploaded by ${image1.uploader}
-Image ID is ${image1.imageID} report any errors using ID.`})
+        embedCard.setImage(image1.imageURL).setFooter(`#${image1.imageNumber} Art by ${image1.artist} | Uploaded by ${image1.uploader}
+Image ID is ${image1.imageID} report any errors using ID.`)
     } else {
         embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        // .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID: **${cid}
 **Series: **${char.seriesID} | ${series.seriesName}
 **Rarity: Quartz**
 **Quantity:** ${card.quantity}`)
         .setColor(color.white);
-    return await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 
@@ -119,20 +131,20 @@ async function viewGCard(card, interaction) {
     const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const image1 = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
     if (image1) {
-        embedCard.setImage(image1.imageURL).setFooter({text: `#${image1.imageNumber} Art by ${image1.artist} | Uploaded by ${image1.uploader}
-Image ID is ${image1.imageID} report any errors using ID.`})
+        embedCard.setImage(image1.imageURL).setFooter(`#${image1.imageNumber} Art by ${image1.artist} | Uploaded by ${image1.uploader}
+Image ID is ${image1.imageID} report any errors using ID.`)
     } else {
         embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity:** Jade
 **Quantity:** ${card.quantity}`)
         .setColor(color.green);
-    await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 //Blue Card Zone
@@ -208,8 +220,8 @@ async function viewBCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: card.imageNumber}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.`}).setImage(url)
+            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+Image ID is ${image.imageID} report any errors using ID.`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -218,22 +230,22 @@ Image ID is ${image.imageID} report any errors using ID.`}).setImage(url)
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageNumber)}});
         if (image){
         url = await image.gifURL;
-        embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
-Gif ID is ${image.gifID} report any errors using ID.`}).setImage(url)
+        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity:** Lapis
 **Quantity:** ${card.quantity}`)
         .setColor(color.blue);
-    await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 ///Purple Zone
@@ -291,9 +303,9 @@ async function viewPCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*you can update image with /amethystupdate*`}).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -302,9 +314,9 @@ Image ID is ${image.imageID} report any errors using ID.
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
             url = await image.gifURL;
-            embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*you can update image with /amethystupdate*`}).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -314,14 +326,14 @@ Gif ID is ${image.gifID} report any errors using ID.
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);    
-    await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 
@@ -332,6 +344,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 async function createRedCard(cid, interaction) {
     const uid = await interaction.user.id;
     const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const imageCap = await rngImage(cid, interaction);
     const gifCap = await rngGif(cid, interaction);
     const total = await (imageCap + gifCap);
@@ -366,7 +379,7 @@ async function createRedCard(cid, interaction) {
         rarity: 5,
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`A luck sack got a Ruby ${cid} | ${char.characterName}!`)
+    channel.send(`A lucky player got a **Ruby :red_square: ${cid} | ${char.characterName} from ${series.seriesName}!**`)
     await viewRCard(newcard, interaction);
 }
 
@@ -381,9 +394,9 @@ async function viewRCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: (card.imageID)}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*you can update image with /amethystupdate*`}).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -392,9 +405,9 @@ Image ID is ${image.imageID} report any errors using ID.
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -card.imageID}});
         if (image){
         url = await image.gifURL;
-        embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID.
-*you can update image with /amethystupdate*`}).setImage(url)
+*you can update image with /amethystupdate*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -404,14 +417,14 @@ Gif ID is ${image.gifID} report any errors using ID.
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
-    await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 async function rngImgID(cid, interaction) {
@@ -439,6 +452,7 @@ async function rngImgID(cid, interaction) {
 async function createDiaCard(cid, interaction) {
     const uid = await interaction.user.id;
     const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const imageRng = await rngImgID(cid, interaction);
     let image;
     let imgID;
@@ -462,11 +476,11 @@ async function createDiaCard(cid, interaction) {
         rarity: 6,
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`An extra lucky luck sack got a Diamond ${cid} | ${char.characterName}!`)
-    await viewDiaCard(newcard, interaction);
+    channel.send(`A luck sack got a **Diamond :large_blue_diamond: ${cid} | ${char.characterName} from ${series.seriesName}!**`)
+    return await viewDiaCard(newcard, interaction);
 }
 
-async function viewDiaCard(card, interaction) { 
+async function viewDiaCard(card, interaction) {
     const embedCard = new MessageEmbed();
     const cid = await card.characterID
     const char = await database.Character.findOne({where: {characterID: cid}});
@@ -477,9 +491,9 @@ async function viewDiaCard(card, interaction) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
             url = await image.imageURL;
-            embedCard.setFooter({text: `#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+            embedCard.setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
 Image ID is ${image.imageID} report any errors using ID.
-*Set image with /diaset*`}).setImage(url)
+*Set image with /diaset*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -488,9 +502,9 @@ Image ID is ${image.imageID} report any errors using ID.
         image = await database.Gif.findOne({where: {characterID: cid, gifID: -card.imageID}});
         if (image){
         url = await image.gifURL;
-        embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
+        embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
 Gif ID is ${image.gifID} report any errors using ID
-*Set image with /diaset*`}).setImage(url)
+*Set image with /diaset*`).setImage(url)
         } else {
             image = database.Image.findOne({where: {imageID: 1}})
             embedCard.addField("no image found", "Send an official image for this character.");
@@ -500,14 +514,61 @@ Gif ID is ${image.gifID} report any errors using ID
         embedCard.addField("no image found", "Send an official image for this character. Then update the card!")
     }
     embedCard.setTitle(`${char.characterName}`)
-        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
-    await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
+}
+
+async function createAzurCard(interaction) {
+    const cid = await azurchar(interaction);
+    const uid = await interaction.user.id;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
+    const image = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
+    const inumber = await inventorycheck(uid);
+    const newcard = await database.Card.create({
+        playerID: uid,
+        characterID: cid,
+        inventoryID: inumber,
+        rarity: 9,
+    });
+    await database.Azurite.create({
+        cardID: newcard.cardID,
+        imageURL: image.imageURL,
+        artist: image.artist,
+        season: 1
+    })
+    let channel = interaction.guild.channels.cache.get('948507565577367563');
+    channel.send(`A Legendary luck sack got a **Azurite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!!!**`)
+    await viewAzurCard(newcard, interaction);
+}
+
+async function viewAzurCard(card, interaction) { 
+    const embedCard = new MessageEmbed();
+    const cid = await card.characterID
+    const char = await database.Character.findOne({where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
+    const azur = await database.Azurite.findOne({where: {cardID: card.cardID}});
+    const url = azur.imageURL;
+    const artist = azur.artist;
+    
+    url = await image.imageURL;
+    embedCard.setFooter(`Art by ${artist}
+Upload your choice of image using /azuriteupload`).setImage(url)
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity: Azurite**
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+        .setColor(color.azur);
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 
@@ -516,30 +577,73 @@ async function raritySwitch(cid, rngRarity, interaction) {
     const player = await database.Player.findOne({where: {playerID: user}});
     player.increment({gems: -10});
     const pity = Math.floor(player.pity*3/10);
-    if ((rngRarity) >= 9992) {
+    if ((rngRarity) >= 99995) {
+        await createAzurCard(interaction);
+    } else if ((rngRarity) >= 99900) {
         player.increment({pity: 1});
-        createDiaCard(cid, interaction);
-    } else if (rngRarity + pity >= 9922) {
+        await createDiaCard(cid, interaction);
+    } else if (rngRarity + pity >= 99200) {
         if (player.pity < 400) {
             await player.update({pity: 0});
         } else {
             await player.increment({pity: -400});
         }
-        createRedCard(cid, interaction);
-    } else if (rngRarity >= 9592) {
+        await createRedCard(cid, interaction);
+    } else if (rngRarity >= 95000) {
         player.increment({pity: 1});
-        createPurpleCard(cid, interaction);
-    } else if (rngRarity >= 8092) {
+        await createPurpleCard(cid, interaction);
+    } else if (rngRarity >= 80000) {
         player.increment({pity: 1});
-        createBlueCard(cid, interaction);
-    } else if (rngRarity >= 6000) {
+        await createBlueCard(cid, interaction);
+    } else if (rngRarity >= 60000) {
         player.increment({pity: 1});
-        createGreenCard(cid, interaction);
+        await createGreenCard(cid, interaction);
     } else {
         player.increment({pity: 1});
-        createWhiteCard(cid, interaction);
+        await createWhiteCard(cid, interaction);
     }
 }
+
+async function azurWishlist(interaction) {
+    const user = interaction.user.id;
+    const wishlist = await database.Wishlist.findAll({where: {playerID: user}});
+    for (let i; i < wishlist.length; i++) {
+        const exists = await database.Card.findOne({where: {rarity: 9, characterID: wishlist.characterID}});
+        if (!exists) {
+            return true;
+        }
+    }
+    return false;
+}
+
+async function azurchar(interaction) {
+    const user = interaction.user.id;
+    const player = await database.Player.findOne({where: {playerID: user}});
+    const rngChar = Math.floor(Math.random() * 20);
+    const wcount = await database.Wishlist.count({where: {playerID: user}})
+    let cid;
+    if (wcount >= 5 && (rngChar >= 10 || player.apity == 1) && (azurWishlist(interaction))) {
+        const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+        await player.update({apity: 0});
+        const rngChar = Math.floor(Math.random() * 1000);
+        const char = (rngChar%wlist.length);
+        cid = await wlist[char].characterID;
+    } else {
+        const rngChar = Math.floor(Math.random() * 10000);
+        const count = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
+        const offset = (rngChar%count);
+        await player.update({apity: 1});
+        const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
+        cid = await char.characterID;
+    }
+    const exists = await database.Card.findOne({where: {rarity: 9, characterID: cid}});
+    if (exists) {
+        return azurchar(interaction);
+    } else {
+        return cid;
+    }
+}
+
 
 async function pityPull(interaction) {
     const user = interaction.user.id;
@@ -552,19 +656,34 @@ async function pityPull(interaction) {
 
 async function wlPool(interaction) {
     const user = interaction.user.id;
-    const wlist = await database.Wishlist.findAll({where: {playerID: user}})
-    const rngChar = Math.floor(Math.random() * 1000);
-    const char = (rngChar%wlist.length);
-    const cid = await wlist[char].characterID;
-    const rngRarity = Math.floor(Math.random() * 10000);
-    await raritySwitch(cid, rngRarity, interaction);
+    const wcount = await database.Wishlist.count({where: {playerID: user}})
+    if (wcount >= 5) {
+        const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+        const rngChar = Math.floor(Math.random() * 1000);
+        const char = (rngChar%wlist.length);
+        const cid = await wlist[char].characterID;
+        const rngRarity = Math.floor(Math.random() * 100000);
+        await raritySwitch(cid, rngRarity, interaction);
+    } else {
+        await mainPool(interaction);
+    }
 }
 
 async function mainPool(interaction) {
     const rngChar = Math.floor(Math.random() * 10000);
-    const rngRarity = Math.floor(Math.random() * 10000);
+    const rngRarity = Math.floor(Math.random() * 100000);
     const offset = (rngChar%100);
     const char = await database.Character.findOne({offset: offset, where: {rank: 1}});
+    const cid = await char.characterID;
+    await raritySwitch(cid, rngRarity, interaction);
+}
+
+async function majorPool(interaction) {
+    const sideChar = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
+    const rngChar = Math.floor(Math.random() * 10000);
+    const rngRarity = Math.floor(Math.random() * 100000);
+    const offset = (rngChar%sideChar);
+    const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
     const cid = await char.characterID;
     await raritySwitch(cid, rngRarity, interaction);
 }
@@ -572,7 +691,7 @@ async function mainPool(interaction) {
 async function sidePool(interaction) {
     const sideChar = await database.Character.count({where: {rank: 2}});
     const rngChar = Math.floor(Math.random() * 10000);
-    const rngRarity = Math.floor(Math.random() * 10000);
+    const rngRarity = Math.floor(Math.random() * 100000);
     const offset = (rngChar%sideChar);
     const char = await database.Character.findOne({offset: offset, where: {rank: 2}});
     const cid = await char.characterID;
@@ -582,13 +701,10 @@ async function sidePool(interaction) {
 async function allPool(interaction) {
     const totalChar = await database.Character.count();
     const rngChar = Math.floor(Math.random() * 100000);
-    const rngRarity = Math.floor(Math.random() * 10000);
+    const rngRarity = Math.floor(Math.random() * 100000);
     const cid = (rngChar%totalChar)+1;
     await raritySwitch(cid, rngRarity, interaction);
 }
-
-
-
 
 async function sideofftrashoff(interaction) {
     const rngPool = Math.floor(Math.random() * 100);
@@ -604,12 +720,11 @@ async function sideontrashoff(interaction) {
     const rngPool = Math.floor(Math.random() * 100);
     if (rngPool >= 91) {
         await wlPool(interaction);
-    } else if (rngPool >= 80) {
-        await mainPool(interaction);
     } else {
-        await sidePool(interaction);
+        await majorPool(interaction);
     }
 }
+
 async function sideontrashon(interaction) {
     const rngPool = Math.floor(Math.random() * 100);
     if (rngPool >= 85) {
@@ -671,6 +786,8 @@ module.exports = {
             const user = await interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: user}});
             const embedE = await embedError(interaction);
+            const embedC = await embedCreating(interaction);
+            
             if(player) {
                 if (player.gems >= 10){
                     const inventory = await database.Card.count({where: {playerID: user}});
@@ -679,10 +796,12 @@ module.exports = {
                     }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
                     if (wlist >= 5) {
+                        await interaction.reply({embeds: [embedC]});
                         await gacha(interaction);
                     } else {
-                        (embedE).setDescription("You need 5 or more waifus in wishlist to use gacha. use /wa to add to your wishlist!")
-                        return await interaction.reply({embeds: [embedE]});
+                        await interaction.reply({embeds: [embedC]});
+                        await gacha(interaction);
+                        await interaction.channel.send("Characters in your wishlist have a higher chance of appearing in gacha. \nIt is recommended to have at least 5 characters in your wishlist.")
                     }
                 } else {
                     //not enough gems embed.

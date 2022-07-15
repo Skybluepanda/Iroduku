@@ -244,7 +244,7 @@ async function nopicList(embed, interaction, page){
         order: [['final', 'DESC']],
         limit: 20,
         offset: (page-1)*20,
-        where: {imageCount: {[Op.lt]: 10}}},
+        where: {imageCount: 0}},
         );
     if (maxPage > 0) {
         deployButton(interaction, embed);

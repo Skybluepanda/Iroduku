@@ -8,10 +8,6 @@ async function checkIDS(interaction) {
 	const gNumber = await interaction.options.getInteger('gifnumber')
 	const char = database.Character.findOne({where: {characterID:cid}});
 	try {
-        const total = await database.Gifqueue.count();
-			if (total >= 50) {
-				return interaction.reply("Send queue is at max capacity, annoy the image mods to complete their screening.")
-			}
 		if (char) {
 			if (1 <= gNumber && gNumber < 6) {
 				const exist = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gNumber}})
@@ -52,16 +48,6 @@ async function check(interaction) {
     }
 }
 
-// function checkNSFW(interaction){
-// 	const nsfw = interaction.options.getBoolean('nsfw');
-// 	const iNumber = interaction.options.getInteger('image_number');
-// 	if ((nsfw && 25 > iNumber > 9) || (!nsfw && 0 <= iNumber < 10)) {
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// }
-
 
 async function upload(interaction) {
     try {
@@ -69,8 +55,6 @@ async function upload(interaction) {
 		const char = await database.Character.findOne({where: {characterID: cid}})
         const iNumber = await interaction.options.getInteger('gifnumber');
         const art = await interaction.options.getString('artist_name');
-        const isnsfw = await interaction.options.getBoolean('nsfw');
-        const selfcrop = await interaction.options.getBoolean('selfcrop');
         const uploader = await interaction.user.username;
 		const player = await database.Player.findOne({where: {playerID: interaction.user.id}});
 
@@ -85,8 +69,8 @@ async function upload(interaction) {
                 gifNumber: iNumber,
                 gifURL: url,
                 artist: art,
-                nsfw: isnsfw, 
-                selfcrop: selfcrop, 
+                nsfw: false, 
+                selfcrop: true, 
                 uploader: uploader,
                 uploaderid: player.id
             });
@@ -107,7 +91,7 @@ Self crop: ${selfcrop}`);
 Gif ID (for deleteing and editing): ${gif.gifID}
 Gif Number: ${iNumber}. 
 The Gif has entered the send queue and will be reviewed by image mods.
-You will recieve minimum of 25 gems and 1 karma for gifs taken from other bots or MAL.
+You will recieve minimum of 50 gems and 1 karma for gifs taken from other bots or MAL.
 There will be bonus rewards based on gif quality.`)
 	} catch(error) {
         console.log("upload failed.")
@@ -133,15 +117,7 @@ module.exports = {
 		.addStringOption(option => option
 			.setName('artist_name')
 			.setDescription('name of the artist')
-			.setRequired(true))
-		.addBooleanOption(option => option
-			.setName('nsfw')
-			.setDescription('is this an nsfw gif?')
-            .setRequired(true))
-        .addBooleanOption(option => option
-            .setName('selfcrop')
-            .setDescription('did you find and crop this image/gif?')
-            .setRequired(true)),
+			.setRequired(true)),
 	async execute(interaction) {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.

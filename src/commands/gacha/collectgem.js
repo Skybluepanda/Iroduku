@@ -84,8 +84,8 @@ async function newCollect(interaction, player){
     await player.increment('gems', {by: 900});
     await embedDone.setDescription(`
     Collect is a command that you grants you 5 gems per 8 minutes
-    Collection will cap at 8hrs for total of 300 gems per 8hr cycle.
-    Collecting after more than 8hrs have past will grant 300 gems.
+    Collection will cap at 16hrs for total of 650 gems per 16hr cycle.
+    Collecting after more than 16hr have past will grant 650 gems.
     Gems produced are tripled for the first 40 minutes after collect.
     Gems: (Start collecting bonus +900 gems!) ${player.gems+900}`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});

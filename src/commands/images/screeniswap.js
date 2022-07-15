@@ -47,8 +47,7 @@ Series: ${char.seriesID} | ${series.seriesName}
 Image Number: ${sent.imageNumber}
 Uploader: ${sent.uploader}
 Artist: ${sent.artist}
-Nsfw: ${sent.nsfw}
-Selfcrop: ${sent.selfcrop}
+Small Edit: ${sent.selfcrop}
 Yes: ${sent.yes}
 No: ${sent.no}
 Another: ${sent.another}
@@ -147,33 +146,47 @@ async function buttonManager(embed, interaction, msg, queue) {
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'approve':
-                    await moveImage(queue);
-                    const image = await database.Image.create({
-                        characterID: sent.characterID,
-                        imageNumber: sent.imageNumber,
-                        imageURL: sent.imageURL,
-                        artist: sent.artist,
-                        nsfw: sent.nsfw,
-                        uploader: sent.uploader,
-                        uploaderid: sent.uploaderid
-                    })
-                    
-                    const sender = await database.Player.findOne({where: {id: sent.uploaderid}}); 
-                    await sender.increment({ gems: 25*(sent.bonus+1), karma: (sent.bonus+1)});
-                    await checker.increment({ gems: 25, karma: 1});
-                    
                     const char = await database.Character.findOne({
                         where: {
                             characterID: sent.characterID
                         }
                     });
+                    if (sent.selfcrop == false) {
+                        await moveImage(queue);
+                        const image = await database.Image.create({
+                            characterID: sent.characterID,
+                            imageNumber: sent.imageNumber,
+                            imageURL: sent.imageURL,
+                            artist: sent.artist,
+                            nsfw: sent.nsfw,
+                            uploader: sent.uploader,
+                            uploaderid: sent.uploaderid
+                        })
+                        const series = await database.Series.findOne({ where: { seriesID: char.seriesID}});
+                        const channel = await interaction.guild.channels.cache.get('949952119052578877');
+                        await channel.send(`${image.imageID}| ${char.characterName} from ${series.seriesName}\nArt by ${sent.artist} and uploaded by ${sent.uploader}`)
+                        await channel.send(`${interaction.user.username} awarded ${50*(sent.bonus+1)}gems and ${sent.bonus+1}karma to uploader.`)
+                        await channel.send(`${sent.imageURL}`);
+                    } else {
+                        const image = await database.Image.findOne({where: {characterID: sent.characterID, imageNumber: sent.imageNumber}});
+                        await image.update({imageURL: sent.imageURL});
+
+                        const series = await database.Series.findOne({ where: { seriesID: char.seriesID}});
+                        const channel = await interaction.guild.channels.cache.get('949952119052578877');
+                        await channel.send(`${image.imageID}| ${char.characterName} from ${series.seriesName}\nArt by ${sent.artist} and edited by ${sent.uploader}`)
+                        await channel.send(`${interaction.user.username} awarded ${50*(sent.bonus+1)}gems and ${sent.bonus+1}karma to uploader.`)
+                        await channel.send(`${sent.imageURL}`);
+                    }
+                    
+                    const sender = await database.Player.findOne({where: {id: sent.uploaderid}}); 
+                    await sender.increment({ gems: 50*(sent.bonus+1), karma: (sent.bonus+1)});
+                    await checker.increment({ gems: 50, karma: 1});
+                    
+                    
 
                     await char.increment({imageCount: 1});
-                    const series = await database.Series.findOne({ where: { seriesID: char.seriesID}});
-                    const channel = await interaction.guild.channels.cache.get('949952119052578877');
-		            await channel.send(`${image.imageID}| ${char.characterName} from ${series.seriesName}\nArt by ${sent.artist} and uploaded by ${sent.uploader}`)
-                    await channel.send(`${interaction.user.username} awarded ${25*(sent.bonus+1)}gems and ${sent.bonus+1}karma to uploader. There will be some delays in reward.`)
-                    await channel.send(`${sent.imageURL}`);
+                    
+                    
                     
                     await database.Swapimage.destroy({
                         where: {imageID: sent.imageID}
