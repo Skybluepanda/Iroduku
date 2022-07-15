@@ -140,7 +140,7 @@ async function buttonManager(embed, interaction, msg, card, attempts) {
         }
         const player = await database.Player.findOne({where: {playerID: interaction.user.id}});
         const filter = i => i.user.id === interaction.user.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         collector.on('collect', async i => {
             i.deferUpdate();
             switch (i.customId){

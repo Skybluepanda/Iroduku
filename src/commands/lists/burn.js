@@ -64,7 +64,7 @@ async function createButton() {
 async function buttonManager(interaction, msg, coins, gems) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
-        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'confirm':
@@ -123,7 +123,7 @@ async function marketCheck() {
 async function buttonManager3(interaction, msg, coins, gems, card) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
-        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         collector.on('collect', async i => {
             i.deferUpdate();
             switch (i.customId){
@@ -758,7 +758,7 @@ async function deployButton2(interaction, embed){
 async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, addgems) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         collector.on('collect', async i => {
             i.deferUpdate();
             switch (i.customId){

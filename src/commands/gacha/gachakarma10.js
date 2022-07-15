@@ -216,6 +216,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 async function createRedCard(cid, interaction) {
     const uid = await interaction.user.id;
     const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const imageCap = await rngImage(cid, interaction);
     const gifCap = await rngGif(cid, interaction);
     const total = await (imageCap + gifCap);
@@ -252,7 +253,7 @@ async function createRedCard(cid, interaction) {
     });
     
     let channel = await interaction.guild.channels.cache.get('948507565577367563');
-    await channel.send(`A luck sack got a Ruby ${cid} | ${char.characterName}!`);
+    await channel.send(`A lucky player got a **Ruby :red_square: ${cid} | ${char.characterName} from ${series.seriesName}!**`);
     await viewRCard(newcard, interaction);
     const gachaString = (`:red_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`);
     
@@ -306,6 +307,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 async function createDiaCard(cid, interaction) {
     const uid = await interaction.user.id;
     const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const imageCap = await rngImage(cid, interaction);
     const gifCap = await rngGif(cid, interaction);
     const total = await (imageCap + gifCap);
@@ -341,7 +343,7 @@ async function createDiaCard(cid, interaction) {
         rarity: 6,
     });
     let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`An extra lucky luck sack got a Diamond ${cid} | ${char.characterName}!`);
+    channel.send(`A luck sack got a **Diamond :large_blue_diamond: ${cid} | ${char.characterName} from ${series.seriesName}!**`);
     await viewDiaCard(newcard, interaction);
     const gachaString = `:large_blue_diamond:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
     return gachaString;

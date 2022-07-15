@@ -127,7 +127,7 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
         await updateButton(embed, interaction, row);
         console.log('button manager ready.');
         const filter = i => i.user.id === interaction.user.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'prev':

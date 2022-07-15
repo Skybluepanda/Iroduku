@@ -53,7 +53,7 @@ async function buttonManager(interaction, msg) {
     try {
         const target = await interaction.options.getUser('targetuser');
         const filter = i => i.user.id === interaction.user.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'accept':
@@ -77,7 +77,7 @@ async function buttonManager2(interaction, msg) {
     try {   
         const target = await interaction.options.getUser('targetuser');
         const filter = i => i.user.id === target.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'accept':

@@ -160,7 +160,7 @@ async function buttonManager(embed, interaction, msg, voteid) {
     try {
         const uid = interaction.user.id;
         const filter = i => i.user.id === interaction.user.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         const image = await checktrack(interaction, voteid+1);
         collector.on('collect', async i => {
             switch (i.customId){

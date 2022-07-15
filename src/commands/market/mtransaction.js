@@ -53,7 +53,7 @@ async function createButton() {
 async function buttonManager3(interaction, msg, coins) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
-        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'buy':

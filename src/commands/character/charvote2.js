@@ -158,7 +158,7 @@ async function buttonManager(embed, interaction, msg, vid) {
         const uid = interaction.user.id;
         const filter = i => i.user.id === interaction.user.id;
         console.log(2);
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         console.log(3);
         collector.on('collect', async i => {
             switch (i.customId){
