@@ -549,7 +549,7 @@ async function viewAzurCard(card, interaction) {
     const azur = await database.Azurite.findOne({where: {cardID: card.cardID}});
     const url = azur.imageURL;
     const artist = azur.artist;
-    url = await image.imageURL;
+    url = await azur.imageURL;
     embedCard.setFooter({text: `Art by ${artist}
 Upload your choice of image using /azuriteupload`}).setImage(url);
     embedCard.setTitle(`${char.characterName}`)

@@ -6,14 +6,14 @@ const database = require('../../database.js');
 async function checkIDS(interaction) {
 	const cid = await interaction.options.getInteger('cid');
 	const gNumber = await interaction.options.getInteger('gifnumber')
-	const char = database.Character.findOne({where: {characterID:cid}});
+	const char = await database.Character.findOne({where: {characterID:cid}});
 	try {
 		if (char) {
 			if (1 <= gNumber && gNumber < 6) {
 				const exist = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gNumber}})
                 const queue = await database.Gifqueue.findOne({ where: {characterID: cid, gifNumber: gNumber}})
-				if (exist || queue) {
-					return await interaction.reply(`Character ${cid} already has an gif ${gNumber}, maximum is 5.`)
+				if (await exist || await queue) {
+					return await interaction.reply(`Character ${cid} already has an gif ${gNumber} or it's queued, maximum is 5.`)
 				} else {
 					return await upload(interaction);
 				};

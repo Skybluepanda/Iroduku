@@ -37,7 +37,7 @@ module.exports = {
         } else if (rank == 3) {
             const exist = await database.Trashon.findOne({where: {playerID: user}});
             if (exist) {
-                return await interaction.reply("Side pool is already toggled.");
+                return await interaction.reply("Extra pool is already toggled.");
             } else {
                 await database.Sideson.destroy({where: {playerID: user}});
                 await database.Trashon.create({

@@ -9,9 +9,7 @@ async function checkIDS(interaction) {
 	const char = database.Character.findOne({where: {characterID:cid}});
 	try {
 		if (char) {
-			console.log(iNumber);
-			console.log(1 <= iNumber && iNumber <= 10);
-			if (1 <= iNumber && iNumber <= 10) {
+			if (1 <= iNumber) {
 				const exist = await database.Image.findOne({ where: {characterID: cid, imageNumber: iNumber}});
 				const queue = await database.Sendqueue.findOne({ where: {characterID: cid, imageNumber: iNumber}});
 				if (exist || queue) {
