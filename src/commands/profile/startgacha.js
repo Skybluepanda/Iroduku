@@ -68,7 +68,7 @@ module.exports = {
                     karma: 300
                 });
                 await database.Votetrack.create({
-                    playerID: user
+                    playerID: userId
                 });
                 const reference = await interaction.options.getUser('reference');
                 if (reference) {

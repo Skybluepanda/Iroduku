@@ -512,6 +512,7 @@ async function createAzurCard(interaction) {
         artist: image.artist,
         season: 1
     })
+    await player.update({apity: 0});
     let channel = interaction.guild.channels.cache.get('948507565577367563');
     channel.send(`A Legendary luck sack got a **Azurite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!!!**`)
     await viewAzurCard(newcard, interaction);
@@ -548,10 +549,13 @@ async function raritySwitch(cid, rngRarity, interaction) {
     const player = await database.Player.findOne({where: {playerID: user}});
     player.increment({gems: -10});
     const pity = Math.floor(player.pity*3/10);
-    if ((rngRarity) >= 99995) {
+    const channel2 = interaction.guild.channels.cache.get('997873272014246018');
+    if ((rngRarity + player.apity) >= 99995) {
+        channel2.send(`${interaction.user} rolled ${rngRarity} with ${player.apity} pity.`)
         return createAzurCard(interaction);
     } else if ((rngRarity) >= 99900) {
-        player.increment({pity: 1});
+        channel2.send(`${interaction.user} rolled ${rngRarity}.`)
+        player.increment({apity: 1});
         return createDiaCard(cid, interaction);
     } else if (rngRarity + pity >= 99200) {
         if (player.pity < 400) {
@@ -590,12 +594,11 @@ async function azurWishlist(interaction) {
 async function azurchar(interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
-    const rngChar = Math.floor(Math.random() * 20);
+    const rngChar = Math.floor(Math.random() * 20 + player.apity);
     const wcount = await database.Wishlist.count({where: {playerID: user}})
     let cid;
-    if (wcount >= 5 && (rngChar >= 10 || player.apity == 1) && (azurWishlist(interaction))) {
+    if (wcount >= 5 && (rngChar >= 10) && (azurWishlist(interaction))) {
         const wlist = await database.Wishlist.findAll({where: {playerID: user}})
-        await player.update({apity: 0});
         const rngChar = Math.floor(Math.random() * 1000);
         const char = (rngChar%wlist.length);
         cid = await wlist[char].characterID;
@@ -603,7 +606,6 @@ async function azurchar(interaction) {
         const rngChar = Math.floor(Math.random() * 10000);
         const count = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
         const offset = (rngChar%count);
-        await player.update({apity: 1});
         const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
         cid = await char.characterID;
     }

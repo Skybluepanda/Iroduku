@@ -347,7 +347,6 @@ async function createDiaCard(cid, interaction) {
     await viewDiaCard(newcard, interaction);
     const gachaString = `:large_blue_diamond:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
     return gachaString;
-    
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -394,6 +393,77 @@ Gif ID is ${image.gifID} report any errors using ID.
     await interaction.followUp({embeds: [embedCard]});
 }
 
+async function createAzurCard(interaction) {
+    const cid = await azurchar(interaction);
+    const uid = await interaction.user.id;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
+    const image = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
+    const inumber = await inventorycheck(uid)
+    const newcard = await database.Card.create({
+        playerID: uid,
+        characterID: cid,
+        inventoryID: inumber,
+        rarity: 9,
+    });
+    await database.Azurite.create({
+        cardID: newcard.cardID,
+        imageURL: image.imageURL,
+        artist: image.artist,
+        season: 1
+    })
+    let channel = interaction.guild.channels.cache.get('948507565577367563');
+    channel.send(`A luck sack got an **Azurite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!**`)
+    await viewAzurCard(newcard, interaction);
+    const gachaString = `:diamond_shape_with_a_dot_inside:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
+    return gachaString;
+}
+
+async function viewAzurCard(card, interaction) { 
+    const embedCard = new MessageEmbed();
+    const cid = await card.characterID
+    const char = await database.Character.findOne({where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
+    const azur = await database.Azurite.findOne({where: {cardID: card.cardID}});
+    const url = azur.imageURL;
+    const artist = azur.artist;
+    
+    url = await image.imageURL;
+    embedCard.setFooter(`Art by ${artist}
+Upload your choice of image using /azuriteupload`).setImage(url)
+    embedCard.setTitle(`${char.characterName}`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity: Azurite**
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+        .setColor(color.azur);
+    await interaction.followUp({embeds: [embedCard]});
+}
+
+async function azurchar(interaction) {
+    const user = interaction.user.id;
+    let cid;
+    if (await checkAzurWl(interaction)) {
+        const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+        const rngChar = Math.floor(Math.random() * 1000);
+        const char = (rngChar%wlist.length);
+        cid = await wlist[char].characterID;
+    } else {
+        const rngChar = Math.floor(Math.random() * 10000);
+        const count = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
+        const offset = (rngChar%count);
+        const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
+        cid = await char.characterID;
+    }
+    const exists = await database.Card.findOne({where: {rarity: 9, characterID: cid}});
+    if (exists) {
+        return await azurchar(interaction);
+    } else {
+        return cid;
+    }
+}
 
 
 async function raritySwitch(cid, rngRarity, interaction) {
@@ -401,17 +471,19 @@ async function raritySwitch(cid, rngRarity, interaction) {
     const player = await database.Player.findOne({where: {playerID: user}});
     const kity = Math.floor(player.kpity/10)
     await player.increment({karma: -10});
-    if (rngRarity + kity == 9984 || player.kpity >= 240) {
-        if (player.kpity < 240) {
+    if (rngRarity >= 9999) {
+        return createAzurCard(interaction);
+    } else if (rngRarity + kity >= 9970 || player.kpity >= 200) {
+        if (player.kpity < 200) {
             await player.update({kpity: 0});
         } else {
-            await player.increment({kpity: -240});
+            await player.increment({kpity: -200});
         }
         return createDiaCard(cid, interaction);
-    } else if (rngRarity >= 9684) {
+    } else if (rngRarity >= 9500) {
         await player.increment({kpity: 1});
         return createRedCard(cid, interaction);
-    } else if (rngRarity >= 6000) {
+    } else if (rngRarity >= 5500) {
         await player.increment({kpity: 1});
         return createPurpleCard(cid, interaction);
     } else {
@@ -430,6 +502,16 @@ async function gacha(interaction) {
     return await raritySwitch(cid, rngRarity, interaction);
 }
 
+async function checkAzurWl(interaction) {
+    const wlist = await database.Wishlist.findAll({where: {playerID: interaction.user.id}})
+    for (let i = 0; i < wlist.length; i++ ) {
+        if (await database.Card.count({where: {characterID: wlist[0].characterID, rarity: 9}}) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('gktenroll')
@@ -442,6 +524,9 @@ module.exports = {
             const embedS = await embedSucess(interaction);
             if(player) {
                 if (player.karma >= 100){
+                    if (await checkAzurWl(interaction)) {
+                        await interaction.channel.send("Azurite for your wishlist is depleted, you'll recieve a random Azurite instead of one from your wishlist.")
+                    }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
                     if (wlist >= 5) {
                         await interaction.reply({embeds: [embedS]});

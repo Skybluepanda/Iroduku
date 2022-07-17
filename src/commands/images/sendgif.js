@@ -7,14 +7,15 @@ async function checkIDS(interaction) {
 	const cid = await interaction.options.getInteger('cid');
 	const gNumber = await interaction.options.getInteger('gifnumber')
 	const char = await database.Character.findOne({where: {characterID:cid}});
+	const exist = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gNumber}})
+	const queue = await database.Gifqueue.findOne({ where: {characterID: cid, gifNumber: gNumber}})
 	try {
 		if (char) {
 			if (1 <= gNumber && gNumber < 6) {
-				const exist = await database.Gif.findOne({ where: {characterID: cid, gifNumber: gNumber}})
-                const queue = await database.Gifqueue.findOne({ where: {characterID: cid, gifNumber: gNumber}})
-				if (await exist || await queue) {
+				if (exist || queue) {
 					return await interaction.reply(`Character ${cid} already has an gif ${gNumber} or it's queued, maximum is 5.`)
 				} else {
+					console.log("passed the checkids");
 					return await upload(interaction);
 				};
 			} else {
@@ -51,6 +52,7 @@ async function check(interaction) {
 
 async function upload(interaction) {
     try {
+		console.log(1)
         const cid = await interaction.options.getInteger('cid');
 		const char = await database.Character.findOne({where: {characterID: cid}})
         const iNumber = await interaction.options.getInteger('gifnumber');
@@ -60,10 +62,12 @@ async function upload(interaction) {
 
         // await check(interaction);
         const url = await interaction.options.getString('gif_link');
+		console.log(2)
         // const message = await interaction.fetchReply();
 		let gif;
         // const link = await message.attachments.first().url;
         if (url.endsWith(".gif")) {
+			console.log(3)
             gif = await database.Gifqueue.create({
                 characterID: cid,
                 gifNumber: iNumber,
@@ -82,11 +86,12 @@ async function upload(interaction) {
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
 		// await database.Player.increment({gems: 25, karma: 1}, {where: {playerID: interaction.user.id}})
+		console.log(4)
 		const channel = await interaction.guild.channels.cache.get('950318845430726686');
 		await channel.send(`${cid} | ${char.characterName}'s image ${iNumber}
-uploaded by ${uploader} and art by ${art}.
-Self crop: ${selfcrop}`);
+uploaded by ${uploader} and art by ${art}.`);
 		await channel.send(`${url}`);
+		console.log(5)
         return await interaction.reply(`Gif for ${char.characterName} has been added!
 Gif ID (for deleteing and editing): ${gif.gifID}
 Gif Number: ${iNumber}. 
@@ -128,11 +133,6 @@ module.exports = {
 			try {
             // interaction.reply("Uploading gif.");
 			await checkIDS(interaction);
-			// if (checkNSFW(interaction)){
-			// 	checkIDS(interaction);
-			// } else {
-			// 	return await interaction.reply("None NSFW images have number 0-9, NSFW images have number 10-24")
-			// }
 			} catch(error){
 				await interaction.channel.send("Error has occured");
 			}

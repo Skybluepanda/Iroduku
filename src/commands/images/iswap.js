@@ -5,20 +5,24 @@ const database = require('../../database.js');
 
 async function checkIDS(interaction) {
 	const cid = interaction.options.getInteger('cid');
+	const edit = await interaction.options.getBoolean('edit');
 	const iNumber = interaction.options.getInteger('image_number')
 	const char = database.Character.findOne({where: {characterID:cid}});
 	try {
 		if (char) {
-			const total = await database.Swapimage.count();
-			if (total >= 50) {
-				return interaction.reply("Send queue is at max capacity, annoy the image mods to complete their screening.")
-			}
 			const imageCount = await database.Image.count({where: {characterID: cid}});
-			if (imageCount >= 10) {
+			if (imageCount >= 10 && !edit) {
 				//check if there's already a swap for the same image slot
 				const exist = await database.Swapimage.findOne({ where: {characterID: cid, imageNumber: iNumber}});
 				if (exist) {
-					await interaction.reply(`Character ${cid} already has an image ${iNumber}, maximum is 10.`)
+					await interaction.reply(`Character ${cid} already has an image ${iNumber} swap request.`)
+				} else {
+					upload(interaction);
+				};
+			} else if (edit) {
+				const exist = await database.Swapimage.findOne({ where: {characterID: cid, imageNumber: iNumber}});
+				if (exist) {
+					await interaction.reply(`Character ${cid} already has an image ${iNumber} swap request.`)
 				} else {
 					upload(interaction);
 				};
