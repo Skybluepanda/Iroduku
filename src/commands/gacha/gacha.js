@@ -617,6 +617,7 @@ Gif ID is ${image.gifID} report any errors using ID
 async function createAzurCard(interaction) {
     const cid = await azurchar(interaction);
     const uid = await interaction.user.id;
+    const player = await database.Player.findOne({where: {playerID: user}});
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const image = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
@@ -627,12 +628,21 @@ async function createAzurCard(interaction) {
         inventoryID: inumber,
         rarity: 9,
     });
-    await database.Azurite.create({
-        cardID: newcard.cardID,
-        imageURL: image.imageURL,
-        artist: image.artist,
-        season: 1
-    })
+    if (image) {
+        await database.Azurite.create({
+            cardID: newcard.cardID,
+            imageURL: image.imageURL,
+            artist: image.artist,
+            season: 1
+        })
+    } else {
+        await database.Azurite.create({
+            cardID: newcard.cardID,
+            imageURL: 'https://cdn.discordapp.com/attachments/948195855742165013/998254327523180685/stockc.png',
+            artist: image.artist,
+            season: 1
+        })
+    }
     await player.update({apity: 0});
     let channel = interaction.guild.channels.cache.get('948507565577367563');
     channel.send(`A Legendary luck sack got a **Azurite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!!!**`)
@@ -669,14 +679,18 @@ async function raritySwitch(cid, rngRarity, interaction) {
     player.increment({gems: -10});
     const pity = Math.floor(player.pity*3/10);
     const channel2 = interaction.guild.channels.cache.get('997873272014246018');
-    if ((rngRarity + player.apity) >= 99995) {
+    const apityrng = await (rngRarity + player.apity);
+    console.log(`rng is ${rngRarity}`);
+    console.log(`apity is ${apityrng}`);
+    const pityrng = await (rngRarity + pity);
+    if ((apityrng) >= 99995) {
         channel2.send(`${interaction.user} rolled ${rngRarity} with ${player.apity} pity.`)
         await createAzurCard(interaction);
     } else if ((rngRarity) >= 99900) {
         channel2.send(`${interaction.user} rolled ${rngRarity}.`)
         player.increment({apity: 1});
         await createDiaCard(cid, interaction);
-    } else if (rngRarity + pity >= 99200) {
+    } else if (pityrng >= 99200) {
         if (player.pity < 400) {
             await player.update({pity: 0});
         } else {

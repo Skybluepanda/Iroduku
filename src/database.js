@@ -525,6 +525,11 @@ const Player = sequelize.define('player', {
 		unique: false,
 		defaultValue: 0,
 	},
+	apity: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		defaultValue: 0,
+	},
 });
 
 const Daily = sequelize.define('daily', { 
@@ -764,6 +769,8 @@ const Azurite = sequelize.define('azurite', {
 		unique: false,
 	},
 });
+
+const Refferee = sequelize.define
 
 
 exports.sequelize = sequelize;

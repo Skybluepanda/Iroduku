@@ -59,7 +59,7 @@ async function border(interaction) {
 			await interaction.reply({ files: [attachment] });
 			return true;
 		} else {
-			await interaction.reply("Image error.")
+			await interaction.reply("Something went wrong with the image link, make sure your image is jpeg or png.")
 			return false;
 		}
 	} catch(error) {

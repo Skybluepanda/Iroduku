@@ -165,28 +165,28 @@ async function buttonManager(embed, interaction, msg, voteid) {
         collector.on('collect', async i => {
             switch (i.customId){
                 case '0':
-                    await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
+                    await database.Votetrack.update({imageVote: voteid}, {where: {playerID: uid}})
                     await database.Player.increment({karma: 2}, {where: {playerID: uid}});
                     await database.Swapimage.increment({no: 1}, {where: {imageID: voteid}});
                     await isvote(embed, interaction, image);
                     break;
                 
                 case '1':
-                    await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
+                    await database.Votetrack.update({imageVote: voteid}, {where: {playerID: uid}})
                     await database.Player.increment({karma: 2}, {where: {playerID: uid}});
                     await database.Swapimage.increment({yes: 1}, {where: {imageID: voteid}});
                     await isvote(embed, interaction, image);
                     break;
                 
                 case '2':
-                    await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
+                    await database.Votetrack.update({imageVote: voteid}, {where: {playerID: uid}})
                     await database.Player.increment({karma: 2}, {where: {playerID: uid}});
                     await database.Swapimage.increment({another: 1}, {where: {imageID: voteid}});
                     await isvote(embed, interaction, image);
                     break;
 
                 case '3':
-                    await database.Votetrack.increment({imageVote: 1}, {where: {playerID: uid}})
+                    await database.Votetrack.update({imageVote: voteid}, {where: {playerID: uid}})
                     await database.Player.increment({karma: 2}, {where: {playerID: uid}});
                     await database.Swapimage.increment({abstain: 1}, {where: {imageID: voteid}});
                     await isvote(embed, interaction, image);

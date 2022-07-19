@@ -23,6 +23,17 @@ async function embedError(interaction) {
     return embed;
 }
 
+async function embedStart(interaction) {
+    const embed = new MessageEmbed();
+
+    embed.setTitle("Creating Card")
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription("Rolling for rarity and character from your wishlist...")
+        .setColor(color.successgreen);
+    
+    return embed;
+}
+
 async function embedSucess(interaction) {
     const embed = new MessageEmbed();
 
@@ -146,7 +157,7 @@ Gif ID is ${image.gifID} report any errors using ID.`}).setImage(url)
 **Rarity:** Lapis
 **Quantity:** ${card.quantity}`)
         .setColor(color.blue);
-    return await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 ///Purple Zone
@@ -235,7 +246,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
-    return await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 
@@ -327,7 +338,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Ruby**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
-    return await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 async function createDiaCard(cid, interaction) {
@@ -414,7 +425,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Rarity: Diamond**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
-    return await interaction.reply({embeds: [embedCard]});
+    return await interaction.editReply({embeds: [embedCard]});
 }
 
 async function createAzurCard(interaction) {
@@ -430,12 +441,21 @@ async function createAzurCard(interaction) {
         inventoryID: inumber,
         rarity: 9,
     });
-    await database.Azurite.create({
-        cardID: newcard.cardID,
-        imageURL: image.imageURL,
-        artist: image.artist,
-        season: 1
-    })
+    if (image) {
+        await database.Azurite.create({
+            cardID: newcard.cardID,
+            imageURL: image.imageURL,
+            artist: image.artist,
+            season: 1
+        })
+    } else {
+        await database.Azurite.create({
+            cardID: newcard.cardID,
+            imageURL: 'https://cdn.discordapp.com/attachments/948195855742165013/998254327523180685/stockc.png',
+            artist: 'Image 1 Missing',
+            season: 1
+        })
+    }
     let channel = interaction.guild.channels.cache.get('948507565577367563');
     channel.send(`A luck sack got an **Azurite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!**`)
     await viewAzurCard(newcard, interaction);
@@ -494,7 +514,7 @@ async function raritySwitch(cid, rngRarity, interaction) {
     const kity = Math.floor(player.kpity/10)
     await player.increment({karma: -10});
     if (rngRarity >= 9999 ) {
-        return createAzurCard(interaction);
+        await createAzurCard(interaction);
     } else if (rngRarity + kity >= 9970 || player.kpity >= 200) {
         if (player.kpity < 200) {
             await player.update({kpity: 0});
@@ -543,6 +563,7 @@ module.exports = {
             const user = interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: user}});
             const embedE = await embedError(interaction);
+            const embedS = await embedStart(interaction);
             if(player) {
                 if (player.karma >= 10){
                     if (await checkAzurWl(interaction)) {
@@ -550,6 +571,7 @@ module.exports = {
                     }
                     const wlist = await database.Wishlist.count({where: {playerID: user}})
                     if (wlist >= 5) {
+                        await interaction.reply({embeds: [embedS]});
                         await gacha(interaction);
                     }else {
                         await interaction.channel.send("Karma Gacha uses your wishlist as the character pool. Please add at least 5 characters to your wishlist before continuing.")

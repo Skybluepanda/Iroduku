@@ -14,9 +14,9 @@ module.exports = {
         .setDescription('Initiates player profile')
         .addUserOption(option => 
             option
-                .setName("reference")
+                .setName("referrer")
                 .setDescription("The person who introduced you to the bot.")
-                .setRequired(false)
+                .setRequired(true)
                 ),
     async execute(interaction) {
         const username = interaction.user.username;
@@ -70,13 +70,17 @@ module.exports = {
                 await database.Votetrack.create({
                     playerID: userId
                 });
-                const reference = await interaction.options.getUser('reference');
+                const reference = await interaction.options.getUser('referrer');
                 if (reference) {
                     const refplayer = await database.Player.findOne({whhere: {playerID: reference.id}});
                     if (refplayer) {
                         await database.Player.increment({karma: 100}, {where: {playerID: reference.id}});
                         embedNew.setDescription(`Profile ${username} was created using discord ID ${userId}
-    Reference ${reference.toString()} was rewarded 100 karma!`);
+Referrer ${reference.toString()} was rewarded 100 karma!`);
+                    } else {
+                        await database.Player.increment({karma: 100}, {where: {playerID: reference.id}});
+                        embedNew.setDescription(`Profile ${username} was created using discord ID ${userId}
+Referrer wasn't found. Ask a mod about it.`);
                     }
                 }
             }

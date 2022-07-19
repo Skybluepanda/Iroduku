@@ -399,6 +399,7 @@ async function createAzurCard(interaction) {
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const image = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
+    
     const inumber = await inventorycheck(uid)
     const newcard = await database.Card.create({
         playerID: uid,
@@ -406,12 +407,22 @@ async function createAzurCard(interaction) {
         inventoryID: inumber,
         rarity: 9,
     });
-    await database.Azurite.create({
-        cardID: newcard.cardID,
-        imageURL: image.imageURL,
-        artist: image.artist,
-        season: 1
-    })
+    if (image) {
+        await database.Azurite.create({
+            cardID: newcard.cardID,
+            imageURL: image.imageURL,
+            artist: image.artist,
+            season: 1
+        })
+    } else {
+        await database.Azurite.create({
+            cardID: newcard.cardID,
+            imageURL: 'https://cdn.discordapp.com/attachments/948195855742165013/998254327523180685/stockc.png',
+            artist: 'Image 1 Missing',
+            season: 1
+        })
+    }
+    
     let channel = interaction.guild.channels.cache.get('948507565577367563');
     channel.send(`A luck sack got an **Azurite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!**`)
     await viewAzurCard(newcard, interaction);
