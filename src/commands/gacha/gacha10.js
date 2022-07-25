@@ -538,8 +538,6 @@ async function viewAzurCard(card, interaction) {
     const azur = await database.Azurite.findOne({where: {cardID: card.cardID}});
     const url = azur.imageURL;
     const artist = azur.artist;
-    
-    url = await azur.imageURL;
     embedCard.setFooter({text: `Art by ${artist}
 Upload your choice of image using /azuriteupload`}).setImage(url);
     embedCard.setTitle(`${char.characterName}`)
@@ -550,7 +548,7 @@ Upload your choice of image using /azuriteupload`}).setImage(url);
 **Rarity: Azurite**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.azur);
-    await interaction.reply({embeds: [embedCard]});
+    await interaction.followUp({embeds: [embedCard]});
 }
 
 
@@ -560,7 +558,7 @@ async function raritySwitch(cid, rngRarity, interaction) {
     player.increment({gems: -10});
     const pity = Math.floor(player.pity*3/10);
     const channel2 = interaction.guild.channels.cache.get('997873272014246018');
-    const apityrng = await (rngRarity + player.apity);
+    const apityrng = await (rngRarity + player.apity/4);
     const pityrng = await (rngRarity + pity);
     if (apityrng >= 99995) {
         channel2.send(`${interaction.user} rolled ${rngRarity} with ${player.apity} pity.`)
@@ -606,10 +604,10 @@ async function azurWishlist(interaction) {
 async function azurchar(interaction) {
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
-    const rngChar = Math.floor(Math.random() * 20 + player.apity);
+    const rngpool = Math.floor(Math.random() * 1000 + player.apity);
     const wcount = await database.Wishlist.count({where: {playerID: user}})
     let cid;
-    if (wcount >= 5 && (rngChar >= 10) && (azurWishlist(interaction))) {
+    if (wcount >= 5 && (rngpool >= 500) && (azurWishlist(interaction))) {
         const wlist = await database.Wishlist.findAll({where: {playerID: user}})
         const rngChar = Math.floor(Math.random() * 1000);
         const char = (rngChar%wlist.length);

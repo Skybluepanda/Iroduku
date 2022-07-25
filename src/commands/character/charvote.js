@@ -96,6 +96,7 @@ Character ID: ${char.characterID}
 Character Alias: ${char.alias}
 Series: ${char.seriesID} | ${series.seriesName}
 
+Vote 2 for characters you want and 0 if you don't want, and 1 if they are somewhere in between.
 If the image isn't updated, it means they don't have a pic 1.
 Try refresh if image or name doesn't match.
 `)
@@ -105,6 +106,7 @@ Character ID: ${char.characterID}
 Character Alias: ${char.alias}
 Series: ${char.seriesID} | ${series.seriesName}
 
+Vote 2 for characters you want and 0 if you don't want, and 1 if they are somewhere in between.
 If the image isn't updated, it means they don't have a pic 1.
 Try refresh if image or name doesn't match.
 `)

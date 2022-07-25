@@ -1167,6 +1167,7 @@ module.exports = {
         const uid = interaction.user.id;
         try {
             if (burnCooldown.get(uid)) {
+                burnCooldown.delete(uid);
                 return interaction.reply("Existing Burn Command in Progress.");
             } else {
                 burnCooldown.set(uid, true);

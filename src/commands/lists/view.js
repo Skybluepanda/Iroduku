@@ -69,7 +69,7 @@ async function viewGreenCard(card, interaction) {
     if (image) {
         embedCard.setImage(image.imageURL)
             .setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-        Image ID is ${image.imageID} report any errors using ID.`)
+Image ID is ${image.imageID} report any errors using ID.`)
     } else {
         embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
     }

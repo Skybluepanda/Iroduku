@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageAttachment } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('borderplus')
+		.setName('border')
 		.setDescription('adding the border to the desired image. Image should be 225x350px in size.')
 		.addStringOption(option => option
 			.setName('imagelink')

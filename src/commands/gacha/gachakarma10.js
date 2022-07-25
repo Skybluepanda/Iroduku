@@ -399,7 +399,6 @@ async function createAzurCard(interaction) {
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const image = await database.Image.findOne({where: {characterID: cid, imageNumber: 1}});
-    
     const inumber = await inventorycheck(uid)
     const newcard = await database.Card.create({
         playerID: uid,
@@ -438,8 +437,6 @@ async function viewAzurCard(card, interaction) {
     const azur = await database.Azurite.findOne({where: {cardID: card.cardID}});
     const url = azur.imageURL;
     const artist = azur.artist;
-    
-    url = await image.imageURL;
     embedCard.setFooter(`Art by ${artist}
 Upload your choice of image using /azuriteupload`).setImage(url)
     embedCard.setTitle(`${char.characterName}`)

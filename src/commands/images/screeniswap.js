@@ -253,9 +253,9 @@ module.exports = {
 		.setDescription('Command for image mod to screen images.'),
 	async execute(interaction) { 
         try {
-            if (!interaction.member.roles.cache.has('951960776380416000')) {
-                return interaction.reply("You don't have the image mod role!", {ephemeral: true});
-            };
+            // if (!interaction.member.roles.cache.has('951960776380416000')) {
+            //     return interaction.reply("You don't have the image mod role!", {ephemeral: true});
+            // };
             const uid = interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: uid}});
             if (player) {

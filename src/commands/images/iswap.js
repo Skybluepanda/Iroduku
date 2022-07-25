@@ -167,11 +167,11 @@ async function upload(interaction) {
 		// const char = await database.Character.findOne({where: {characterID:cid}});
 		// await char.increment('imageCount', {by: 1});
 		// await database.Player.increment({gems: 75, karma: 3}, {where: {playerID: interaction.user.id}})
-		const channel = await interaction.guild.channels.cache.get('950318845430726686');
-		await channel.send(`${cid} | ${char.characterName}'s image ${iNumber}
-uploaded by ${uploader} and art by ${art}.
-Small Edit: ${selfcrop}`);
-		await channel.send(`${imagelink}`);
+// 		const channel = await interaction.guild.channels.cache.get('950318845430726686');
+// 		await channel.send(`${cid} | ${char.characterName}'s image ${iNumber}
+// uploaded by ${uploader} and art by ${art}.
+// Small Edit: ${selfcrop}`);
+// 		await channel.send(`${imagelink}`);
 		return await interaction.channel.send(`Image for ${char.characterName} added!
 Image ID (One u use for delete and edit): ${image.imageID}
 Image Number: ${iNumber}
@@ -226,22 +226,23 @@ module.exports = {
 	async execute(interaction) {
 		//check if character exists, and image number is empty
 		//than create the image in database with all details.
-		if (interaction.channel.id === '947123054570512395') {
-            if (!interaction.member.roles.cache.has('947640668031975465')) {
-                return interaction.reply("You don't have the image sender role!", {ephemeral: true});
-            };
-			try {
-				checkIDS(interaction);
-				// if (checkNSFW(interaction)){
-				// 	checkIDS(interaction);
-				// } else {
-				// 	return await interaction.reply("None NSFW images have number 0-9, NSFW images have number 10-24")
-				// }
-			} catch(error){
-				await interaction.channel.send("Error has occured");
-			}
-		} else {
-			interaction.reply("use #send-image to send images please.")
-		}
+		await checkIDS(interaction);
+		// if (interaction.channel.id === '947123054570512395') {
+        //     if (!interaction.member.roles.cache.has('947640668031975465')) {
+        //         return interaction.reply("You don't have the image sender role!", {ephemeral: true});
+        //     };
+		// 	try {
+		// 		checkIDS(interaction);
+		// 		// if (checkNSFW(interaction)){
+		// 		// 	checkIDS(interaction);
+		// 		// } else {
+		// 		// 	return await interaction.reply("None NSFW images have number 0-9, NSFW images have number 10-24")
+		// 		// }
+		// 	} catch(error){
+		// 		await interaction.channel.send("Error has occured");
+		// 	}
+		// } else {
+		// 	interaction.reply("use #send-image to send images please.")
+		// }
 	}
 }

@@ -9,10 +9,10 @@ var dayjs = require('dayjs')
 dayjs().format()
 
 
-async function checkImage(interaction, cardID){
-    const artist = await interaction.options.getString('artist');
-    if (artist) {
-        await database.Special.update({artist: artist}, {where: {cardID: cardID}})
+async function checkImage(interaction, card){
+    const art = await interaction.options.getString('artist');
+    if (art) {
+        await database.Azurite.update({artist: art}, {where: {cardID: card.cardID}})
     }
     const imageURL = await interaction.options.getString('imageurl');
     console.log(imageURL);
@@ -20,29 +20,34 @@ async function checkImage(interaction, cardID){
         console.log("10");
         if (imageURL.endsWith('.png') || imageURL.endsWith('.gif')) {
             console.log("11");
-            await database.Special.update({imageURL: imageURL}, {where: {cardID: cardID}});
+            await database.Azurite.update({imageURL: imageURL}, {where: {cardID: card.cardID}});
             console.log("12");
         } else {
             await interaction.channel.send("that's not a image or a gif.")
         }
     }
+    
+    await viewSpeCard(card, interaction);
     return;
 }
 
 async function viewSpeCard(card, interaction) { 
-    const special = await database.Special.findOne({where: {cardID: card.cardID}});
+    const azur = await database.Azurite.findOne({where: {cardID: card.cardID}});
+    const cid = await card.characterID
+    const char = await database.Character.findOne({where: {characterID: cid}});
+    const series = await database.Series.findOne({where: {seriesID: char.seriesID}});
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
-    embedCard.setFooter(`Art by ${special.artist}
-*edit card with /spedit*`).setImage(special.imageURL)
-    embedCard.setTitle(`${special.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Card Info
-**LID:** ${card.inventoryID}
-**Series:** ${special.seriesName}
-**Rarity: Special**
+    embedCard.setFooter({text: `Art by ${azur.artist}
+Upload your choice of image using /azuriteupload`}).setImage(azur.imageURL);
+        embedCard.setTitle(`${char.characterName}`)
+            .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+            .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity: Azurite**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
-        .setColor(special.color);
+        .setColor(color.azur);
     return await interaction.reply({embeds: [embedCard]});
 }
 
@@ -61,13 +66,13 @@ module.exports = {
             option
                 .setName("imageurl")
                 .setDescription("The image of the Special card. Send URL of a bordered image or gif.")
-                .setRequired(false)
+                .setRequired(true)
                 )
         .addStringOption(option => 
             option
                 .setName("artist")
                 .setDescription("The artist of the Special card.")
-                .setRequired(false)
+                .setRequired(true)
                 ),
 	async execute(interaction) {
 		//first bring up list from 1 for default call.
@@ -85,8 +90,7 @@ module.exports = {
             if (card) {
                 console.log("3");
                 if (card.rarity == 9) {
-                    await checkImage(interaction, card.cardID);
-                    await viewSpeCard(card, interaction);
+                    await checkImage(interaction, card);
                     
                 } else {
                     return interaction.reply(`Card ${lid} is not an Azurite Card. Check your list.`)
@@ -95,7 +99,7 @@ module.exports = {
                 return interaction.reply(`Card ${lid} doesn't exist. Check your list.`)
             }
         } catch (error) {
-            return interaction.channel.send("Error has occured");
+            return interaction.channel.send(`Error has occured\n${error}`);
         }
 	},
 };

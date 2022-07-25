@@ -61,7 +61,7 @@ async function checkDaily(interaction, player){
             await streakDaily(interaction, player, daily);
             await database.Daily.update({lastDaily: timeNow}, {where: {playerID: userId}});
             await database.Daily.increment({streak: 1}, {where: {playerID: userId}});
-        } else if (timeDiff <= 79200000) {
+        } else if (timeDiff <= 79200000){
             await cooldownDaily(interaction, timeDiff);
         } else {
             await resetDaily(interaction, player);

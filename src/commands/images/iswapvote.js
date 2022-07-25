@@ -8,46 +8,41 @@ const { createCanvas, loadImage, Canvas } = require('canvas');
 
 async function checktrack(interaction, voteid) {
     const user = interaction.user.id;
-    const first = await database.Swapimage.findAll({
+    const first = await database.Swapimage.findOne({
         order: [['imageID','ASC']],
         where: {imageID: {[Op.gte]: voteid}
     }});
     const track = await database.Votetrack.findOne({
         where: {playerID: user}
     });
-    for (let i = 0; i < first.length; i++) {
-        if (first[i].imageID >= track.imageVote) {
-            return first[i].imageID;
-        }
-    }
-    return 0;
+    return first.imageID;
+    // for (let i = 0; i < first.length; i++) {
+    //     if (first[i].imageID >= track.imageVote) {
+    //         return first[i].imageID;
+    //     }
+    // }
+    // return 0;
 }
 
 async function start(interaction) {
     const user = interaction.user.id;
     const embed = await createEmbed(interaction);
-    const first = await database.Swapimage.findOne({
-        order: [['imageID','ASC']]
-    })
     const track = await database.Votetrack.findOne({
         where: {playerID: user}
-    });
-    
+    });  
+    const first = await database.Swapimage.findOne({
+        order: [['imageID','ASC']],
+        where: {imageID: {[Op.gte]: track.imageVote}
+    }})
     let image;
-
-    
     if (track) {
-        if (first) {
-            console.log(track.imageVote);
-            console.log(first.imageID);
-            image = await checktrack(interaction, track.imageVote);
-            console.log(image);
-            //compare it to Vote track and push vote track up to date.
-        } else {
+        if (!first) {
             embed.setDescription(`You are done for now as there are no new swaps.
 There will be a command in the future to let you know if there are new swaps to vote for.
 Thank you so much for doing isvote!`);
             return await interaction.reply({embeds: [embed]});
+            //compare it to Vote track and push vote track up to date.
+        } else {
             //return no swap available.
         }
     } else {
@@ -57,31 +52,39 @@ Thank you so much for doing isvote!`);
         return start(interaction);
     }
     await interaction.reply({embeds: [embed]});
-    await isvote(embed, interaction, image);
+    await isvote(embed, interaction);
 }
 
 function createEmbed(interaction) {
     const embed = new MessageEmbed();
 
     embed.setTitle("Starting isvote")
-        .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
+        .setAuthor(interaction.user.username,interaction.user.avatarURL({ dynamic: true }))
         .setDescription("Starting")
         .setColor(color.failred);
     return embed;
 }
 
-async function isvote(embed, interaction, image) {
+async function isvote(embed, interaction) {
     try {
+        console.log(1)
+        const track = await database.Votetrack.findOne({
+            where: {playerID: interaction.user.id}
+        });  
+        console.log(2)
         const swaps = await database.Swapimage.findOne({
-            where: {imageID: image}
-        });
+            order: [['imageID','ASC']],
+            where: {imageID: {[Op.gte]: track.imageVote}
+        }});
+        console.log(3)
         if (swaps) {
-            console.log("3");
+            console.log(4)
             const char = await database.Character.findOne({
                 where: {
                     characterID: swaps.characterID
                 }
             });
+
             const series = await database.Series.findOne({ where: { seriesID: char.seriesID}});
             console.log("5");
             await embed.setDescription(`
@@ -111,7 +114,7 @@ Or you may choose to abstain.
             console.log("7");
             const msg = await interaction.editReply({embeds: [embed], components: [row], fetchReply: true});
             console.log("8");
-            await buttonManager(embed, interaction, msg, image);
+            await buttonManager(embed, interaction, msg, swaps.imageID);
             console.log("9");
         } else {
             console.log("10");
@@ -156,45 +159,43 @@ async function createButton() {
     }
 }
 
-async function buttonManager(embed, interaction, msg, voteid) {
+async function buttonManager(embed, interaction, msg, swaps) {
     try {
         const uid = interaction.user.id;
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
-        const image = await checktrack(interaction, voteid+1);
         collector.on('collect', async i => {
             switch (i.customId){
                 case '0':
-                    await database.Votetrack.update({imageVote: voteid}, {where: {playerID: uid}})
+                    await database.Votetrack.update({imageVote: swaps+1}, {where: {playerID: uid}})
                     await database.Player.increment({karma: 2}, {where: {playerID: uid}});
-                    await database.Swapimage.increment({no: 1}, {where: {imageID: voteid}});
-                    await isvote(embed, interaction, image);
+                    await database.Swapimage.increment({no: 1}, {where: {imageID: swaps}});
+                    await isvote(embed, interaction);
                     break;
                 
                 case '1':
-                    await database.Votetrack.update({imageVote: voteid}, {where: {playerID: uid}})
+                    await database.Votetrack.update({imageVote: swaps+1}, {where: {playerID: uid}})
                     await database.Player.increment({karma: 2}, {where: {playerID: uid}});
-                    await database.Swapimage.increment({yes: 1}, {where: {imageID: voteid}});
-                    await isvote(embed, interaction, image);
+                    await database.Swapimage.increment({yes: 1}, {where: {imageID: swaps}});
+                    await isvote(embed, interaction);
                     break;
                 
                 case '2':
-                    await database.Votetrack.update({imageVote: voteid}, {where: {playerID: uid}})
+                    await database.Votetrack.update({imageVote: swaps+1}, {where: {playerID: uid}})
                     await database.Player.increment({karma: 2}, {where: {playerID: uid}});
-                    await database.Swapimage.increment({another: 1}, {where: {imageID: voteid}});
-                    await isvote(embed, interaction, image);
+                    await database.Swapimage.increment({another: 1}, {where: {imageID: swaps}});
+                    await isvote(embed, interaction);
                     break;
 
                 case '3':
-                    await database.Votetrack.update({imageVote: voteid}, {where: {playerID: uid}})
+                    await database.Votetrack.update({imageVote: swaps+1}, {where: {playerID: uid}})
                     await database.Player.increment({karma: 2}, {where: {playerID: uid}});
-                    await database.Swapimage.increment({abstain: 1}, {where: {imageID: voteid}});
-                    await isvote(embed, interaction, image);
+                    await database.Swapimage.increment({abstain: 1}, {where: {imageID: swaps}});
+                    await isvote(embed, interaction);
                     break;
             };
             i.deferUpdate();
-        }
-        );
+        });
     } catch(error) {
         console.log("Error has occured in button Manager");
     }
@@ -212,13 +213,13 @@ module.exports = {
             const uid = interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: uid}});
             if (player) {
-                start(interaction);
+                await start(interaction);
             } else {
                 await interaction.reply("You are not a registered player. Use /isekai to get started.")
             }
             
         } catch(error) {
-            await interaction.reply("Error has occured while performing the command.")
+            await interaction.reply(`Error ${error} has occured while performing the command.`)
         }        
     }
 }
