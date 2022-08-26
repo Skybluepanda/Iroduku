@@ -1286,6 +1286,7 @@ module.exports = {
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
+                        .addChoice('stellarite',9)
                         .addChoice('special',10)
                         )
                 .addStringOption(option => 
@@ -1327,6 +1328,7 @@ module.exports = {
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
+                        .addChoice('stellarite',9)
                         .addChoice('special',10)
                         )
                 .addStringOption(option => 
@@ -1368,6 +1370,7 @@ module.exports = {
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
+                        .addChoice('stellarite',9)
                         .addChoice('special',10)
                         )
                 .addStringOption(option => 
@@ -1409,6 +1412,7 @@ module.exports = {
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
+                        .addChoice('stellarite',9)
                         .addChoice('special',10)
                         )
                 .addStringOption(option => 
@@ -1450,6 +1454,7 @@ module.exports = {
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
+                        .addChoice('stellarite',9)
                         .addChoice('special',10)
                         )
                 .addStringOption(option => 
@@ -1485,6 +1490,7 @@ module.exports = {
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
+                        .addChoice('stellarite',9)
                         .addChoice('special',10)
                         )
                 .addStringOption(option => 
@@ -1520,6 +1526,7 @@ module.exports = {
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)
                         .addChoice('pink_diamond',7)
+                        .addChoice('stellarite',9)
                         .addChoice('special',10)
                         )
                 .addStringOption(option => 

@@ -564,7 +564,7 @@ async function switchRarity(card, rarity, interaction) {
 
         case 9:
             burnCooldown.delete(uid);
-            return interaction.reply("You can't burn Azurite cards.");
+            return interaction.reply("You can't burn Stellarite cards.");
         
         
         case 10:

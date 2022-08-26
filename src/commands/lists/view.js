@@ -326,16 +326,16 @@ async function viewAzurCard(card, interaction) {
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
     //all we get is inventory id and player id
     embedCard.setFooter(`Art by ${Azurite.artist}
-*Upload with /azuriteupload*`).setImage(Azurite.imageURL)
+*Upload your choice of image of the character using with /stellarupload*`).setImage(Azurite.imageURL)
     embedCard.setTitle(`${char.characterName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${card.characterID}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rank: **${char.rank}
-**Rarity: Azurite**
+**Rarity: Stellarite**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
-        .setColor(color.azur);
+        .setColor(color.stellar);
     return await interaction.reply({embeds: [embedCard]});
 }
 

@@ -18,7 +18,7 @@ module.exports = {
 4.2% Amethyst
 0.7% Ruby (0.003% increased / pity)
 0.095% Diamond
-0.005% Azurite
+0.005% Stellarite
 
 **Character Pool Rates:**
 Main: Wishlist 3% ; Main 27% ; Side 70%
@@ -31,7 +31,7 @@ Extra: Wishlist 15% ; All 85%
 40% Amethyst
 4.7% Ruby
 0.29% Diamond (0.01% increased diamond rate/10 Karma pity. Guaranteed at 200)
-0.01% Azurite
+0.01% Stellarite
 
 
 *Karma Gacha chooses characters from your wishlist.
@@ -44,7 +44,7 @@ Therefore you must have 5 wishlist characters to use Karma Gacha.*
 **Ruby:** Same as amethyst. You can use /rubygamble to spend 500 coins for an attempt to upgrade to Pink Diamond
 **Pink Diamond:** Upgraded from Ruby. Can change the image using */diaset*.
 **Diamond:** Can change the image using */diaset*.
-**Azurite:** User can upload an image/gif of their choice as a link using */azuriteupload*. Only one Azurite can exist per character.
+**Stellarite:** Upload your choice of image of the character using */stellarupload*. Only one Stellarite can exist per character.
 `)
 			.setColor(color.successgreen)
 		await interaction.reply({embeds: [embed]});

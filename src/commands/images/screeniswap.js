@@ -167,6 +167,7 @@ async function buttonManager(embed, interaction, msg, queue) {
                         await channel.send(`${image.imageID}| ${char.characterName} from ${series.seriesName}\nArt by ${sent.artist} and uploaded by ${sent.uploader}`)
                         await channel.send(`${interaction.user.username} awarded ${50*(sent.bonus+1)}gems and ${sent.bonus+1}karma to uploader.`)
                         await channel.send(`${sent.imageURL}`);
+                        await char.increment({imageCount: 1});
                     } else {
                         const image = await database.Image.findOne({where: {characterID: sent.characterID, imageNumber: sent.imageNumber}});
                         await image.update({imageURL: sent.imageURL});
@@ -184,7 +185,7 @@ async function buttonManager(embed, interaction, msg, queue) {
                     
                     
 
-                    await char.increment({imageCount: 1});
+                    
                     
                     
                     

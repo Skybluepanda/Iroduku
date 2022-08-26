@@ -365,6 +365,7 @@ async function azurcard(card, ID) {
     const char = await database.Character.findOne({where: {characterID: card.characterID}});
     const charname = char.characterName;
     //image number of card
+    const inumber = card.imageNumber;
     
     if (tag) {
         const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ${tag}` + charname;

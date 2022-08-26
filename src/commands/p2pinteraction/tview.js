@@ -37,7 +37,7 @@ async function buttonManager(interaction, msg, card, trade) {
         
         const target = await interaction.options.getUser('targetuser');
         const filter = i => i.user.id === interaction.user.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
        
         collector.on('collect', async i => {
             switch (i.customId){
@@ -248,15 +248,15 @@ async function viewAzurCard(card, interaction, own, trade) {
     const Azurite = await database.Azurite.findOne({where: {cardID: card.cardID}});
     //all we get is inventory id and player id
     embedCard.setFooter(`Art by ${Azurite.artist}
-*Upload with /azuriteupload*`).setImage(Azurite.imageURL)
+*Upload your choice of image of the character using /stellarupload*`).setImage(Azurite.imageURL)
     embedCard.setTitle(`${char.characterName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity: Azurite**
+**Rarity: Stellarite**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
-        .setColor(color.azur);
+        .setColor(color.stellar);
     if (own) {
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});

@@ -510,7 +510,7 @@ async function createAzurCard(interaction) {
     }
     await player.update({apity: 0});
     let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`A Legendary luck sack got a **Azurite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!!!**`)
+    channel.send(`A Legendary luck sack got a **Stellarite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!!!**`)
     await viewAzurCard(newcard, interaction);
 }
 
@@ -564,15 +564,15 @@ async function viewAzurCard(card, interaction) {
     const url = azur.imageURL;
     const artist = azur.artist;
     embedCard.setFooter({text: `Art by ${artist}
-Upload your choice of image using /azuriteupload`}).setImage(url);
+*Upload your choice of image of the character using /stellarupload*`}).setImage(url);
     embedCard.setTitle(`${char.characterName}`)
         .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity: Azurite**
+**Rarity: Stellarite**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
-        .setColor(color.azur);
+        .setColor(color.stellar);
     await interaction.followUp({embeds: [embedCard]});
 }
 
@@ -802,7 +802,7 @@ async function gacha(interaction, embed) {
 **Amethyst:** ${gachaArray[4]}
 **Ruby:** ${gachaArray[5]}
 **Diamond:** ${gachaArray[6]}
-**Azurite:** ${gachaArray[9]}
+**Stellarite:** ${gachaArray[9]}
 
 
 **Burn Stats**

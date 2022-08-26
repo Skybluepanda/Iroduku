@@ -146,10 +146,11 @@ async function checkSeverM(interaction) {
 async function resetDaily(interaction, player){
     const embedDone = await embedD(interaction);
     await player.increment('gems', {by: 250});
+    await player.increment('karma', {by: 5});
     await checkSeverB(interaction);
     await checkSeverM(interaction);
     await embedDone.setDescription(`
-Streak: (reset) 1\nGems: ${player.gems+250} (+250)\nUse daily again within two days to continue the streak.`);
+Streak: (reset) 1\nGems: ${player.gems+250} (+250)\nKarma: ${player.karma+5}\nUse daily again within two days to continue the streak.`);
     return interaction.editReply({ embeds: [embedDone] }, {ephemeral: true});
 }
 

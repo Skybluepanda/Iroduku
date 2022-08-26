@@ -53,7 +53,7 @@ async function buttonManager(interaction, msg) {
     try {
         const target = await interaction.options.getUser('targetuser');
         const filter = i => i.user.id === interaction.user.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'accept':
@@ -77,7 +77,7 @@ async function buttonManager2(interaction, msg) {
     try {   
         const target = await interaction.options.getUser('targetuser');
         const filter = i => i.user.id === target.id;
-        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
+        const collector = msg.createMessageComponentCollector({ filter, max:1, time: 15000 });
         collector.on('collect', async i => {
             switch (i.customId){
                 case 'accept':
@@ -426,15 +426,15 @@ async function viewAzurCard(card, interaction) {
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
     embedCard.setFooter(`Art by ${Azur.artist}
-    *Upload with /azuriteupload*`).setImage(Azur.imageURL)
+*Upload your choice of image of the character using /stellarupload*`).setImage(Azur.imageURL)
     embedCard.setTitle(`${char.characterName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity: Azurite**
+**Rarity: Stellarite**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
-        .setColor(color.azur);
+        .setColor(color.stellar);
     const row = await createButton();
 
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
@@ -487,7 +487,7 @@ async function switchRarity(card, rarity, interaction) {
         case 7:
             return viewPinkCard(card, interaction);
 
-        case 7:
+        case 9:
             return viewAzurCard(card, interaction);
 
         case 10:

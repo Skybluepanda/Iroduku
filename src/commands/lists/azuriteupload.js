@@ -15,15 +15,18 @@ async function checkImage(interaction, card){
         await database.Azurite.update({artist: art}, {where: {cardID: card.cardID}})
     }
     const imageURL = await interaction.options.getString('imageurl');
-    console.log(imageURL);
     if (imageURL) {
         console.log("10");
-        if (imageURL.endsWith('.png') || imageURL.endsWith('.gif')) {
+        if (imageURL.endsWith('.png') || imageURL.endsWith('.jpg') || imageURL.endsWith('.gif')) {
             console.log("11");
+            const prev = await database.Azurite.findOne({where: {cardID: card.cardID}});
+            const channel = interaction.guild.channels.cache.get('996650197008515142');
+            await channel.send(`${interaction.user} modified their ${card.characterID} stellarite card.\n${prev.imageURL}\n ${imageURL}`);
+
             await database.Azurite.update({imageURL: imageURL}, {where: {cardID: card.cardID}});
             console.log("12");
         } else {
-            await interaction.channel.send("that's not a image or a gif.")
+            await interaction.channel.send("Image must be PNG, JPG or GIF format.")
         }
     }
     
@@ -39,39 +42,39 @@ async function viewSpeCard(card, interaction) {
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
     embedCard.setFooter({text: `Art by ${azur.artist}
-Upload your choice of image using /azuriteupload`}).setImage(azur.imageURL);
+*Upload your choice of image of the character using /stellarupload*`}).setImage(azur.imageURL);
         embedCard.setTitle(`${char.characterName}`)
             .setAuthor({name: interaction.user.username, iconURL: interaction.user.avatarURL({ dynamic: true })})
             .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity: Azurite**
+**Rarity: Stellarite**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
-        .setColor(color.azur);
+        .setColor(color.stellar);
     return await interaction.reply({embeds: [embedCard]});
 }
 
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('azuriteupload')
-		.setDescription('Upload a new image and the artist for your Azurite card.')
+		.setName('stellarupload')
+		.setDescription('Upload a new image and the artist for your Stellarite card.')
         .addIntegerOption(option => 
             option
                 .setName("lid")
-                .setDescription("The inventory id of the Special card.")
+                .setDescription("The inventory id of the Stellarite card.")
                 .setRequired(true)
                 )
         .addStringOption(option => 
             option
                 .setName("imageurl")
-                .setDescription("The image of the Special card. Send URL of a bordered image or gif.")
+                .setDescription("The image of the Stellarite card. Send URL of a bordered image or gif.")
                 .setRequired(true)
                 )
         .addStringOption(option => 
             option
                 .setName("artist")
-                .setDescription("The artist of the Special card.")
+                .setDescription("The artist of the Stellarite card.")
                 .setRequired(true)
                 ),
 	async execute(interaction) {
