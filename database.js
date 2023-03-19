@@ -732,13 +732,24 @@ const Card = sequelize.define('card', {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: true,
-	  },
+	},
 	lock: {
 		type: Sequelize.BOOLEAN,
 		unique: false,
 		allowNull: false,
 		defaultValue: false
-	}
+	},
+	charred: {
+		type: Sequelize.BOOLEAN,
+		unique: false,
+		allowNull: false,
+		defaultValue: false
+	},
+	weapon: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: true,
+	},
 });
 
 
@@ -821,6 +832,319 @@ const Listtags = sequelize.define('listtag', {
 	},
 })
 
+const Weapon = sequelize.define('weapon', {
+	weaponSprite: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	weaponFluff: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	name: {
+		type: Sequelize.STRING,
+		unique: true,
+		allowNull: false,
+	},
+	rarity: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	class: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	init: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	health: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	armor: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	atk: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	eva: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	acc: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	crt: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	crd: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+})
+
+const Ability = sequelize.define('ability', {
+	abilityID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+		allowNull: false,
+	},
+	abilityName: {
+		type: Sequelize.STRING,
+		unique: true,
+		allowNull: false,
+	},
+	abilityText: {
+		type: Sequelize.STRING,
+		unique: true,
+		allowNull: false,
+	},
+	weaponID: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	abilitySlot: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	target: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	damage: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	dmgvar: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	pen: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	acc: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	crt: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	crd: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	effect: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	self: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	cooldown: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+})
+
+const Deck = sequelize.define('deck', {
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	deckNumber: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	deckName: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	deckImage: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: true,
+	},
+	unit1: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit2: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit3: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit4: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit5: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+})
+
+const Game = sequelize.define('game', {
+	gameID: {
+		type: Sequelize.INTEGER,
+		unique: true,
+		allowNull: false,
+	},
+	gameType: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	round: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	phase: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	player1ID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	player2ID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit1: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit2: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit3: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit4: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit5: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit6: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit7: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit8: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit9: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	unit10: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+})
+
+const StatusType = sequelize.define('statusType', {
+	name: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+	statusSprite: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+	description: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+});
+
+const Status = sequelize.define('status', {
+	gameID: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+	},
+	unitNumber: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	statusID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	duration: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+});
+
+
+
 
 exports.sequelize = sequelize;
 exports.Character = Character;
@@ -845,3 +1169,10 @@ exports.Special = Special;
 exports.Azurite = Azurite;
 exports.Events = Events;
 exports.Listtags = Listtags;
+
+exports.Weapon = Weapon;
+exports.Ability = Ability;
+exports.Deck = Deck;
+exports.Game = Game;
+exports.StatusType = StatusType;
+exports.Status = Status;

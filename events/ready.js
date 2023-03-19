@@ -28,6 +28,13 @@ module.exports = {
         database.Azurite.sync();
         database.Events.sync();
         database.Listtags.sync();
+
+        database.Weapon.sync();
+        database.Ability.sync();
+        database.Deck.sync();
+        database.Game.sync();
+        database.StatusType.sync();
+        database.Status.sync();
         console.log('database sync complete!');
     },
 };

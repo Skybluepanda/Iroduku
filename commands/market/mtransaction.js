@@ -65,19 +65,62 @@ async function buttonManager3(interaction, msg, coins) {
                     if (buyer.money < coins) {
                         return interaction.channel.send(`${interaction.user} doesn't have enough money.`)
                     }
-                    const lid = await interaction.options.getInteger('lid');
+                    const lid = await interaction.options.getString('lid');
                     const newlid = await inventorycheck(uid);
                     await database.Card.update(
                         {
-                            playerID: uid, inventoryID: newlid, tag: null
+                            playerID: uid, inventoryID: newlid, tag: null, charred: true,
                         },
                         {
                             where: {playerID: '903935562208141323', inventoryID: lid}
                         }
                     )
+                    
                     await database.Player.increment({money: -coins}, {where: {playerID: uid}});
                     await interaction.followUp(`Card ${lid} purchased from market for ${coins} coins.
 The card id is ${newlid} in your inventory.`)
+                    break;
+                
+                case 'cancel':
+                    await interaction.followUp("Purchase Cancelled")
+                    break;
+            };
+            
+        }
+        );
+    } catch(error) {
+        console.log("Error has occured in button Manager");
+    }
+}
+
+async function buttonManager4(interaction, msg, coins, lidarray) {
+    try {   
+        const filter = i => i.user.id === interaction.user.id;
+        const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
+        collector.on('collect', async i => {
+            i.deferUpdate();
+            switch (i.customId){
+                case 'buy':
+                    await interaction.followUp("Processing...");
+                    const mid = '903935562208141323'
+                    const uid = await interaction.user.id;
+                    const buyer = await database.Player.findOne({where: {playerID: uid}});
+                    if (buyer.money < coins) {
+                        return interaction.channel.send(`${interaction.user} doesn't have enough money.`)
+                    }
+                    for(let i = 0; i < lidarray.length;i++) {
+                        const newlid = await inventorycheck(uid);
+                        await database.Card.update(
+                            {
+                                playerID: uid, inventoryID: newlid, tag: null, charred: true,
+                            },
+                            {
+                                where: {playerID: '903935562208141323', inventoryID: lidarray[i].inventoryID}
+                            }
+                        )
+                    }              
+                    await database.Player.increment({money: -coins}, {where: {playerID: uid}});
+                    await interaction.followUp(`Cards purchased from market for ${coins} coins.`)
                     break;
                 
                 case 'cancel':
@@ -314,11 +357,203 @@ async function switchRarity(card, rarity, interaction) {
     }
 }
 
+
+
+async function redcard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    
+    if (tag) {
+        const cardString = `:red_square:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
+        console.log(cardString);
+        return cardString
+    } else {
+        const cardString = `:red_square:` + ID + ` | ` + charname + `(#${inumber})`;
+        console.log(cardString);
+        return cardString
+    }
+}
+
+async function diacard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    
+    if (tag) {
+        const cardString = `:large_blue_diamond:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
+        console.log(cardString);
+        return cardString
+    } else {
+        const cardString = `:large_blue_diamond:` + ID + ` | ` + charname + `(#${inumber})`;
+        console.log(cardString);
+        return cardString
+    }
+}
+
+async function pinkcard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    
+    if (tag) {
+        const cardString = `:diamonds:` + ID + ` | ${tag}` + charname + ` (#${inumber})`;
+        console.log(cardString);
+        return cardString;
+    } else {
+        const cardString = `:diamonds:` + ID + ` | ` + charname + `(#${inumber})`;
+        console.log(cardString);
+        return cardString;
+    }
+}
+
+async function stellarcard(card) {
+    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+    const ID = card.inventoryID;
+    //white block :white_large_square:
+
+    //check for tag 
+    const tag = card.tag;
+    
+    //find charname
+    const char = await database.Character.findOne({where: {characterID: card.characterID}});
+    const charname = char.characterName;
+    //image number of card
+    const inumber = card.imageNumber;
+    
+    if (tag) {
+        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ${tag}` + charname;
+        console.log(cardString);
+        return cardString;
+    } else {
+        const cardString = `:diamond_shape_with_a_dot_inside:` + ID + ` | ` + charname;
+        console.log(cardString);
+        return cardString;
+    }
+}
+
+async function switchListRarity(card, rarity) {
+    switch (rarity) {
+        case 5:
+            return redcard(card);
+            //red
+        case 6:
+            return diacard(card);
+
+        case 7:
+            return pinkcard(card);
+
+        case 9:
+            return stellarcard(card);
+
+        default:
+            return "error";
+            //wtf?
+    }
+}
+
+async function makeList(list) {
+    const listRef = [];
+    for (let i = 0;i < list.length; i++) {
+        //ID|Rarity ImageNumber Name Quantity if white, green or blue and there's more than 1.
+        const rarity = await list[i].rarity;
+        const cardString = await switchListRarity(list[i], rarity);
+        listRef[i] = cardString;
+    }
+    return listRef;
+}
+
+async function switchPrice(rarity) {
+    switch (rarity) {
+        case 5:
+            return 30000;
+        //red
+        case 6:
+            return 200000;
+
+        case 7:
+            return 60000;
+
+        case 9:
+            return 2000000;
+
+        default:
+            return "error";
+            //wtf?
+    }
+}
+
+async function justList(interaction, lidarray){
+    const pid = await interaction.user.id;
+    const player = await database.Player.findOne({where: {playerID: pid}});
+    const mid = '903935562208141323';
+    let cardList = [];
+    let totalCost = 0;
+    for(let i = 0; i < lidarray.length; i++) {
+        const card = await database.Card.findOne({where: {playerID: mid, inventoryID: lidarray[i]}});
+        console.log(card.rarity);
+        const cost = await switchPrice(card.rarity);
+        console.log(cost);
+        totalCost += cost;
+        console.log(totalCost)
+        if (card) {
+            cardList.push(card);
+        }
+    }
+    const listString = await makeList(cardList);
+    const fullList = await listString.join(`\n`);
+    const embed = new MessageEmbed();
+    await embed.setTitle("Your Cart")
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`
+**Your Cart**
+${fullList}
+
+**Cost**
+**Money:** ${totalCost}
+
+**Your Balance**
+**Money:** ${player.money}`)
+        .setColor(color.successgreen);
+    const row = await createButton();
+
+    msg = await interaction.reply( {embeds: [embed], components: [row], fetchReply: true});
+    await buttonManager4(interaction, msg, totalCost, cardList);
+}
+
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('mbuy')
 		.setDescription('buys a card from market.')
-        .addIntegerOption(option => 
+        .addStringOption(option => 
             option
                 .setName("lid")
                 .setDescription("The list id for the card you want to view")
@@ -332,12 +567,36 @@ module.exports = {
                 return interaction.reply(`You are not registered use command /isekai to get started.`);
             }
             const mid = '903935562208141323'
-            const lid = await interaction.options.getInteger('lid');
-            const card = await database.Card.findOne({where: {playerID: mid, inventoryID: lid}});
-            if (card) {
-                await switchRarity(card, card.rarity, interaction);
-            } else if (!card) {
-                interaction.reply("Error Invalid list ID");
+            console.log(1);
+            const lids = await interaction.options.getString('lid');
+            console.log(2);
+            const lidarray = lids.split(" ");
+            console.log(3);
+            if (lidarray.length > 20) {
+                console.log(4);
+                return interaction.reply("Bulk buy limit is 20.");
+            } else if (lidarray.length > 1) {
+                console.log(5);
+                for(let i = 0; i < lidarray.length; i++) {
+                    console.log(6);
+                    const card = await database.Card.findOne({where: {playerID: mid, inventoryID: lidarray[i]}});
+                    if (!card) {
+                        console.log(7);
+                        return interaction.reply("Error Invalid list ID");
+                    }
+                    console.log(8);
+                }
+                console.log(9);
+                await justList(interaction, lidarray);
+                //buy the list of lids
+            } else {
+                console.log(10);
+                const card = await database.Card.findOne({where: {playerID: mid, inventoryID: lidarray[0]}});
+                if (card) {
+                    await switchRarity(card, card.rarity, interaction);
+                } else if (!card) {
+                    interaction.reply("Error Invalid list ID");
+                }
             }
         } catch(error) {
             await  interaction.reply("Error has occured while performing the command.")

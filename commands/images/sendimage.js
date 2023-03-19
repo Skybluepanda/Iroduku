@@ -110,7 +110,7 @@ Image ID (used for delete and edit): ${image.imageID}
 Image Number: ${iNumber}
 Artist: ${art}
 Image has entered the send queue and will be reviewed by image mods.
-You will recieve minimum of 50 gems and 1 karma and more depending on submition quality!`);
+You will recieve minimum of 50 gems and 1 karma and more depending on submission quality!`);
 	} catch(error) {
 		interaction.channel.send("Something went wrong. Ask an image mod if the image got uploaded.");
 	}

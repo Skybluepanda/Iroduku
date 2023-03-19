@@ -97,7 +97,7 @@ async function claimDaily(interaction, player){
             await cooldownDaily(interaction, timeDiff);
         } else {
             await database.Player.increment({xp: 10}, {where: {playerID: userId}});
-            await resetDaily(interaction, player);
+            await resetDaily(interaction, player, daily);
             await database.Daily.update({lastDaily: timeNow, streak: 1}, {where: {playerID: userId}});
         }
     } else {
@@ -134,8 +134,8 @@ async function streakDaily(interaction, player, daily){
     await checkSeverM(interaction);
     await checkKarma(interaction, daily);
     await checkLevelup(interaction);
-    if (player.level > 5) {
-        xpLimit = 300;
+    if (player.level > 6) {
+        xpLimit = 500;
     } else {
         xpLimit = (2**player.level)*10;
     }
@@ -147,7 +147,7 @@ async function streakDaily(interaction, player, daily){
     Streak: (max) ${streak+1}\nGems: ${player.gems+reward} (+${reward})\nKarma: ${player.karma+30} (+30)\nxp: ${player.xp+10}/${xpLimit} (+10)\nUse daily again within two days to continue the streak.`);
         return interaction.followUp({ embeds: [embedDone] }, {ephemeral: true});
     } else {
-        const reward = 500 + streak*50;
+        const reward = 500 + streak*50 + 100*player.level;
         await player.increment('gems', {by: reward});
         await player.increment('karma', {by: 30});
         await embedDone.setDescription(`
@@ -191,8 +191,8 @@ async function checkLevelup(interaction) {
     const player = await database.Player.findOne({ where: { playerID: interaction.user.id } })
     const embed = await embedLvl(interaction, player);
     let xpLimit;
-    if (player.level > 5) {
-        xpLimit = 300;
+    if (player.level > 6) {
+        xpLimit = 500;
     } else {
         xpLimit = (2**player.level)*10;
     }
@@ -202,13 +202,13 @@ async function checkLevelup(interaction) {
     };
 }
 
-async function resetDaily(interaction, player){
+async function resetDaily(interaction, player, daily){
     const embedDone = await embedD(interaction);
     await player.increment('gems', {by: 500});
     await player.increment('karma', {by: 30});
     let xpLimit;
-    if (player.level > 5) {
-        xpLimit = 300;
+    if (player.level > 6) {
+        xpLimit = 500;
     } else {
         xpLimit = (2**player.level)*10;
     }
@@ -454,8 +454,8 @@ async function viewCds(interaction) {
             const ccount = await database.Character.count();
             const cvount = await database.Cvotetrack.count();
             console.log("2")
-            await checkDaily1(interaction);
-            await checkCollect1(interaction);
+            // await checkDaily1(interaction);
+            // await checkCollect1(interaction);
             console.log("3")
             if (player && daily && collect && votetrack) {
                 console.log("1")
@@ -478,7 +478,7 @@ async function viewCds(interaction) {
             } else {
                 embedDone.setDescription(`To enable cds, you must be a player, try /isekai\nThen do /daily, /collect and /cvote`)
                         .setColor(color.failred);
-                return await interaction.reply({ embeds: [embedDone]});
+                return await interaction.reply({embeds: [embedDone]});
             }
             const row = await createButton(interaction);
             msg = await interaction.reply({ embeds: [embedDone],components: [row], fetchReply: true });
@@ -493,7 +493,7 @@ async function viewCds(interaction) {
 async function checkDaily1(interaction) {
     const daily = await database.Daily.findOne({where: {playerID: interaction.user.id}});
     if (!daily) {
-        return await interaction.followUp('Do /daily first!')
+        await interaction.followUp('Do /daily first!')
     }
     return;
 }
@@ -501,7 +501,7 @@ async function checkDaily1(interaction) {
 async function checkCollect1(interaction) {
     const collect = await database.Collect.findOne({where: {playerID: interaction.user.id}});
     if (!collect) {
-        return await interaction.followUp('Do /collect first!')
+        await interaction.followUp('Do /collect first!')
     }
     return;
 }

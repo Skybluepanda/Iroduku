@@ -1,0 +1,142 @@
+Weapon Gacha
+Weapon gacha will be separate component from the character gacha. (possibly new currency introduced...?)
+Each weapon has passive, basic attack and 2 abilities and can skip turn.
+5 slots in combat
+You can make prebuilt decks and play blind pick or draft pick where you take turn drafting weapons.
+
+Once weapon gacha is activated on a card, it cannot be sold and will be charred, with the exception of low rarities which can be burnt lel.
+It'll be possible to use karma to reroll the weapon on a card.
+Phases
+Round start Phases
+First unit activates
+start of unit turn Phases
+unit action Phase
+end of unit turn Phase
+repeat for all units
+Round end phases.
+
+game keep track of position, health, status and cooldowns.
+
+status effect
+
+blue is default icon
+red is negative effect
+green is positive effect
+
+
+
+modifies base stats
+stats
+health
+armor
+eva
+acc
+crt
+crd
+atk
+
+disarm
+prevents ability1
+silence
+prevents ability2
+cleanse
+removes negative status
+break
+removes positive status
+stun
+skip turn
+stun resist+
+initslow
+dot
+heal over time
+shield/overhealth.
+
+specific stacking system.
+
+elemental status effect
+probably can be classified as dot
+and other statuses
+burn
+poison
+freeze(stun)
+shocked(break)
+
+customisations
+items or weapon specific skill tree?
+Maybe later?
+
+
+physical damage, most common, can be dodged, blocked, reduced by armour and crit.
+magic damage, can't be dodged, blocked or reduced by armour but does flat damage without crit chance, and often requires cooldown and smaller in damage value.
+
+display
+shows each character and weapon. Health and status effects on a image visual.
+The text status will show current unit's specific stats.
+
+
+9x14
+
+border uses the rarity colours
+
+if it's gif or custom image use image 1 unfortunately.
+if no image is found uh why did you use this character ffs...
+
+weapon rarity system
+Stars system nah
+Rare, Epic, Legendary
+Rarities don't change the effectiveness, but how flexible they are and powerlevels when you get the perfect combos.
+Rares are flexible, epics enable specific comps, legendaries require specific comps to be effective, but can be countered.
+
+commands
+/deck list/add/remove/edit
+/awaken do one at a time :D
+/waeponinfo
+/gamewiki
+/startgame (blind/draft) new/continue/end
+
+mod only commands
+/weapon new/edit
+/ability new/edit
+/status new/edit
+
+existing things edit
+card list sort by weapons
+card view show weapon as thumbnail.
+Show short weapon detail
+
+every command that views that might want to also view the waepons.
+view
+gift
+disable burn on awakened cards.
+disable ruby gamble on awakened cards.
+list shows weapon name in italics.
+lview shows just the thumbnail and maybe awakenstatus.
+diaset nah
+market (can't be in there)
+disable awakening for lapis-
+
+disable gifting cards in deck.
+
+
+awakening rates
+
+amethyst
+higher rare rate.
+
+ruby
+equal chance
+
+pinkdia
+equal chance
+
+dia
+equal but higher than pink dia legendary chance
+
+stellarite
+can't be rare.
+
+special
+Special I think will always be Legendary. Just takes a shit ton of coins.
+
+
+Each attempt will increase the overall chance 

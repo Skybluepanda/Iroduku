@@ -195,22 +195,27 @@ async function purplecard(card) {
     //image number of card
     const inumber = card.imageNumber;
     const lock = card.lock;
+    let cardName = " ";
+    if (card.weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
+        cardName = `- **${weaponDB.name}**`;
+    }
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         } else {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         } else {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         }
     }
@@ -230,22 +235,27 @@ async function redcard(card) {
     //image number of card
     const inumber = card.imageNumber;
     const lock = card.lock;
+    let cardName = " ";
+    if (card.weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
+        cardName = `- **${weaponDB.name}**`;
+    }
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         } else {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         } else {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         }
     }
@@ -265,22 +275,27 @@ async function diacard(card) {
     //image number of card
     const inumber = card.imageNumber;
     const lock = card.lock;
+    let cardName = " ";
+    if (card.weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
+        cardName = `- **${weaponDB.name}**`;
+    }
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         } else {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         } else {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         }
     }
@@ -300,22 +315,27 @@ async function pinkcard(card) {
     //image number of card
     const inumber = card.imageNumber;
     const lock = card.lock;
+    let cardName = " ";
+    if (card.weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
+        cardName = `- **${weaponDB.name}**`;
+    }
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         } else {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})`;
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         } else {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`;
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
             return cardString
         }
     }
@@ -334,22 +354,27 @@ async function azurcard(card) {
     const char = await database.Character.findOne({where: {characterID: card.characterID}});
     const charname = char.characterName;
     const lock = card.lock;
+    let cardName = " ";
+    if (card.weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
+        cardName = `- **${weaponDB.name}**`;
+    }
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname + ` ${cardName}`;
             return cardString
         } else {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname + ` ${cardName}`;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname;
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname + ` ${cardName}`;
             return cardString
         } else {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname;
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname + ` ${cardName}`;
             return cardString
         }
     }
@@ -367,22 +392,27 @@ async function specard(card) {
     //find charname
     const charname = special.characterName;
     const lock = card.lock;
+    let cardName = " ";
+    if (card.weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
+        cardName = `- **${weaponDB.name}**`;
+    }
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` ${cardName}`;
             return cardString
         } else {
-            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname + ` ${cardName}`;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` ${cardName}`;
             return cardString
         } else {
-            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname + ` ${cardName}`;
             return cardString
         }
     }
@@ -454,6 +484,10 @@ async function listSwitch(embed, interaction, page){
 
         case "base":
             justList(embed, interaction, page);
+            break;
+
+        case "weapon":
+            weaponList(embed, interaction, page);
             break;
 
         case "wishlist":
@@ -1157,6 +1191,107 @@ async function justList(embed, interaction, page){
     await buttonManager(embed, interaction, msg, page, totalPage);
 }
 
+
+async function weaponList(embed, interaction, page){
+    const uid = await interaction.user.id;
+    let rarity = await interaction.options.getInteger("rarity");
+    let tag = await interaction.options.getString("tag");
+    const orderOpt = await order(interaction)
+    let cardList;
+    let maxPage;
+    if (rarity && tag) {
+        cardList = await database.Card.findAll(
+            {
+                order: [orderOpt],
+                limit: 20,
+                offset: (page-1)*20,
+                where: {
+                rarity: rarity,
+                tag: tag,
+                playerID: uid,
+                weapon: {[Op.not]:null}
+            }}
+        );
+        maxPage = await database.Card.count(
+            {
+                where: {
+                rarity: rarity,
+                tag: tag,
+                playerID: uid,
+                weapon: {[Op.not]:null}
+            }}
+        );
+    } else if (rarity && !tag) {
+        cardList = await database.Card.findAll(
+            {
+                order: [orderOpt],
+                limit: 20,
+                offset: (page-1)*20,
+                where: {
+                rarity: rarity,
+                playerID: uid,
+                weapon: {[Op.not]:null}
+            }}
+        );
+        maxPage = await database.Card.count(
+            {
+                where: {
+                rarity: rarity,
+                playerID: uid,
+                weapon: {[Op.not]:null}
+            }}
+        );
+    } else if (!rarity && tag) {
+        cardList = await database.Card.findAll(
+            {
+                order: [orderOpt],
+                limit: 20,
+                offset: (page-1)*20,
+                where: {
+                tag: tag,
+                playerID: uid,
+                weapon: {[Op.not]:null}
+            }}
+        );
+        maxPage = await database.Card.count(
+            {
+                where: {
+                tag: tag,
+                playerID: uid,
+                weapon: {[Op.not]:null}
+            }}
+        );
+    } else {
+        cardList = await database.Card.findAll(
+            {
+                order: [orderOpt],
+                limit: 20,
+                offset: (page-1)*20,
+                where: {
+                playerID: uid,
+                weapon: {[Op.not]:null}
+            }}
+        );
+        maxPage = await database.Card.count(
+            {
+                where: {
+                playerID: uid,
+                weapon: {[Op.not]:null}
+            }}
+        );
+    }
+    const totalPage = Math.ceil(maxPage/20);
+    if (totalPage > 1) {
+        await deployButton(interaction, embed);
+    }
+    const listString = await makeList(cardList);
+    const fullList = await listString.join(`\n`);
+    await embed.setDescription(`**List of ${interaction.user.username} Cards**\n${fullList}`);
+    await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
+    const msg = await updateReply(interaction, embed);
+    await buttonManager(embed, interaction, msg, page, totalPage);
+}
+
 async function untagList(embed, interaction, page){
     const uid = await interaction.user.id;
     let rarity = await interaction.options.getInteger("rarity");
@@ -1550,6 +1685,39 @@ module.exports = {
                         .addChoice('quartz',1)
                         .addChoice('jade',2)
                         .addChoice('lapis',3)
+                        .addChoice('amethyst',4)
+                        .addChoice('ruby',5)
+                        .addChoice('diamond',6)
+                        .addChoice('pink_diamond',7)
+                        .addChoice('stellarite',9)
+                        .addChoice('special',10)
+                        )
+                .addStringOption(option => 
+                    option
+                        .setName("tag")
+                        .setDescription("Filter cards by tag")
+                        .setRequired(false)
+                        )
+                .addIntegerOption(option => 
+                    option
+                        .setName("order")
+                        .setDescription("Order cards to a standard")
+                        .setRequired(false)
+                        .addChoice('rarity',1)
+                        .addChoice('reverse',2)
+                        .addChoice('newest',3)
+                        .addChoice('oldest',4)
+                        .addChoice('cid',5)
+                        ))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("weapon")
+                .setDescription("Lists cards that has weapons")
+                .addIntegerOption(option => 
+                    option
+                        .setName("rarity")
+                        .setDescription("Filters cards with certain rarity")
+                        .setRequired(false)
                         .addChoice('amethyst',4)
                         .addChoice('ruby',5)
                         .addChoice('diamond',6)

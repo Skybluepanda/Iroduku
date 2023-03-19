@@ -11,9 +11,9 @@ dayjs().format()
 function embedSucess(interaction) {
     const embed = new MessageEmbed();
 
-    embed.setTitle("List View Initial EMbed")
+    embed.setTitle("List Viewing")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Initialising listview`)
+        .setDescription(`0 cards found in the list.`)
         .setColor(color.successgreen)
     
     return embed;
@@ -683,39 +683,39 @@ async function viewListCard(interaction, cardList, cardNumber) {
     await buttonManager(interaction, cardList, cardNumber, msg);
 }
 
-async function listSwitch(interaction){
+async function listSwitch(interaction, embed){
     const subCommand = await interaction.options.getSubcommand();
     switch (subCommand) {
         case "cname":
-            cnameList(interaction);
+            cnameList(interaction, embed);
             break;
         
         case "cid":
-            cidList(interaction);
+            cidList(interaction, embed);
             break;
 
         case "sname":
-            snameList(interaction);
+            snameList(interaction, embed);
             break;
 
         case "sid":
-            sidList(interaction);
+            sidList(interaction, embed);
             break;
 
         case "base":
-            justList(interaction);
+            justList(interaction, embed);
             break;
 
         case "wishlist":
-            wishList(interaction);
+            wishList(interaction, embed);
             break;
 
         case "untagged":
-            untagList(interaction);
+            untagList(interaction, embed);
             break;
 
         case "locked":
-            lockList(interaction);
+            lockList(interaction, embed);
             break;
     }
 }
@@ -740,7 +740,7 @@ async function order(interaction) {
     }
 }
 
-async function cnameList(interaction){
+async function cnameList(interaction, embed){
     const uid = await interaction.user.id;
     let rarity = await interaction.options.getInteger("rarity");
     let tag = await interaction.options.getString("tag");
@@ -801,13 +801,17 @@ async function cnameList(interaction){
             }}
         );
     }
+    if (cardList.length == 0) {
+        embed.setDescription("Your query has 0 cards after the filter.")
+        return interaction.editReply({embeds: [embed]});
+    }
 
     //cardlist is the list of cards that we can view!
     //view card, set buttons, use the list of cards somehow
     await viewListCard(interaction, cardList, 1);
 }
 
-async function cidList(interaction){
+async function cidList(interaction, embed){
     const uid = await interaction.user.id;
     const cid = await interaction.options.getInteger('id');
     let rarity = await interaction.options.getInteger("rarity");
@@ -855,10 +859,14 @@ async function cidList(interaction){
             }}
         );
     }
+    if (cardList.length == 0) {
+        embed.setDescription("Your query has 0 cards after the filter.")
+        return interaction.editReply({embeds: [embed]});
+    }
     await viewListCard(interaction, cardList, 1);
 }
 
-async function snameList(interaction, page) {
+async function snameList(interaction, embed) {
     const uid = await interaction.user.id;
     let rarity = await interaction.options.getInteger("rarity");
     let tag = await interaction.options.getString("tag");
@@ -929,10 +937,14 @@ async function snameList(interaction, page) {
             }}
         );
     }
+    if (cardList.length == 0) {
+        embed.setDescription("Your query has 0 cards after the filter.")
+        return interaction.editReply({embeds: [embed]});
+    }
     await viewListCard(interaction, cardList, 1);
 }
 
-async function sidList(interaction) {
+async function sidList(interaction, embed) {
     const uid = await interaction.user.id;
     let rarity = await interaction.options.getInteger("rarity");
     let tag = await interaction.options.getString("tag");
@@ -991,10 +1003,14 @@ async function sidList(interaction) {
             }}
         );
     }
+    if (cardList.length == 0) {
+        embed.setDescription("Your query has 0 cards after the filter.")
+        return interaction.editReply({embeds: [embed]});
+    }
     await viewListCard(interaction, cardList, 1);
 }
 
-async function wishList(interaction){
+async function wishList(interaction, embed){
     const uid = await interaction.user.id;
     const user = await interaction.options.getUser("user");
     const player = await database.Player.findOne({where: {playerID: user.id}});
@@ -1059,9 +1075,13 @@ async function wishList(interaction){
             }}
         );
     }
+    if (cardList.length == 0) {
+        embed.setDescription("Your query has 0 cards after the filter.")
+        return interaction.editReply({embeds: [embed]});
+    }
     await viewListCard(interaction, cardList, 1);
 }
-async function justList(interaction){
+async function justList(interaction, embed){
     const uid = await interaction.user.id;
     let rarity = await interaction.options.getInteger("rarity");
     let tag = await interaction.options.getString("tag");
@@ -1104,10 +1124,14 @@ async function justList(interaction){
             }}
         );
     }
+    if (cardList.length == 0) {
+        embed.setDescription("Your query has 0 cards after the filter.")
+        return interaction.editReply({embeds: [embed]});
+    }
     await viewListCard(interaction, cardList, 1);
 }
 
-async function untagList(interaction){
+async function untagList(interaction, embed){
     const uid = await interaction.user.id;
     let rarity = await interaction.options.getInteger("rarity");
     const orderOpt = await order(interaction)
@@ -1132,10 +1156,14 @@ async function untagList(interaction){
             }}
         );
     }
+    if (cardList.length == 0) {
+        embed.setDescription("Your query has 0 cards after the filter.")
+        return interaction.editReply({embeds: [embed]});
+    }
     await viewListCard(interaction, cardList, 1);
 }
 
-async function lockList(interaction){
+async function lockList(interaction, embed){
     const uid = await interaction.user.id;
     let rarity = await interaction.options.getInteger("rarity");
     let tag = await interaction.options.getString("tag");
@@ -1181,6 +1209,10 @@ async function lockList(interaction){
                 lock: 1,
             }}
         );
+    }
+    if (cardList.length == 0) {
+        embed.setDescription("Your query has 0 cards after the filter.")
+        return interaction.editReply({embeds: [embed]});
     }
     await viewListCard(interaction, cardList, 1);
 }
@@ -1532,7 +1564,7 @@ module.exports = {
                 .setDescription(taglist.tag1 + " " + taglist.tag2 + " " + taglist.tag3 + " " + taglist.tag4 + " " + taglist.tag5).setColor(color.successgreen);
                 await interaction.reply({embeds: [embed]});
                 await interaction.followUp({embeds: [embed2]});
-                await listSwitch(interaction);
+                await listSwitch(interaction, embed);
             } else {
                 return interaction.reply("Please set your taglist using command /lvtedit!");
             }

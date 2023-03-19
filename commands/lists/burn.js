@@ -565,12 +565,24 @@ async function switchRarity(card, rarity, interaction) {
                 burnCooldown.delete(uid);
                 return interaction.reply("Amethyst Cards Don't have Quantity. Try again without quantity.");
             }
+            if (card.weapon) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Can't burn awakened cards.");
+            }
             return viewPurpleCard(card, interaction);
             //Purple
         case 5:
             if (quantity) {
                 burnCooldown.delete(uid);
                 return interaction.reply("Ruby Cards Don't have Quantity. Try again without quantity.");
+            }
+            if (card.charred) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Can't burn cards purchased from market.");
+            }
+            if (card.weapon) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Can't burn awakened cards.");
             }
             return viewRedCard(card, interaction);
             //red
@@ -580,6 +592,14 @@ async function switchRarity(card, rarity, interaction) {
                 burnCooldown.delete(uid);
                 return interaction.reply("Diamond Cards Don't have Quantity. Try again without quantity.");
             }
+            if (card.charred) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Can't burn cards purchased from market.");
+            }
+            if (card.weapon) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Can't burn awakened cards.");
+            }
             return viewDiaCard(card, interaction);
 
         case 7:
@@ -587,10 +607,29 @@ async function switchRarity(card, rarity, interaction) {
                 burnCooldown.delete(uid);
                 return interaction.reply("Pink Diamond Cards Don't have Quantity. Try again without quantity.");
             }
+            if (card.charred) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Can't burn cards purchased from market.");
+            }
+            if (card.weapon) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Can't burn awakened cards.");
+            }
             return viewPinkCard(card, interaction);
 
         case 9:
-            burnCooldown.delete(uid);
+            if (quantity) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Stellarite Cards Don't have Quantity. Try again without quantity.");
+            }
+            if (card.charred) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Can't burn cards purchased from market.");
+            }
+            if (card.weapon) {
+                burnCooldown.delete(uid);
+                return interaction.reply("Can't burn awakened cards.");
+            }
             return viewStellarCard(card, interaction);
         
         
@@ -652,8 +691,9 @@ async function burnList(embed, interaction, page){
             rarity: {[Op.lt]: 8}, 
             tag: tag,
             playerID: uid,
-            lock: false
-                
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const totalList = await database.Card.findAll(
@@ -662,7 +702,9 @@ async function burnList(embed, interaction, page){
             rarity: {[Op.lt]: 8},
             tag: tag,
             playerID: uid,
-            lock: false
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const maxPage = await database.Card.count(
@@ -671,7 +713,9 @@ async function burnList(embed, interaction, page){
             rarity: {[Op.lt]: 8},
             tag: tag,
             playerID: uid,
-            lock: false
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const whiteCount = await database.Card.sum('quantity',
@@ -680,7 +724,9 @@ async function burnList(embed, interaction, page){
             rarity: 1,
             tag: tag,
             playerID: uid,
-            lock: false
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const greenCount = await database.Card.sum('quantity',
@@ -689,7 +735,9 @@ async function burnList(embed, interaction, page){
             rarity: 2,
             tag: tag,
             playerID: uid,
-            lock: false
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const blueCount = await database.Card.sum('quantity',
@@ -698,7 +746,9 @@ async function burnList(embed, interaction, page){
             rarity: 3,
             tag: tag,
             playerID: uid,
-            lock: false
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const purpleCount = await database.Card.count(
@@ -707,7 +757,9 @@ async function burnList(embed, interaction, page){
             rarity: 4,
             tag: tag,
             playerID: uid,
-            lock: false
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const redCount = await database.Card.count(
@@ -716,7 +768,9 @@ async function burnList(embed, interaction, page){
             rarity: 5,
             tag: tag,
             playerID: uid,
-            lock: false
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const pinkCount = await database.Card.count(
@@ -725,7 +779,9 @@ async function burnList(embed, interaction, page){
             rarity: 7,
             tag: tag,
             playerID: uid,
-            lock: false
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const diaCount = await database.Card.count(
@@ -734,7 +790,9 @@ async function burnList(embed, interaction, page){
             rarity: 6,
             tag: tag,
             playerID: uid,
-            lock: false
+            lock: false,
+            charred: false,
+            weapon: null
         }}
     );
     const totalCoin = diaCount * 10000 + pinkCount * 3000 + redCount * 1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
@@ -833,7 +891,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                             rarity: {[Op.lt]: 5},
                             tag: tag,
                             playerID: uid,
-                            lock: false
+                            lock: false,
+                            charred: false,
+                            weapon: null
                         }}
                     );
                     const redCount = await database.Card.count(
@@ -842,7 +902,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                             rarity: 5,
                             tag: tag,
                             playerID: uid,
-                            lock: false
+                            lock: false,
+                            charred: false,
+                            weapon: null
                         }}
                     );
                     const redList = await database.Card.findAll(
@@ -851,7 +913,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                             rarity: 5,
                             tag: tag,
                             playerID: uid,
-                            lock: false
+                            lock: false,
+                            charred: false,
+                            weapon: null
                         }}
                     );
                     const pinkCount = await database.Card.count(
@@ -860,7 +924,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                             rarity: 7,
                             tag: tag,
                             playerID: uid,
-                            lock: false
+                            lock: false,
+                            charred: false,
+                            weapon: null
                         }}
                     );
                     const pinkList = await database.Card.findAll(
@@ -869,7 +935,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                             rarity: 7,
                             tag: tag,
                             playerID: uid,
-                            lock: false
+                            lock: false,
+                            charred: false,
+                            weapon: null
                         }}
                     );
                     const diaCount = await database.Card.count(
@@ -878,7 +946,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                             rarity: 6,
                             tag: tag,
                             playerID: uid,
-                            lock: false
+                            lock: false,
+                            charred: false,
+                            weapon: null
                         }}
                     );
                     const diaList = await database.Card.findAll(
@@ -887,7 +957,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                             rarity: 6,
                             tag: tag,
                             playerID: uid,
-                            lock: false
+                            lock: false,
+                            charred: false,
+                            weapon: null
                         }}
                     );
                     const marketlid = await marketCheck();
@@ -902,7 +974,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                                     cardID: redList[i].cardID,
                                     tag: tag,
                                     playerID: uid,
-                                    lock: 0
+                                    lock: 0,
+                                    charred: false,
+                                    weapon: null
                                 }
                             }
                         )
@@ -918,7 +992,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                                     cardID: pinkList[i].cardID,
                                     tag: tag,
                                     playerID: uid,
-                                    lock: 0
+                                    lock: 0,
+                                    charred: false,
+                                    weapon: null
                                 }
                             }
                         )
@@ -934,7 +1010,9 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                                     cardID: diaList[i].cardID,
                                     tag: tag,
                                     playerID: uid,
-                                    lock: 0
+                                    lock: 0,
+                                    charred: false,
+                                    weapon: null
                                 }
                             }
                         )

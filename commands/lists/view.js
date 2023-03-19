@@ -173,6 +173,14 @@ async function viewPurpleCard(card, interaction) {
     const cid = await card.characterID;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     let image;
     let url;
     if (card.imageID > 0) {
@@ -216,11 +224,12 @@ Gif ID is ${image.gifID} report any errors using ID.
     }
     embedCard.setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
-**LID:** ${card.inventoryID} | **CID:** ${cid}
-**Series:** ${char.seriesID} | ${series.seriesName}
+**LID: ** ${card.inventoryID} | **CID: ** ${cid}
+**Series: ** ${char.seriesID} | ${series.seriesName}
 **Rank: **${char.rank}
-**Rarity:** Amethyst
-**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
+**Rarity: ** Amethyst
+**Weapon: **${weaponName}
+**Date Pulled: ** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
     return await interaction.reply({embeds: [embedCard]});
 }
@@ -232,6 +241,14 @@ async function viewRedCard(card, interaction) {
     const cid = await card.characterID;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     let image;
     let url;
     if (card.imageID > 0) {
@@ -275,10 +292,11 @@ Gif ID is ${image.gifID} report any errors using ID.
     }
     embedCard.setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
-**LID:** ${card.inventoryID} | **CID:** ${cid}
-**Series:** ${char.seriesID} | ${series.seriesName}
+**LID: ** ${card.inventoryID} | **CID: ** ${cid}
+**Series: ** ${char.seriesID} | ${series.seriesName}
 **Rank: **${char.rank}
-**Rarity: Ruby**
+**Rarity: **Ruby
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
     return await interaction.reply({embeds: [embedCard]});
@@ -291,6 +309,14 @@ async function viewDiaCard(card, interaction) {
     const cid = await card.characterID;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     let image;
     let url;
     if (card.imageID > 0) {
@@ -334,10 +360,11 @@ Gif ID is ${image.gifID} report any errors using ID.
     }
     embedCard.setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
-**LID:** ${card.inventoryID} | **CID:** ${cid}
-**Series:** ${char.seriesID} | ${series.seriesName}
+**LID: ** ${card.inventoryID} | **CID:** ${cid}
+**Series: ** ${char.seriesID} | ${series.seriesName}
 **Rank: **${char.rank}
-**Rarity: Diamond**
+**Rarity: **Diamond
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
     return await interaction.reply({embeds: [embedCard]});
@@ -350,6 +377,14 @@ async function viewPinkCard(card, interaction) {
     const cid = await card.characterID;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     let image;
     let url;
     if (card.imageID > 0) {
@@ -393,10 +428,11 @@ Gif ID is ${image.gifID} report any errors using ID.
     }
     embedCard.setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
-**LID:** ${card.inventoryID} | **CID:** ${cid}
-**Series:** ${char.seriesID} | ${series.seriesName}
+**LID: ** ${card.inventoryID} | **CID:** ${cid}
+**Series: ** ${char.seriesID} | ${series.seriesName}
 **Rank: **${char.rank}
-**Rarity: Pink Diamond**
+**Rarity: **Pink Diamond
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.pink);
     return await interaction.reply({embeds: [embedCard]});
@@ -408,6 +444,14 @@ async function viewAzurCard(card, interaction) {
     const cid = await card.characterID;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     //all we get is inventory id and player id
     embedCard.setFooter(`Art by ${Azurite.artist}
 *Upload your choice of image of the character using with /stellarupload*`).setImage(Azurite.imageURL);
@@ -427,9 +471,10 @@ async function viewAzurCard(card, interaction) {
     embedCard.setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${card.characterID}
-**Series:** ${char.seriesID} | ${series.seriesName}
+**Series: ** ${char.seriesID} | ${series.seriesName}
 **Rank: **${char.rank}
-**Rarity: Stellarite**
+**Rarity: **Stellarite
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.stellar);
     if (Azurite.season == 2) {
@@ -444,6 +489,14 @@ async function viewAzurCard(card, interaction) {
 async function viewSpeCard(card, interaction) { 
     const special = await database.Special.findOne({where: {cardID: card.cardID}});
     const embedCard = new MessageEmbed();
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     //all we get is inventory id and player id
     embedCard.setFooter(`Art by ${special.artist}
 *edit card with /spedit*`).setImage(special.imageURL)
@@ -466,6 +519,7 @@ async function viewSpeCard(card, interaction) {
 **Series:** ${special.seriesName}
 **Rank: **1!
 **Rarity: Special**
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(special.color);
     return await interaction.reply({embeds: [embedCard]});

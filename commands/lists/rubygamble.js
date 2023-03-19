@@ -224,6 +224,9 @@ module.exports = {
             console.log(player.rpity);
             if (card) {
                 if (card.rarity == 5) {
+                    if (card.weapon) {
+                        return interaction.reply("Can't rubygamble awakened rubies.");
+                    }
                     if (player.money < 500) {
                         return interaction.reply(`You need at least 500 coins to start rubygamble.`)
                     } else {

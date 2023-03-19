@@ -450,7 +450,7 @@ Image ID is ${image.imageID} report any errors using ID.
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: card.imageID}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
         url = await image.gifURL;
         embedCard.setFooter({text: `#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -526,8 +526,8 @@ async function azurchar(interaction) {
         const rngChar = Math.floor(Math.random() * 1000);
         const char = (rngChar%wlist.length);
         cid = await wlist[char].characterID;
-        if(await player.apity > 6000) {
-            await player.increment({apity: -6000});
+        if(await player.apity > 10000) {
+            await player.increment({apity: -10000});
         } else {
             await player.update({apity: 0});
         }
@@ -537,7 +537,11 @@ async function azurchar(interaction) {
         const offset = (rngChar%count);
         const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
         cid = await char.characterID;
-        player.increment({apity: 250});
+        if(await player.apity > 2000) {
+            await player.increment({apity: -2000});
+        } else {
+            await player.update({apity: 0});
+        }
     }
     return cid;
 }
@@ -726,7 +730,7 @@ async function raritySwitch(interaction) {
     await player.increment({gems: -10});
     const pity = Math.floor(player.pity*3/10);
     const channel2 = interaction.guild.channels.cache.get('997873272014246018');
-    const apityrng = await (rngRarity + player.apity/500);
+    const apityrng = await (rngRarity + player.apity/700);
     const pityrng = await (rngRarity + pity);
     await player.increment({apity: 1});
     if (apityrng >= 99995) {
@@ -1405,9 +1409,6 @@ module.exports = {
             option.setName('rarity')
                 .setDescription('Character ID.')
                 .setRequired(true)
-                .addChoice('none', 0)
-                .addChoice('quartz', 1)
-                .addChoice('jade', 2)
                 .addChoice('lapis', 3)
                 .addChoice('amethyst', 4))
         .addBooleanOption(option => 

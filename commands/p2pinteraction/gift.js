@@ -119,6 +119,14 @@ async function viewWhiteCard(card, interaction) {
     let imgID = await card.imageID;
     let imgNumber = await card.imageNumber;
     let image;
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     if (imgID) {
         image = await database.Image.findOne({ where: { imageID: imgID}});
     } else if (imgNumber) {
@@ -141,7 +149,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageU
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID: **${cid}
 **Series: **${char.seriesID} | ${series.seriesName}
-**Rarity: Quartz**
+**Rarity: **Quartz
 **Quantity:** ${card.quantity}`)
         .setColor(color.white);
     const row = await createButton();
@@ -159,6 +167,14 @@ async function viewGreenCard(card, interaction) {
     let imgID = await card.imageID;
     let imgNumber = await card.imageNumber;
     let image;
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     if (imgID) {
         image = await database.Image.findOne({ where: { imageID: imgID}});
     } else if (imgNumber) {
@@ -198,6 +214,14 @@ async function viewBlueCard(card, interaction) {
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
     let image;
     let url;
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     if (card.imageNumber > 0) {
         image = await database.Image.findOne({where: {characterID: cid, imageNumber: card.imageNumber}});
         if (image) {
@@ -244,6 +268,14 @@ async function viewPurpleCard(card, interaction) {
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
     let image;
     let url;
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     if (card.imageID > 0) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
@@ -274,6 +306,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity:** Amethyst
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.purple);
     const row = await createButton();
@@ -292,6 +325,14 @@ async function viewRedCard(card, interaction) {
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
     let image;
     let url;
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     if (card.imageID > 0) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
@@ -321,7 +362,8 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity: Ruby**
+**Rarity: **Ruby
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.red);
     const row = await createButton();
@@ -341,6 +383,14 @@ async function viewDiaCard(card, interaction) {
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
     let image;
     let url;
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     if (card.imageID > 0) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
@@ -372,7 +422,8 @@ Gif ID is ${image.gifID} report any errors using ID.
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity: Diamond**
+**Rarity: **Diamond
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.diamond);
     const row = await createButton();
@@ -390,6 +441,14 @@ async function viewPinkCard(card, interaction) {
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
     let image;
     let url;
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     if (card.imageID > 0) {
         image = await database.Image.findOne({where: {characterID: cid, imageID: card.imageID}});
         if (image) {
@@ -422,6 +481,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Pink Diamond**
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.pink);
     const row = await createButton();
@@ -436,6 +496,14 @@ async function viewStelCard(card, interaction) {
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
     const embedCard = new MessageEmbed();
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     //all we get is inventory id and player id
     embedCard.setFooter(`Art by ${Azur.artist}
 *Upload your choice of image of the character using /stellarupload*`).setImage(Azur.imageURL)
@@ -445,6 +513,7 @@ async function viewStelCard(card, interaction) {
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
 **Rarity: Stellarite**
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(color.stellar);
     const row = await createButton();
@@ -464,6 +533,14 @@ async function viewSpeCard(card, interaction) {
     const player = await interaction.user.id;
     const cname = special.characterName;
     url = await image.imageURL;
+    const weapon = card.weapon;
+    let weaponName;
+    if (weapon) {
+        const weaponDB = await database.Weapon.findOne({where: {id:weapon}});
+        weaponName = weaponDB.name;
+    } else {
+        weaponName = "Unawakened"
+    }
     embedCard.setFooter(`Art by ${special.artist}
 *edit card with /spedit*`).setImage(special.imageURL)
     embedCard.setTitle(`${char.characterName}`)
@@ -471,7 +548,8 @@ async function viewSpeCard(card, interaction) {
         .setDescription(`Card Info
 **LID:** ${card.inventoryID}
 **Series:** ${special.seriesName}
-**Rarity: Diamond**
+**Rarity: Special**
+**Weapon: **${weaponName}
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
         .setColor(special.color);
     const row = await createButton();
@@ -514,6 +592,25 @@ async function switchRarity(card, rarity, interaction) {
     }
 }
 
+async function deckCheck(interaction) {
+    const lid = await interaction.options.getInteger('lid');
+    const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
+    if(card.weapon) {
+        const deck = await database.Deck.findOne({where: {
+            [Op.or]: [
+            { unit1: card.cardID },
+            { unit2: card.cardID },
+            { unit3: card.cardID },
+            { unit4: card.cardID },
+            { unit5: card.cardID }
+          ]}});
+        if (deck) {
+            return true;
+        }
+    }
+    return false;
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('gift')
@@ -540,6 +637,9 @@ module.exports = {
             console.log(target.id);
             const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
             if (card && targetplayer) {
+                if(deckCheck(interaction)) {
+                    return interaction.reply("Can't gift awakened cards that is currently in a deck!");
+                }
                 await switchRarity(card, card.rarity, interaction);
             } else if (!card) {
                 interaction.reply("Error Invalid list ID");

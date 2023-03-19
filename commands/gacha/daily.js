@@ -80,7 +80,7 @@ async function checkDaily(interaction, player){
             await cooldownDaily(interaction, timeDiff);
         } else {
             console.log(6);
-            await resetDaily(interaction, player);
+            await resetDaily(interaction, player, daily);
             await database.Player.increment({xp: 10}, {where: {playerID: userId}});
             await database.Daily.update({lastDaily: timeNow, streak: 1}, {where: {playerID: userId}});
         }
@@ -118,8 +118,8 @@ async function streakDaily(interaction, player, daily){
     const streak = daily.streak;
     console.log(4.1);
     let xpLimit;
-    if (player.level > 5) {
-        xpLimit = 300;
+    if (player.level > 6) {
+        xpLimit = 500;
     } else {
         xpLimit = (2**player.level)*10;
     }
@@ -169,8 +169,8 @@ async function checkLevelup(interaction) {
     const player = await database.Player.findOne({ where: { playerID: interaction.user.id } })
     const embed = await embedLvl(interaction, player);
     let xpLimit;
-    if (player.level > 5) {
-        xpLimit = 300;
+    if (player.level > 6) {
+        xpLimit = 500;
     } else {
         xpLimit = (2**player.level)*10;
     }
@@ -190,7 +190,7 @@ async function checkSeverM(interaction) {
     };
 }
 
-async function resetDaily(interaction, player){
+async function resetDaily(interaction, player, daily){
     console.log(6.1);
     const embedDone = await embedD(interaction);
     const reward = 500 + player.level * 100;
@@ -201,8 +201,8 @@ async function resetDaily(interaction, player){
     await checkKarma(interaction, daily);
     await checkLevelup(interaction);
     let xpLimit;
-    if (player.level > 5) {
-        xpLimit = 300;
+    if (player.level > 6) {
+        xpLimit = 500;
     } else {
         xpLimit = (2**player.level)*10;
     }

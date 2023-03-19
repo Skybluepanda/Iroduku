@@ -3,6 +3,32 @@ const database = require('../../database.js');
 const { MessageEmbed } = require('discord.js');
 const color = require('../../color.json');
 
+async function embedLvl(interaction) {
+    const player = await database.Player.findOne({ where: { playerID: interaction.user.id } });
+    const username = interaction.user.username;
+    const embedL = new MessageEmbed();
+    await embedL.setTitle("Level Up!")
+            .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
+            .setDescription(`Level ${player.level+1} reached!\nLevel up karma reward +${(player.level+1)*100} Karma\nDaily gem reward increased by 100!`)
+            .setColor(color.stellar);
+    return await embedL;
+}
+
+async function checkLevelup(interaction) {
+    const player = await database.Player.findOne({ where: { playerID: interaction.user.id } })
+    const embed = await embedLvl(interaction, player);
+    let xpLimit;
+    if (player.level > 6) {
+        xpLimit = 500;
+    } else {
+        xpLimit = (2**player.level)*10;
+    }
+    if (player.xp >= xpLimit) {
+        await database.Player.increment({Karma: (player.level+1)*100, xp: -xpLimit, level: 1}, {where: {playerID: interaction.user.id}});
+        await interaction.followUp({ embeds: [embed] }, {ephemeral: true});
+    };
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('stats')
@@ -31,14 +57,16 @@ module.exports = {
             .setColor("#ff0000")
             .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
         try {
+            await interaction.reply({embeds: [embed]});
+            await checkLevelup(interaction);
             const player = await database.Player.findOne({ where: { playerID: userId } });
             if (player) {
                 let toggle;
                 const sideson = await database.Sideson.findOne({ where: { playerID: userId } });
                 const trashon = await database.Trashon.findOne({ where: { playerID: userId } });
                 let xpLimit;
-                if (player.level > 5) {
-                    xpLimit = 300;
+                if (player.level > 6) {
+                    xpLimit = 500;
                 } else {
                     xpLimit = (2**player.level)*10;
                 }
@@ -63,9 +91,9 @@ module.exports = {
                 embedDone.setDescription('Player does not exist.')
                         .setColor(color.successgreen);
             }
-            return interaction.reply({ embeds: [embedDone] });
+            return interaction.editReply({ embeds: [embedDone] });
         } catch (error) {
-            return interaction.reply({ embeds: [embedError] });
+            return interaction.editReply({ embeds: [embedError] });
         }
     },
 };

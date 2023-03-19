@@ -20,14 +20,9 @@ async function newTagList(interaction, uid) {
             tag5: tags5,
         });
         const embed = new MessageEmbed();
-        embed.setTitle("Checking in")
+        embed.setTitle("Taglist Created")
                 .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-                .setDescription(`New Taglist Created with tags
-    ${tags1}
-    ${tags2}
-    ${tags3}
-    ${tags4}
-    ${tags5}`).setColor(color.successgreen);
+                .setDescription(`${tags1} ${tags2} ${tags3} ${tags4} ${tags5}`).setColor(color.successgreen);
         return interaction.reply({ embeds: [embed] });
     } catch (error) {
         return interaction.reply("Error has occured, you might need to enter 5 emotes for first time using this command.")
@@ -97,14 +92,9 @@ module.exports = {
                     await taglist.update({tag5:tags5});
                 }
                 const embed = new MessageEmbed();
-    embed.setTitle("Checking in")
+    embed.setTitle("Taglist Edited")
             .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Taglist edited with tags 
-${taglist.tag1}
-${taglist.tag2}
-${taglist.tag3}
-${taglist.tag4}
-${taglist.tag5}`).setColor(color.successgreen);
+            .setDescription(`${taglist.tag1} ${taglist.tag2} ${taglist.tag3} ${taglist.tag4} ${taglist.tag5}`).setColor(color.successgreen);
                 return interaction.reply({ embeds: [embed] });
             } else {
                 newTagList(interaction, uid);

@@ -468,7 +468,7 @@ Image ID is ${image.imageID} report any errors using ID.
             embedCard.addField("no image found", "Send an official image for this character.");
         }
     } else if (card.imageID < 0){
-        image = await database.Gif.findOne({where: {characterID: cid, gifID: card.imageID}});
+        image = await database.Gif.findOne({where: {characterID: cid, gifID: -(card.imageID)}});
         if (image){
         url = await image.gifURL;
         embedCard.setFooter(`#${image.gifNumber} Gif from ${image.artist} | Uploaded by ${image.uploader}
@@ -557,7 +557,7 @@ async function raritySwitch(cid, rngRarity, interaction) {
     player.increment({gems: -10});
     const pity = Math.floor(player.pity*3/10);
     const channel2 = interaction.guild.channels.cache.get('997873272014246018');
-    const apityrng = await (rngRarity + player.apity/500);
+    const apityrng = await (rngRarity + player.apity/700);
     const pityrng = await (rngRarity + pity);
     if (apityrng >= 99995) {
         channel2.send(`${interaction.user} rolled ${rngRarity} with ${player.apity} pity.`)
@@ -601,8 +601,8 @@ async function azurchar(interaction) {
         const rngChar = Math.floor(Math.random() * 1000);
         const char = (rngChar%wlist.length);
         cid = await wlist[char].characterID;
-        if(await player.apity > 6000) {
-            await player.increment({apity: -6000});
+        if(await player.apity > 10000) {
+            await player.increment({apity: -10000});
         } else {
             await player.update({apity: 0});
         }
@@ -612,7 +612,11 @@ async function azurchar(interaction) {
         const offset = (rngChar%count);
         const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
         cid = await char.characterID;
-        player.increment({apity: 250});
+        if(await player.apity > 2000) {
+            await player.increment({apity: -2000});
+        } else {
+            await player.update({apity: 0});
+        }
     }
     return cid;
 }
