@@ -34,7 +34,8 @@ module.exports = {
         database.Deck.sync();
         database.Game.sync();
         database.StatusType.sync();
-        database.Status.sync();
+        database.Gamelog.sync();
+        database.Unit.sync();
         console.log('database sync complete!');
     },
 };

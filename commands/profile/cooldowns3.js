@@ -424,48 +424,48 @@ async function viewCds2(interaction) {
 
 async function viewCds(interaction) {
     const username = interaction.user.username;
-        const userId = interaction.user.id;
-        
-        const embed = new MessageEmbed();
-        const embedDone = new MessageEmbed();
-        const embedError = new MessageEmbed();
+    const userId = interaction.user.id;
+    
+    const embed = new MessageEmbed();
+    const embedDone = new MessageEmbed();
+    const embedError = new MessageEmbed();
 
-        embed.setTitle("Checking Stats")
-            .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Checking for ${username}'s account.`)
-            .setColor(color.purple)
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
-        embedDone.setTitle(`${username}'s Stats`)
-            .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setColor(color.successgreen)
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
+    embed.setTitle("Checking Stats")
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Checking for ${username}'s account.`)
+        .setColor(color.purple)
+        .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
+    embedDone.setTitle(`${username}'s Stats`)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setColor(color.successgreen)
+        .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
 
-        embedError.setTitle("Unknown Error")
-            .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-            .setDescription(`Please report the error if it persists.`)
-            .setColor(color.failred)
-            .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
-        try {
+    embedError.setTitle("Unknown Error")
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Please report the error if it persists.`)
+        .setColor(color.failred)
+        .setThumbnail(interaction.user.avatarURL({ dynamic: true }))
+    try {
+        console.log("1")
+        const player = await database.Player.findOne({where: {playerID: userId}});
+        const daily = await database.Daily.findOne({where: {playerID: userId}});
+        const collect = await database.Collect.findOne({where: {playerID: userId}});
+        const votetrack = await database.Votetrack.findOne({where: {playerID: userId}});
+        const ccount = await database.Character.count();
+        const cvount = await database.Cvotetrack.count();
+        console.log("2")
+        // await checkDaily1(interaction);
+        // await checkCollect1(interaction);
+        console.log("3")
+        if (player && daily && collect && votetrack) {
             console.log("1")
-            const player = await database.Player.findOne({where: {playerID: userId}});
-            const daily = await database.Daily.findOne({where: {playerID: userId}});
-            const collect = await database.Collect.findOne({where: {playerID: userId}});
-            const votetrack = await database.Votetrack.findOne({where: {playerID: userId}});
-            const ccount = await database.Character.count();
-            const cvount = await database.Cvotetrack.count();
+            const dailyText = await checkDaily(interaction);
+            const collectText = await checkCollect(interaction);
+            const voteText = await checkVote(interaction);
             console.log("2")
-            // await checkDaily1(interaction);
-            // await checkCollect1(interaction);
+            const isvote = await checkIsvote(interaction);
             console.log("3")
-            if (player && daily && collect && votetrack) {
-                console.log("1")
-                const dailyText = await checkDaily(interaction);
-                const collectText = await checkCollect(interaction);
-                const voteText = await checkVote(interaction);
-                console.log("2")
-                const isvote = await checkIsvote(interaction);
-                console.log("3")
-                embedDone.setDescription(`
+            embedDone.setDescription(`
 **Daily:** ${dailyText}
 
 **Collect:** ${collectText}
@@ -483,9 +483,9 @@ async function viewCds(interaction) {
             const row = await createButton(interaction);
             msg = await interaction.reply({ embeds: [embedDone],components: [row], fetchReply: true });
             await buttonManager(interaction, msg);
-        } catch (error) {
-            return interaction.reply(`${error} error`);
-        }
+    } catch (error) {
+        return interaction.reply(`${error} error`);
+    }
 }
 
 
@@ -652,6 +652,10 @@ module.exports = {
         .setName('cds')
         .setDescription('Check your cooldowns'),
     async execute(interaction) {
-        await viewCds(interaction);
-    },
-};
+        try {
+            await viewCds(interaction);
+        } catch(error) {
+            await  interaction.reply(`${error} Error occured.`);
+        }        
+    }
+}

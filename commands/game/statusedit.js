@@ -8,7 +8,7 @@ async function embedNew(interaction) {
     const embedNew = new MessageEmbed();
     embedNew.setTitle("Status Created")
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Status has been created.`)
+        .setDescription(`Status has been created or deleted.`)
         .setColor(color.purple)
     return embedNew;
 };
@@ -102,6 +102,10 @@ async function editStatus(interaction) {
     return viewStatus(interaction, status);
 }
 
+async function removeStatus(interaction) {
+    const id = interaction.options.getInteger('id');
+    return await database.StatusType.destroy({where: {id: id}});
+}
 
 
 async function selectOption(interaction) {
@@ -112,6 +116,9 @@ async function selectOption(interaction) {
         case "edit":
             return editStatus(interaction);
 
+        case "remove":
+            return removeStatus(interaction);
+
         default:
             break;
     }
@@ -120,7 +127,7 @@ async function selectOption(interaction) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('statuscreatedit')
+		.setName('sfx')
 		.setDescription('Creates a new status effect')
         .addSubcommand(subcommand => subcommand
             .setName("new")
@@ -130,13 +137,13 @@ module.exports = {
                 .setDescription("The name of the status")
                 .setRequired(true))
             .addStringOption(option => option
-                .setName("statussprite")
-                .setDescription("The name of the status")
-                .setRequired(true))
-            .addStringOption(option => option
                 .setName("description")
                 .setDescription("The fluff for the status")
-                .setRequired(true)))
+                .setRequired(true))
+            .addStringOption(option => option
+                .setName("statussprite")
+                .setDescription("The name of the status")
+                .setRequired(false)))
         .addSubcommand(subcommand =>subcommand
             .setName("edit")
             .setDescription("Edit existing status.")
@@ -147,14 +154,21 @@ module.exports = {
             .addStringOption(option => option
                 .setName("name")
                 .setDescription("The name of the status")
-                .setRequired(true))
+                .setRequired(false))
             .addStringOption(option => option
                 .setName("statussprite")
                 .setDescription("The name of the status")
-                .setRequired(true))
+                .setRequired(false))
             .addStringOption(option => option
                 .setName("description")
                 .setDescription("The fluff for the status")
+                .setRequired(false)))
+        .addSubcommand(subcommand =>subcommand
+            .setName("remove")
+            .setDescription("removes existing status.")
+            .addIntegerOption(option => option
+                .setName("id")
+                .setDescription("The id of the status")
                 .setRequired(true))),
 	async execute(interaction) {
         const embedN = await embedNew(interaction);
@@ -163,9 +177,9 @@ module.exports = {
         
         try {
             await interaction.reply({ embeds: [embedN] });
-            if (!interaction.member.roles.cache.has('1086819458800177213')) {
+            if (!interaction.member.roles.cache.has('908920341588496445')) {
                 embedE.setTitle("Insufficient Permissions")
-                    .setDescription("You don't have the blacksmith role!");
+                    .setDescription("You don't have the wizard role!");
                 return interaction.editReply({ embeds: [embedE] }, {ephemeral: true});
             };
             if (interaction.channel.id === '1086674842893438976') {

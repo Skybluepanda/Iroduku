@@ -195,7 +195,7 @@ async function purplecard(card) {
     //image number of card
     const inumber = card.imageNumber;
     const lock = card.lock;
-    let cardName = " ";
+    let cardName = "";
     if (card.weapon) {
         const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
         cardName = `- **${weaponDB.name}**`;
@@ -203,19 +203,19 @@ async function purplecard(card) {
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + cardName;
             return cardString
         } else {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + cardName;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + cardName;
             return cardString
         } else {
-            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:purple_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})`  + cardName;
             return cardString
         }
     }
@@ -235,7 +235,7 @@ async function redcard(card) {
     //image number of card
     const inumber = card.imageNumber;
     const lock = card.lock;
-    let cardName = " ";
+    let cardName = "";
     if (card.weapon) {
         const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
         cardName = `- **${weaponDB.name}**`;
@@ -243,19 +243,19 @@ async function redcard(card) {
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + cardName;
             return cardString
         } else {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + cardName;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + cardName;
             return cardString
         } else {
-            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:red_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + cardName;
             return cardString
         }
     }
@@ -275,7 +275,7 @@ async function diacard(card) {
     //image number of card
     const inumber = card.imageNumber;
     const lock = card.lock;
-    let cardName = " ";
+    let cardName = "";
     if (card.weapon) {
         const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
         cardName = `- **${weaponDB.name}**`;
@@ -283,19 +283,19 @@ async function diacard(card) {
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + cardName;
             return cardString
         } else {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + cardName;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + cardName;
             return cardString
         } else {
-            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:large_blue_diamond:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + cardName;
             return cardString
         }
     }
@@ -323,19 +323,19 @@ async function pinkcard(card) {
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + cardName;
             return cardString
         } else {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + cardName;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + cardName;
             return cardString
         } else {
-            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber}) ${cardName}`;
+            const cardString =`:diamonds:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + cardName;
             return cardString
         }
     }
@@ -354,7 +354,7 @@ async function azurcard(card) {
     const char = await database.Character.findOne({where: {characterID: card.characterID}});
     const charname = char.characterName;
     const lock = card.lock;
-    let cardName = " ";
+    let cardName = "";
     if (card.weapon) {
         const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
         cardName = `- **${weaponDB.name}**`;
@@ -362,19 +362,19 @@ async function azurcard(card) {
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname + ` ${cardName}`;
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname + cardName;
             return cardString
         } else {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname + ` ${cardName}`;
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname + cardName;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname + ` ${cardName}`;
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + tag + charname + cardName;
             return cardString
         } else {
-            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname + ` ${cardName}`;
+            const cardString =`:diamond_shape_with_a_dot_inside:` + ID + ` ${lockstatus} ` + charname + cardName;
             return cardString
         }
     }
@@ -392,27 +392,22 @@ async function specard(card) {
     //find charname
     const charname = special.characterName;
     const lock = card.lock;
-    let cardName = " ";
-    if (card.weapon) {
-        const weaponDB = await database.Weapon.findOne({where: {id:card.weapon}});
-        cardName = `- **${weaponDB.name}**`;
-    }
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` ${cardName}`;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname;
             return cardString
         } else {
-            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname + ` ${cardName}`;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname + ` ${cardName}`;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + tag + charname;
             return cardString
         } else {
-            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname + ` ${cardName}`;
+            const cardString =`:large_orange_diamond:` + ID + ` ${lockstatus} ` + charname;
             return cardString
         }
     }

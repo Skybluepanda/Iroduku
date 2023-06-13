@@ -752,6 +752,29 @@ const Card = sequelize.define('card', {
 	},
 });
 
+const Weaponcard = sequelize.define('weaponcard', {
+	cardID: {
+		type: Sequelize.INTEGER,
+		autoIncrement: true,
+		primaryKey: true,
+	},
+	playerID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	cardID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	inventoryID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+})
+
 
 const Special = sequelize.define('special', {
 	cardID: {
@@ -853,8 +876,18 @@ const Weapon = sequelize.define('weapon', {
 		unique: false,
 		allowNull: false,
 	},
-	class: {
+	title: {
 		type: Sequelize.STRING,
+		unique: false,
+		allowNull: false,
+	},
+	class: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
+	element: {
+		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
 	},
@@ -878,27 +911,35 @@ const Weapon = sequelize.define('weapon', {
 		unique: false,
 		allowNull: false,
 	},
-	eva: {
-		type: Sequelize.INTEGER,
-		unique: false,
-		allowNull: false,
-	},
-	acc: {
-		type: Sequelize.INTEGER,
-		unique: false,
-		allowNull: false,
-	},
 	crt: {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
 	},
-	crd: {
-		type: Sequelize.INTEGER,
-		unique: false,
+})
+
+const Class = sequelize.define('class', {
+	name: {
+		type: Sequelize.STRING,
 		allowNull: false,
 	},
-})
+	sprite: {
+		type: Sequelize.STRING,
+		allowNull: true,
+	},
+});
+
+const Element = sequelize.define('element', {
+	name: {
+		type: Sequelize.STRING,
+		allowNull: false,
+	},
+	sprite: {
+		type: Sequelize.STRING,
+		allowNull: true,
+	},
+});
+
 
 const Ability = sequelize.define('ability', {
 	abilityID: {
@@ -908,12 +949,12 @@ const Ability = sequelize.define('ability', {
 	},
 	abilityName: {
 		type: Sequelize.STRING,
-		unique: true,
+		unique: false,
 		allowNull: false,
 	},
 	abilityText: {
 		type: Sequelize.STRING,
-		unique: true,
+		unique: false,
 		allowNull: false,
 	},
 	weaponID: {
@@ -931,22 +972,17 @@ const Ability = sequelize.define('ability', {
 		unique: false,
 		allowNull: false,
 	},
+	range: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+	},
 	damage: {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
 	},
 	dmgvar: {
-		type: Sequelize.INTEGER,
-		unique: false,
-		allowNull: false,
-	},
-	pen: {
-		type: Sequelize.INTEGER,
-		unique: false,
-		allowNull: false,
-	},
-	acc: {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
@@ -1027,15 +1063,26 @@ const Deck = sequelize.define('deck', {
 })
 
 const Game = sequelize.define('game', {
-	gameID: {
-		type: Sequelize.INTEGER,
-		unique: true,
-		allowNull: false,
-	},
 	gameType: {
 		type: Sequelize.INTEGER,
 		unique: false,
 		allowNull: false,
+	},
+	ladyluck: {
+		type: Sequelize.INTEGER,
+		unique: false,
+		allowNull: false,
+		defaultValue: 0,
+	},
+	deck1Image: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: true
+	},
+	deck2Image: {
+		type: Sequelize.STRING,
+		unique: false,
+		allowNull: true
 	},
 	round: {
 		type: Sequelize.INTEGER,
@@ -1057,57 +1104,113 @@ const Game = sequelize.define('game', {
 		unique: false,
 		allowNull: false,
 	},
-	unit1: {
+	resonance11: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	unit2: {
+	resonance12: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	unit3: {
+	resonance13: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	unit4: {
+	resonance14: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	unit5: {
+	resonance15: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	unit6: {
+	resonance21: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	unit7: {
+	resonance22: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	unit8: {
+	resonance23: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	unit9: {
+	resonance24: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
-	unit10: {
+	resonance25: {
 		type: Sequelize.INTEGER,
 		unique: false,
-		allowNull: false,
+		allowNull: true,
 	},
 })
+
+const Unit = sequelize.define('unit', {
+	gameID: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+	},
+	playerID: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+	},
+	//Takes the character image and weapon image as set.
+	spriteSet: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+	weaponID: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	position: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	logName: {
+		type: Sequelize.STRING,
+		unique: false,
+	},
+	init: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	maxHp: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	currentHp: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	res: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	atk: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	crt: {
+		type: Sequelize.INTEGER,
+		unique: false,
+	},
+	token: {
+		type: Sequelize.ARRAY(Sequelize.INTEGER),
+      allowNull: true
+	}
+});
 
 const StatusType = sequelize.define('statusType', {
 	name: {
@@ -1124,23 +1227,27 @@ const StatusType = sequelize.define('statusType', {
 	},
 });
 
-const Status = sequelize.define('status', {
+const Gamelog = sequelize.define('gamelog', {
 	gameID: {
 		type: Sequelize.INTEGER,
 		allowNull: false,
 	},
-	unitNumber: {
+	result: {
 		type: Sequelize.INTEGER,
-		unique: false,
+		allowNull: true,
 	},
-	statusID: {
+	player1: {
 		type: Sequelize.INTEGER,
-		unique: false,
+		allowNull: false,
 	},
-	duration: {
+	player2: {
 		type: Sequelize.INTEGER,
-		unique: false,
+		allowNull: false,
 	},
+	text: {
+		type: Sequelize.TEXT,
+		allowNull: true,
+	}
 });
 
 
@@ -1175,4 +1282,5 @@ exports.Ability = Ability;
 exports.Deck = Deck;
 exports.Game = Game;
 exports.StatusType = StatusType;
-exports.Status = Status;
+exports.Gamelog = Gamelog;
+exports.Unit = Unit;

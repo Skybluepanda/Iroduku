@@ -23,7 +23,7 @@ function embedC(interaction) {
 function embedD(interaction) {
     const username = interaction.user.username;
     const embedDone = new MessageEmbed();
-    embedDone.setTitle("Collected gems!")
+    embedDone.setTitle("Gems collected!")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setColor(color.successgreen)
     return embedDone;
@@ -32,7 +32,7 @@ function embedD(interaction) {
 function embedL(interaction) {
     const username = interaction.user.username;
     const embedCool = new MessageEmbed();
-    embedCool.setTitle("Collection too soon.")
+    embedCool.setTitle("Collect not ready yet.")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setDescription(`Please wait for the cooldown.`)
             .setColor(color.failred)

@@ -252,8 +252,6 @@ async function createRedCard(cid, interaction) {
         rarity: 5,
     });
     
-    let channel = await interaction.guild.channels.cache.get('948507565577367563');
-    await channel.send(`A lucky player got a **Ruby :red_square: ${cid} | ${char.characterName} from ${series.seriesName}!**`);
     await viewRCard(newcard, interaction);
     const gachaString = (`:red_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`);
     
@@ -504,6 +502,14 @@ module.exports = {
                         await interaction.reply({embeds: [embedS]});
                         const list = [];
                         for (let i = 0; i < 10; i++) {
+                            if (i == 5) {
+                                const playerc = await database.Player.findOne({where: {playerID: user}});
+                                if (playerc.karma < 0) {
+                                    i = 10;
+                                    await interaction.channel.send("Insufficient Gems, ending gktenroll.");
+                                }
+                            }
+                            
                             const card = await gacha(interaction);
                             list[i] = card;
                             const listString = list.join(`\n`);

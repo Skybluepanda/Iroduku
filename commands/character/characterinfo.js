@@ -128,7 +128,7 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
         console.log('button manager ready.');
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
-        collector.on('collect', async i => {
+        await collector.on('collect', async i => {
             switch (i.customId){
                 case 'prev':
                     await checkInumber(embed, interaction, msg, -1, currentImage, totalImage, imageC, cid, row);
@@ -180,6 +180,7 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
         console.log("Error has occured in button Manager");
     }
 }
+
 async function subcommandProcess(embed, interaction) {
     const subCommand = interaction.options.getSubcommand();
     switch (subCommand) {

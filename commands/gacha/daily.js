@@ -23,7 +23,7 @@ function embedC(interaction) {
 function embedD(interaction) {
     const username = interaction.user.username;
     const embedDone = new MessageEmbed();
-    embedDone.setTitle("Daily claimed!")
+    embedDone.setTitle("Daily Claimed!")
             .setAuthor(username, interaction.user.avatarURL({ dynamic: true }))
             .setColor(color.successgreen)
     return embedDone;

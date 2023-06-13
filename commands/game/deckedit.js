@@ -96,8 +96,10 @@ async function convertRarity(rarity) {
     }
 }
 
-async function viewDeckLineup(interaction, deck) {
+async function viewDeckLineup(interaction, deckid) {
     const uid = await interaction.user.id;
+    const deckUrl = 'https://cdn.discordapp.com/attachments/1086674842893438976/1090131793430204416/deckfill.png';
+    const deck = await database.Deck.findOne({where: {deckNumber: deckid, playerID: uid}});
     const card1 = await database.Card.findOne({where: {playerID: uid, inventoryID: deck.unit1}});
     const card2 = await database.Card.findOne({where: {playerID: uid, inventoryID: deck.unit2}});
     const card3 = await database.Card.findOne({where: {playerID: uid, inventoryID: deck.unit3}});
@@ -123,18 +125,20 @@ async function viewDeckLineup(interaction, deck) {
     const wpn3 = await loadImage(unit3Weapon.weaponSprite);
     const wpn4 = await loadImage(unit4Weapon.weaponSprite);
     const wpn5 = await loadImage(unit5Weapon.weaponSprite);
-    const canvas = createCanvas(1125, 575);
+    const deckfill = await loadImage(deckUrl);
+    const canvas = createCanvas(1240, 622);
     const context = canvas.getContext('2d');
-    context.drawImage(img1, 0, 0, 225, 350);
-    context.drawImage(img2, 225, 0, 225, 350);
-    context.drawImage(img3, 450, 0, 225, 350);
-    context.drawImage(img4, 675, 0, 225, 350);
-    context.drawImage(img5, 900, 0, 225, 350);
-    context.drawImage(wpn1, 0, 350, 225, 225);
-    context.drawImage(wpn2, 225, 350, 225, 225);
-    context.drawImage(wpn3, 450, 350, 225, 225);
-    context.drawImage(wpn4, 675, 350, 225, 225);
-    context.drawImage(wpn5, 900, 350, 225, 225);
+    context.drawImage(deckfill, 0, 0, 1240, 622);
+    context.drawImage(img1, 12, 12, 225, 350);
+    context.drawImage(img2, 260, 12, 225, 350);
+    context.drawImage(img3, 508, 12, 225, 350);
+    context.drawImage(img4, 756 , 12, 225, 350);
+    context.drawImage(img5, 1004, 12, 225, 350);
+    context.drawImage(wpn1, 8, 382, 232, 232);
+    context.drawImage(wpn2, 256, 382, 232, 232);
+    context.drawImage(wpn3, 504, 382, 232, 232);
+    context.drawImage(wpn4, 752, 382, 232, 232);
+    context.drawImage(wpn5, 1000, 382, 232, 232);
     const col1 = await switchRarityColour(card1);
     const col2 = await switchRarityColour(card2);
     const col3 = await switchRarityColour(card3);
@@ -151,16 +155,16 @@ async function viewDeckLineup(interaction, deck) {
     const w4r = await convertRarity(unit4Weapon.rarity);
     const w5r = await convertRarity(unit5Weapon.rarity);
     context.strokeStyle = col1;
-    context.lineWidth = 4;
-    context.strokeRect(2, 2, 221, 346);
+    context.lineWidth = 6;
+    context.strokeRect(11, 11, 227, 352);
     context.strokeStyle = col2;
-    context.strokeRect(227, 2, 221, 346);
+    context.strokeRect(259, 11, 227, 352);
     context.strokeStyle = col3;
-    context.strokeRect(452, 2, 221, 346);
+    context.strokeRect(508, 11, 227, 352);
     context.strokeStyle = col4;
-    context.strokeRect(677, 2, 221, 346);
+    context.strokeRect(756, 11, 227, 352);
     context.strokeStyle = col5;
-    context.strokeRect(902, 2, 221, 346);
+    context.strokeRect(1004, 11, 227, 352);
     const attachment = await new MessageAttachment(canvas.toBuffer(), 'ayaka.png');
     await interaction.editReply({ files: [attachment] });
     const message = await interaction.fetchReply();
@@ -169,7 +173,7 @@ async function viewDeckLineup(interaction, deck) {
         deck.update({deckImage: link});
     })
     const embed = new MessageEmbed();
-    embed.setTitle(`Deck ${deck.deckID} | ${deck.deckName}`)
+    embed.setTitle(`Deck ${deckid} | ${deck.deckName}`)
         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
         .setDescription(`Deck Info`)
         .addFields({name: `Position 1: ${charname1}`, value: `${unit1Weapon.id} | ${unit1Weapon.name}
@@ -318,6 +322,10 @@ async function newDeck(interaction) {
         const pos3 = await interaction.options.getInteger("pos3");
         const pos4 = await interaction.options.getInteger("pos4");
         const pos5 = await interaction.options.getInteger("pos5");
+        const sameWeapon = await noSameWeapon(interaction, pos1,pos2,pos3,pos4,pos5);
+        if (sameWeapon) {
+            return interaction.followUp("Can't use duplicate weapons in same deck.");
+        }
         const unit1 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos1}})
         const unit2 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos1}})
         const unit3 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos1}})
@@ -342,7 +350,7 @@ async function newDeck(interaction) {
             unit4: pos4,
             unit5: pos5,
         });
-        return await viewDeckLineup(interaction, deck)
+        return await viewDeckLineup(interaction, deck.deckNumber)
     } catch (error) {
         return console.log(error);
     }
@@ -360,11 +368,15 @@ async function editDeck(interaction) {
         const pos5 = await interaction.options.getInteger("pos5");
         const deck = await database.Deck.findOne({where: {playerID: uid, deckNumber: deckID}})
         const unit1 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos1}})
-        const unit2 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos1}})
-        const unit3 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos1}})
-        const unit4 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos1}})
-        const unit5 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos1}})
+        const unit2 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos2}})
+        const unit3 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos3}})
+        const unit4 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos4}})
+        const unit5 = await database.Card.findOne({where: {playerID: uid, inventoryID: pos5}})
         if (deck) {
+            const sameWeapon = await noSameWeaponDeck(interaction, deck, pos1,pos2,pos3,pos4,pos5);
+            if (sameWeapon) {
+                return interaction.followUp("Can't use duplicate weapons in same deck.");
+            }
             if (dname) {
                 await deck.update({deckName:dname});
             }
@@ -382,7 +394,7 @@ async function editDeck(interaction) {
             if (pos2) {
                 if (unit2) {
                     if (unit2.weapon) {
-                        await deck.update({unit1:pos2});
+                        await deck.update({unit2:pos2});
                     } else {
                         return await interaction.followUp(`${pos2} isn't awakened.`)
                     }
@@ -393,7 +405,7 @@ async function editDeck(interaction) {
             if (pos3) {
                 if (unit3) {
                     if (unit3.weapon) {
-                        await deck.update({unit1:pos3});
+                        await deck.update({unit3:pos3});
                     } else {
                         return await interaction.followUp(`${pos3} isn't awakened.`)
                     }
@@ -404,7 +416,7 @@ async function editDeck(interaction) {
             if (pos4) {
                 if (unit4) {
                     if (unit4.weapon) {
-                        await deck.update({unit1:pos4});
+                        await deck.update({unit4:pos4});
                     } else {
                         return await interaction.followUp(`${pos4} isn't awakened.`)
                     }
@@ -415,7 +427,7 @@ async function editDeck(interaction) {
             if (pos5) {
                 if (unit5) {
                     if (unit5.weapon) {
-                        await deck.update({unit1:pos5});
+                        await deck.update({unit5:pos5});
                     } else {
                         return await interaction.followUp(`${pos5} isn't awakened.`)
                     }
@@ -426,12 +438,71 @@ async function editDeck(interaction) {
         } else {
             return await interaction.followUp("Can't edit invalid deck.")
         }
-        
-        return await viewDeckLineup(interaction, deck)
+        return await viewDeckLineup(interaction, deckID)
     } catch (error) {
         return console.log(error);
     }
 }
+
+async function noSameWeapon(interaction, unit1, unit2, unit3, unit4, unit5) {
+    const uid = interaction.user.id;
+    const card1 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit1}});
+    const card2 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit2}});
+    const card3 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit3}});
+    const card4 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit4}});
+    const card5 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit5}});
+    if (card1.weapon == card2.weapon || card1.weapon == card3.weapon || card1.weapon == card4.weapon || card1.weapon == card5.weapon ||
+        card2.weapon == card3.weapon || card2.weapon == card4.weapon || card2.weapon == card5.weapon ||
+        card3.weapon == card4.weapon || card3.weapon == card5.weapon ||
+        card4.weapon == card5.weapon) {
+            return true;
+    } else {
+        return false;
+    }
+}
+
+async function noSameWeaponDeck(interaction, deck, unit1, unit2, unit3, unit4, unit5) {
+    const uid = interaction.user.id;
+    let card1;
+    let card2;
+    let card3;
+    let card4;
+    let card5;
+    if (unit1) {
+        card1 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit1}});
+    } else {
+        card1 = await database.Card.findOne({where: {playerID: uid, inventoryID: deck.unit1}});
+    }
+    if (unit2) {
+        card2 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit2}});
+    } else {
+        card2 = await database.Card.findOne({where: {playerID: uid, inventoryID: deck.unit2}});
+    }
+    if (unit3) {
+        card3 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit3}});
+    } else {
+        card3 = await database.Card.findOne({where: {playerID: uid, inventoryID: deck.unit3}});
+    }
+    if (unit4) {
+        card4 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit4}});
+    } else {
+        card4 = await database.Card.findOne({where: {playerID: uid, inventoryID: deck.unit4}});
+    }
+    if (unit5) {
+        card5 = await database.Card.findOne({where: {playerID: uid, inventoryID: unit5}});
+    } else {
+        card5 = await database.Card.findOne({where: {playerID: uid, inventoryID: deck.unit5}});
+    }
+    if (card1.weapon == card2.weapon || card1.weapon == card3.weapon || card1.weapon == card4.weapon || card1.weapon == card5.weapon ||
+        card2.weapon == card3.weapon || card2.weapon == card4.weapon || card2.weapon == card5.weapon ||
+        card3.weapon == card4.weapon || card3.weapon == card5.weapon ||
+        card4.weapon == card5.weapon) {
+            return true;
+    } else {
+        return false;
+    }
+}
+
 
 async function selectOption(interaction) {
     switch (interaction.options.getSubcommand()) {

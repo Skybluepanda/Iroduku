@@ -49,8 +49,8 @@ async function viewWeapon(interaction) {
 **Health: ** ${weapon.health}
 **Armor: ** ${weapon.armor}
 **Attack: ** ${weapon.atk}
-**Evasion: ** ${weapon.eva}
 **Accuracy: ** ${weapon.acc}
+**Evasion: ** ${weapon.eva}
 **Critical Chance: ** ${weapon.crt}
 **Critical Damage: ** ${weapon.crd}`
     });
@@ -104,21 +104,21 @@ async function viewWeaponId(interaction) {
 **Critical Chance: ** ${weapon.crt}
 **Critical Damage: ** ${weapon.crd}`
     });
-    const ability0 = database.Ability.findOne({where: {weaponID: weapon.id, abilitySlot: 0}});
-    const ability1 = database.Ability.findOne({where: {weaponID: weapon.id, abilitySlot: 1}});
-    const ability2 = database.Ability.findOne({where: {weaponID: weapon.id, abilitySlot: 2}});
-    const ability3 = database.Ability.findOne({where: {weaponID: weapon.id, abilitySlot: 3}});
+    const ability0 = await database.Ability.findOne({where: {weaponID: weapon.id, abilitySlot: 0}});
+    const ability1 = await database.Ability.findOne({where: {weaponID: weapon.id, abilitySlot: 1}});
+    const ability2 = await database.Ability.findOne({where: {weaponID: weapon.id, abilitySlot: 2}});
+    const ability3 = await database.Ability.findOne({where: {weaponID: weapon.id, abilitySlot: 3}});
     if(ability0) {
-        embed.addFields({name: `${ability0.abilityName}`, value: `${ability0.abilityText}`});
+        embed.addFields({name: `Passive: ${ability0.abilityName}`, value: `${ability0.abilityText}`});
     }
     if(ability1) {
-        embed.addFields({name: `${ability1.abilityName}`, value: `${ability1.abilityText}`});
+        embed.addFields({name: `Attack: ${ability1.abilityName}`, value: `${ability1.abilityText}`});
     }
     if(ability2) {
-        embed.addFields({name: `${ability2.abilityName}`, value: `${ability2.abilityText}`});
+        embed.addFields({name: `Primary: ${ability2.abilityName}`, value: `${ability2.abilityText}`});
     }
     if(ability3) {
-        embed.addFields({name: `${ability3.abilityName}`, value: `${ability3.abilityText}`});
+        embed.addFields({name: `Secondary: ${ability3.abilityName}`, value: `${ability3.abilityText}`});
     }
     return interaction.reply({embeds: [embed]});
 }

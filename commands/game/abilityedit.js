@@ -46,11 +46,12 @@ async function viewAbility(interaction, ability) {
     embed.setTitle(`${ability.abilityName}`)
         .setDescription(`${ability.abilityText}`)
         .setColor(color.successgreen)
-        .setFields({name: "Weapon Details",
+        .setFields({name: "Ability Details",
             value:
 `**weaponID: ** ${ability.weaponID}
 **Slot: ** ${ability.abilitySlot}
 **Target: ** ${ability.target}
+**Range: **${ability.range}
 **Damage: ** ${ability.damage}
 **Damage Variance: ** ${ability.dmgvar}
 **Armor Penetration: ** ${ability.pen}
@@ -74,6 +75,7 @@ async function newAbility(interaction) {
         const abilitySlot = interaction.options.getInteger('abilityslot');
         const abilityID = weaponID*10 + abilitySlot;
         const target = interaction.options.getInteger('target');
+        const range = interaction.options.getInteger('range');
         const damage = interaction.options.getInteger('damage');
         const dmgvar = interaction.options.getInteger('dmgvar');
         const pen = interaction.options.getInteger('pen');
@@ -91,6 +93,7 @@ async function newAbility(interaction) {
             weaponID: weaponID,
             abilitySlot: abilitySlot,
             target: target,
+            range: range,
             damage: damage,
             dmgvar: dmgvar,
             pen: pen,
@@ -113,63 +116,67 @@ async function newAbility(interaction) {
 
 
 async function editAbility(interaction) {
-    const id = interaction.options.getInteger('id');
-    const name = interaction.options.getString('name');
-    const text = interaction.options.getString('text');
-    const weaponID = interaction.options.getInteger('weaponid');
-    const abilitySlot = interaction.options.getInteger('abilityslot');
-    const target = interaction.options.getInteger('target');
-    const damage = interaction.options.getInteger('damage');
-    const dmgvar = interaction.options.getInteger('dmgvar');
-    const pen = interaction.options.getInteger('pen');
-    const acc = interaction.options.getInteger('acc');
-    const crt = interaction.options.getInteger('crt');
-    const crd = interaction.options.getInteger('crd');
-    const effect = interaction.options.getString('effect');
-    const self = interaction.options.getString('self');
-    const cooldown = interaction.options.getInteger('cooldown');
-    const ability = await database.ability.findOne({where: {abilityID: id}});
-    if(name) {
-        ability.update({name: name});
+    const id = await interaction.options.getInteger('id');
+    const name = await interaction.options.getString('name');
+    const text = await interaction.options.getString('text');
+    const weaponID = await interaction.options.getInteger('weaponid');
+    const abilitySlot = await interaction.options.getInteger('abilityslot');
+    const target = await interaction.options.getInteger('target');
+    const range = await interaction.options.getInteger('range');
+    const damage = await interaction.options.getInteger('damage');
+    const dmgvar = await interaction.options.getInteger('dmgvar');
+    const pen = await interaction.options.getInteger('pen');
+    const acc = await interaction.options.getInteger('acc');
+    const crt = await interaction.options.getInteger('crt');
+    const crd = await interaction.options.getInteger('crd');
+    const effect = await interaction.options.getString('effect');
+    const self = await interaction.options.getString('self');
+    const cooldown = await interaction.options.getInteger('cooldown');
+    const ability = await database.Ability.findOne({where: {abilityID: id}});
+    if(name !== null) {
+        await ability.update({abilityName: name});
     }
-    if(text) {
-        ability.update({abilityText: text});
+    if(text !== null) {
+        await ability.update({abilityText: text});
     }
-    if(weaponID) {
-        ability.update({weaponID: weaponID});
+    if(weaponID !== null) {
+        await ability.update({weaponID: weaponID});
     }
-    if(abilitySlot) {
-        ability.update({abilitySlot: abilitySlot});
+    if(abilitySlot !== null) {
+        await ability.update({abilitySlot: abilitySlot});
     }
-    if(target) {
-        ability.update({target: target});
+    if(target !== null) {
+        await ability.update({target: target});
     }
-    if(damage) {
-        ability.update({damage: damage});
+    if(range !== null) {
+        await ability.update({range: range});
     }
-    if(dmgvar) {
-        ability.update({dmgvar: dmgvar});
+    if(damage !== null) {
+        await ability.update({damage: damage});
     }
-    if(pen) {
-        ability.update({pen: pen});
+    if(dmgvar !== null) {
+        await ability.update({dmgvar: dmgvar});
     }
-    if(acc) {
-        ability.update({acc: acc});
+    if(pen !== null) {
+        await ability.update({pen: pen});
     }
-    if(crt) {
-        ability.update({crt: crt});
+    if(acc !== null) {
+        await ability.update({acc: acc});
     }
-    if(crd) {
-        ability.update({crd: crd});
+    if(crt !== null) {
+        await ability.update({crt: crt});
     }
-    if(effect) {
-        ability.update({effect: effect});
+    if(crd !== null) {
+        await ability.update({crd: crd});
     }
-    if(self) {
-        ability.update({self: self});
+    if(effect !== null) {
+        await ability.update({effect: effect});
     }
-    if(cooldown) {
-        ability.update({cooldown: cooldown});
+    if(self !== null) {
+        await ability.update({self: self});
+    }
+    if(cooldown !== null) {
+        await ability.update({cooldown: cooldown});
     }
     return viewAbility(interaction, ability);
 }
@@ -183,6 +190,11 @@ async function selectOption(interaction) {
 
         case "edit":
             return editAbility(interaction);
+
+        case "info":
+            const id = interaction.options.getInteger('id');
+            const ability = await database.Ability.findOne({where: {abilityID: id}});
+            return viewAbility(interaction, ability);
 
         default:
             break;
@@ -216,6 +228,10 @@ module.exports = {
             .addIntegerOption(option => option
                 .setName("target")
                 .setDescription("ability target")
+                .setRequired(true))
+            .addIntegerOption(option => option
+                .setName("range")
+                .setDescription("ability range")
                 .setRequired(true))
             .addIntegerOption(option => option
                 .setName("damage")
@@ -263,58 +279,69 @@ module.exports = {
             .addStringOption(option => option
                 .setName("name")
                 .setDescription("The name of the ability")
-                .setRequired(true))
+                .setRequired(false))
             .addStringOption(option => option
                 .setName("text")
                 .setDescription("The text of the ability")
-                .setRequired(true))
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("weaponid")
                 .setDescription("Weapon id")
-                .setRequired(true))
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("abilityslot")
                 .setDescription("ability health")
-                .setRequired(true))
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("target")
                 .setDescription("ability target")
-                .setRequired(true))
+                .setRequired(false))
+            .addIntegerOption(option => option
+                .setName("range")
+                .setDescription("ability range")
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("damage")
                 .setDescription("ability damage")
-                .setRequired(true))
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("dmgvar")
                 .setDescription("ability dmgvar")
-                .setRequired(true))
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("pen")
                 .setDescription("ability pen")
-                .setRequired(true))
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("acc")
                 .setDescription("ability acc")
-                .setRequired(true))
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("crt")
                 .setDescription("ability crt")
-                .setRequired(true))
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("crd")
                 .setDescription("ability crd")
-                .setRequired(true))
+                .setRequired(false))
             .addStringOption(option => option
                 .setName("effect")
                 .setDescription("ability effect")
-                .setRequired(true))
+                .setRequired(false))
             .addStringOption(option => option
                 .setName("self")
                 .setDescription("ability self")
-                .setRequired(true))
+                .setRequired(false))
             .addIntegerOption(option => option
                 .setName("cooldown")
                 .setDescription("ability cooldown")
+                .setRequired(false)))
+        .addSubcommand(subcommand =>subcommand
+            .setName("info")
+            .setDescription("Edit existing ability.")
+            .addIntegerOption(option => option
+                .setName("id")
+                .setDescription("The id of the ability")
                 .setRequired(true))),
 	async execute(interaction) {
         const embedN = await embedNew(interaction);

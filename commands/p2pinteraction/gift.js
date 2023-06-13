@@ -582,7 +582,7 @@ async function switchRarity(card, rarity, interaction) {
             return viewPinkCard(card, interaction);
 
         case 9:
-            return viewStelCard(card, interaction);
+            return interaction.reply("Stellarite cannot be gifted. use trade commands.");
 
         case 10:
             return viewSpeCard(card, interaction);
@@ -594,16 +594,19 @@ async function switchRarity(card, rarity, interaction) {
 
 async function deckCheck(interaction) {
     const lid = await interaction.options.getInteger('lid');
-    const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
-    if(card.weapon) {
+    const card = await database.Card.findOne({where: {playerID: interaction.user.id, inventoryID: lid}});
+    console.log('card', card);
+    if(card && card.weapon) {
         const deck = await database.Deck.findOne({where: {
+            playerID: interaction.user.id,
             [Op.or]: [
-            { unit1: card.cardID },
-            { unit2: card.cardID },
-            { unit3: card.cardID },
-            { unit4: card.cardID },
-            { unit5: card.cardID }
+            { unit1: lid },
+            { unit2: lid },
+            { unit3: lid },
+            { unit4: lid },
+            { unit5: lid }
           ]}});
+        console.log('deck', deck);
         if (deck) {
             return true;
         }
@@ -637,7 +640,7 @@ module.exports = {
             console.log(target.id);
             const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
             if (card && targetplayer) {
-                if(deckCheck(interaction)) {
+                if(await deckCheck(interaction)) {
                     return interaction.reply("Can't gift awakened cards that is currently in a deck!");
                 }
                 await switchRarity(card, card.rarity, interaction);

@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { createCanvas, loadImage, Canvas } = require('canvas');
 const database = require('../../database');
 const { MessageEmbed } = require('discord.js');
+const { MessageAttachment } = require('discord.js');
 const color = require('../../color.json');
 
 
@@ -72,7 +74,42 @@ async function convertRarity(rarity) {
     }
 }
 
-async function viewWeapon(interaction, weapon) {
+
+async function borderWeapon(interaction, spriteurl, rarity){
+    let borderColor;
+    switch (rarity) {
+        case 1:
+            borderColor = color.blue;
+            break;
+        case 2:
+            borderColor = color.purple;
+            break;
+        case 3:
+            borderColor = color.stellar;
+            break;
+    }
+    const canvas = createCanvas(232, 232);
+    const context = canvas.getContext('2d');
+    const image = await loadImage(`${spriteurl}`);
+    context.drawImage(image, 4, 4, 224, 224);
+    console.log(borderColor);
+    context.strokeStyle = borderColor;
+    context.lineWidth = 6;
+    context.strokeRect(3, 3, 227, 227);
+    const attachment = await new MessageAttachment(canvas.toBuffer(), 'ayaka.png');
+    let link;
+    await interaction.editReply({ files: [attachment] });
+    const message = await interaction.fetchReply();
+    await message.attachments.forEach(attachment => {
+        link = attachment.proxyURL;
+        console.log(link)
+    })
+    return link;
+}
+
+
+async function viewWeapon(interaction, weapon1) {
+    const weapon = await database.Weapon.findOne({where: {id: weapon1.id}});
     const embed = new MessageEmbed();
     const rarityText = await convertRarity(weapon.rarity);
     embed.setTitle(`${weapon.name}`)
@@ -98,8 +135,8 @@ async function viewWeapon(interaction, weapon) {
 async function newWeapon(interaction) {
     const name = interaction.options.getString('name');
     const fluff = interaction.options.getString('fluff');
-    const spriteurl = interaction.options.getString('spriteurl');
-    const rarity = interaction.options.getInteger('rarity');
+    const spriteurl = await interaction.options.getString('spriteurl');
+    const rarity = await interaction.options.getInteger('rarity');
     const classtype = interaction.options.getString('class');
     const init = interaction.options.getInteger('init');
     const health = interaction.options.getInteger('health');
@@ -109,12 +146,13 @@ async function newWeapon(interaction) {
     const acc = interaction.options.getInteger('acc');
     const crt = interaction.options.getInteger('crt');
     const crd = interaction.options.getInteger('crd');
+    const borderedsprite = await borderWeapon(interaction, spriteurl, rarity);
     const weapon = await database.Weapon.create({
-        weaponSprite: spriteurl,
+        weaponSprite: borderedsprite,
         name: name,
         weaponFluff: fluff,
-        rarity: rarity,
         class: classtype,
+        rarity: rarity,
         init: init,
         health: health,
         armor: armor,
@@ -129,10 +167,11 @@ async function newWeapon(interaction) {
 
 async function editWeapon(interaction) {
     const id = interaction.options.getInteger('id');
+    const weapon = await database.Weapon.findOne({where: {id: id}});
     const name = interaction.options.getString('name');
     const fluff = interaction.options.getString('fluff');
-    const spriteurl = interaction.options.getString('spriteurl');
-    const rarity = interaction.options.getInteger('rarity');
+    let spriteurl = interaction.options.getString('spriteurl');
+    let rarity = interaction.options.getInteger('rarity');
     const classtype = interaction.options.getString('class');
     const init = interaction.options.getInteger('init');
     const health = interaction.options.getInteger('health');
@@ -142,7 +181,15 @@ async function editWeapon(interaction) {
     const acc = interaction.options.getInteger('acc');
     const crt = interaction.options.getInteger('crt');
     const crd = interaction.options.getInteger('crd');
-    const weapon = await database.Weapon.findOne({where: {weaponID: id}});
+    if (!rarity) {
+        rarity = weapon.rarity;
+    }
+    if (!spriteurl) {
+        spriteurl = weapon.weaponSprite;
+    }
+    const borderedsprite = await borderWeapon(interaction, spriteurl, rarity);
+    console.log(borderedsprite);
+    
     if(name) {
         weapon.update({name: name});
     }
@@ -150,7 +197,7 @@ async function editWeapon(interaction) {
         weapon.update({weaponFluff: fluff});
     }
     if(spriteurl) {
-        weapon.update({weaponSprite: spriteurl});
+        weapon.update({weaponSprite: borderedsprite});
     }
     if(rarity) {
         weapon.update({rarity: rarity});
@@ -325,7 +372,7 @@ module.exports = {
             if (!interaction.member.roles.cache.has('1086819458800177213')) {
                 embedE.setTitle("Insufficient Permissions")
                     .setDescription("You don't have the blacksmith role!");
-                return interaction.editReply({ embeds: [embedE] }, {ephemeral: true});
+                return interaction.reply({ embeds: [embedE] }, {ephemeral: true});
             };
             if (interaction.channel.id === '1086674842893438976') {
                 return selectOption(interaction);
@@ -334,9 +381,9 @@ module.exports = {
             }
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
-                return interaction.editReply({ embeds: [embedD] });
+                return interaction.reply({ embeds: [embedD] });
             }
-            return interaction.editReply({ embeds: [embedE] });
+            return interaction.reply({ embeds: [embedE] });
         }
         console.log("there are no errors here.")
 	},

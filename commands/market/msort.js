@@ -120,12 +120,29 @@ module.exports = {
                 .addChoice('newest',3)
                 .addChoice('oldest',4)
                 .addChoice('cid',5)
+                )
+        .addBooleanOption(option => 
+            option
+                .setName("wipe")
+                .setDescription("Do you want to wipe the market")
+                .setRequired(false)
                 ),
 	async execute(interaction) {
         try {
             if (!interaction.member.roles.cache.has('947442920724787260')) {
                 return interaction.reply("You don't have the gemmod role!");
             };
+            const wipe = interaction.options.getBoolean('wipe');
+            
+            if (wipe) {
+                const botid = '903935562208141323';
+                await database.Card.destroy({
+                    where: {
+                        playerID: botid,
+                    }
+                })
+                return interaction.channel.send("market wipe complete.");; 
+            }
             console.log(1)
             const uid = interaction.user.id;
             const player = await database.Player.findOne({where: {playerID: uid}});

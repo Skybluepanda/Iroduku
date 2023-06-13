@@ -120,7 +120,7 @@ async function marketCheck() {
     return await lastCard + 1;
 }
 
-async function buttonManager3(interaction, msg, coins, gems, card) {
+async function buttonManager3(interaction, msg, coins, gems, karmaadd, card) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
         const collector = await msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
@@ -138,9 +138,9 @@ async function buttonManager3(interaction, msg, coins, gems, card) {
                         }
                     )
                     console.log(7);
-                    await database.Player.increment({money: coins, gems: gems}, {where: {playerID: uid}});
+                    await database.Player.increment({money: coins, gems: gems, karma: karmaadd}, {where: {playerID: uid}});
                     console.log(8);
-                    await interaction.channel.send(`Card ${lid} Sold to Market for ${coins} coins and ${gems} gems.`)
+                    await interaction.channel.send(`Card ${lid} Sold to Market for ${coins} coins and ${karmaadd} karma.`)
                     break;
                     
                 case 'cancel':
@@ -405,11 +405,11 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Ruby
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 1500 <:datacoin:947388797828612127> | 250 <:waifugem:947388797916700672>`)
+Burn Reward: 1500 <:datacoin:947388797828612127> | 25 <:karma:947388797627281409>`)
         .setColor(color.red);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 1500, 250, card);
+    await buttonManager3(interaction, msg, 1500, 0, 25, card);
 }
 
 async function viewPinkCard(card, interaction) { 
@@ -453,11 +453,11 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Pink Diamond
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 3000 <:datacoin:947388797828612127> | 500 <:waifugem:947388797916700672>`)
+Burn Reward: 3000 <:datacoin:947388797828612127> | 25 <:karma:947388797627281409>`)
         .setColor(color.pink);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 3000, 500, card);
+    await buttonManager3(interaction, msg, 3000, 0, 25, card);
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -501,11 +501,11 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Diamond
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 10000 <:datacoin:947388797828612127> | 1000 <:waifugem:947388797916700672>`)
+Burn Reward: 10000 <:datacoin:947388797828612127> | 100 <:karma:947388797627281409>`)
         .setColor(color.diamond);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 10000, 1000, card);
+    await buttonManager3(interaction, msg, 10000, 0, 100, card);
 }
 
 async function viewStellarCard(card, interaction) { 
@@ -528,11 +528,11 @@ async function viewStellarCard(card, interaction) {
 **Rarity:** Stellarite
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 100000 <:datacoin:947388797828612127> | 20000 <:waifugem:947388797916700672>`)
+Burn Reward: 100000 <:datacoin:947388797828612127> | 200 <:karma:947388797627281409>`)
         .setColor(color.stellar);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 100000, 20000, card);
+    await buttonManager3(interaction, msg, 100000, 0, 200, card);
 }
 
 async function switchRarity(card, rarity, interaction) {
@@ -796,7 +796,8 @@ async function burnList(embed, interaction, page){
         }}
     );
     const totalCoin = diaCount * 10000 + pinkCount * 3000 + redCount * 1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
-    const totalGem = diaCount * 1000 + pinkCount * 500 + redCount * 250 + purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
+    const totalGem = purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
+    const totalKarma = diaCount * 100 + pinkCount * 25 + redCount * 25;
 
     
     const totalPage = Math.ceil(maxPage/20);
@@ -812,14 +813,14 @@ async function burnList(embed, interaction, page){
     Jade: ${greenCount} cards for ${greenCount*20} coins and ${greenCount*5} gems,
     Lapis: ${blueCount} cards for ${blueCount*50} coins and ${blueCount*10} gems,
     Amethyst: ${purpleCount} cards for ${purpleCount*200} coins and ${purpleCount*20} gems.
-    Ruby: ${redCount} cards for ${redCount*1500} coins and ${redCount*250} gems.
-    Pink: ${pinkCount} cards for ${pinkCount*3000} coins and ${pinkCount*500} gems.
-    Diamond: ${diaCount} cards for ${diaCount*10000} coins and ${diaCount*1000} gems.
-    Total: ${totalCoin} coin and ${totalGem} gems.
+    Ruby: ${redCount} cards for ${redCount*1500} coins and ${redCount*25} karma.
+    Pink: ${pinkCount} cards for ${pinkCount*3000} coins and ${pinkCount*25} karma.
+    Diamond: ${diaCount} cards for ${diaCount*10000} coins and ${diaCount*100} karma.
+    Total: ${totalCoin} coins, ${totalGem} gems and ${totalKarma} karma.
     `);
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
     const msg = await updateReply(interaction, embed);
-    await buttonManager2(embed, interaction, msg, page, totalPage, totalCoin, totalGem);
+    await buttonManager2(embed, interaction, msg, page, totalPage, totalCoin, totalGem, totalKarma);
 }
 
 async function checkPage(direction, page, maxPage) {
@@ -860,7 +861,7 @@ async function deployButton2(interaction, embed){
 }
 
 
-async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, addgems) {
+async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, addgems, addkarma) {
     try {   
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
@@ -883,7 +884,7 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
                     await interaction.followUp("Burning in progress, may take up to 15 seconds.");
                     const mid = '903935562208141323';
                     const tag = await interaction.options.getString('tag');
-                    await database.Player.increment({money: addcoins, gems: addgems}, {where: {playerID: uid}});
+                    await database.Player.increment({money: addcoins, gems: addgems, karma: addkarma}, {where: {playerID: uid}});
                     await interaction.channel.send(`Cards with ${tag} burnt. ${addcoins} coins and ${addgems} gems refunded.`)
                     await database.Card.destroy(
                         {

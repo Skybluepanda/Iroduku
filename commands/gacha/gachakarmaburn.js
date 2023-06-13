@@ -330,8 +330,6 @@ async function createRedCard(cid, interaction) {
         quantity: 1,
         rarity: 5,
     });
-    let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`A lucky player got a **Ruby :red_square: ${cid} | ${char.characterName} from ${series.seriesName}!**`);
     await viewRCard(newcard, interaction);
 }
 
@@ -614,7 +612,10 @@ async function raritySwitch(interaction) {
 
 async function gacha(interaction, embed) {
     const amount = interaction.options.getInteger('amount');
-    const setRarity = interaction.options.getInteger('rarity');
+    let setRarity = interaction.options.getInteger('rarity');
+    if (!setRarity) {
+        setRarity = 4;
+    }
     const rarityName = await returnRarityName(setRarity);
     const burnArray = [0,0,0,0,0];
     const gachaArray = [0,0,0,0,0,0,0,0,0,0];
@@ -664,6 +665,13 @@ async function gacha(interaction, embed) {
 **Gems:** ${burnRewards[1]}`)
         if(i%10 == 0) {
             await interaction.editReply({embeds: [embed]});
+            if (i%300 == 0) {
+                const player = await database.Player.findOne({where: {playerID: user}});
+                if (player.karma < 0) {
+                    i = amount;
+                    await interaction.channel.send("Insufficient Karma, ending gkultimate.");
+                }
+            }
         }
     }
     await interaction.followUp({embeds: [embed]});
@@ -1067,7 +1075,10 @@ async function returnRarityName(rarity) {
 
 async function confirmGacha(interaction) {
     const amount = interaction.options.getInteger('amount');
-    const setRarity = interaction.options.getInteger('rarity');
+    let setRarity = interaction.options.getInteger('rarity');
+    if (!setRarity) {
+        setRarity = 4;
+    }
     const embed = await embedSucess(interaction);
     const rarityName = await returnRarityName(setRarity);
     embed.setTitle('Confirm Gacha?')
@@ -1154,7 +1165,7 @@ module.exports = {
         .addIntegerOption(option => 
             option.setName('rarity')
                 .setDescription('Character ID.')
-                .setRequired(true)
+                .setRequired(false)
                 .addChoice('none', 0)
                 .addChoice('lapis', 3)
                 .addChoice('amethyst', 4))

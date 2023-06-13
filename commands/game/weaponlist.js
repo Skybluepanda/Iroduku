@@ -63,7 +63,6 @@ async function weaponListSwitch2(embed, interaction, page) {
             rankList(embed, interaction, page);
             break;
     }
-
 }
 
 async function updateReply(interaction, embed){
@@ -111,16 +110,16 @@ async function buttonManager(embed, interaction, msg, page, maxPage) {
     }
 }
 
-function joinBar(character){
+function joinBar(weapon){
     // const series = await database.Series.findOne({where: {seriesID: character.seriesID}});
-    const charlist = character.characterID + " | " + character.characterName + " [" + character.rank+ "]";
+    const weaponList = weapon.id + " | " + weapon.name + " [" +weapon.class+ "]";
     // if (series) {
     //      - " + series.alias;
     // } else {
     //     charlist = character.characterID + " | " + character.characterName + " [" + character.rank+ "] - No series alias set";
     // }
     //CID | Cname -Rank- Series shortened
-    return charlist;
+    return weaponList;
 }
 
 async function justList(embed, interaction, page){
@@ -134,8 +133,8 @@ async function justList(embed, interaction, page){
             limit: 20,
             offset: (page-1)*20
         }
-        );
-
+    );
+    console.log(list);
     const listMap = await list.map(joinBar);
     const listString = await listMap.join(`\n`);
     await embed.setDescription(`${listString}`);
@@ -158,11 +157,11 @@ async function nameList(embed, interaction, page){
     }
     const list = await database.Weapon.findAll(
         {
-            order: ['characterID'],
+            order: ['id'],
             limit: 20,
             offset: (page-1)*20,
         where: {
-            characterName: {[Op.like]: '%' + name + '%'}
+            name: {[Op.like]: '%' + name + '%'}
         }}
         );
 
@@ -222,13 +221,7 @@ module.exports = {
         .addSubcommand(subcommand => 
             subcommand
                 .setName("id")
-                .setDescription("list by ID")
-                .addStringOption(option => 
-                    option
-                        .setName("name")
-                        .setDescription("Lists characters that have the same name.")
-                        .setRequired(true)
-                        ))
+                .setDescription("list by ID"))
         .addSubcommand(subcommand => 
             subcommand
                 .setName("name")

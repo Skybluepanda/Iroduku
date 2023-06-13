@@ -378,8 +378,6 @@ async function createRedCard(cid, interaction) {
         quantity: 1,
         rarity: 5,
     });
-    let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`A lucky player got a **Ruby :red_square: ${cid} | ${char.characterName} from ${series.seriesName}!**`)
     await viewRCard(newcard, interaction);
 }
 

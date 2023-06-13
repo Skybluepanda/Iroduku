@@ -178,7 +178,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
 **Cost**
-**Money:** 30000
+**Money:** 20000
 
 **Your Balance**
 **Money:** ${player.money}`)
@@ -186,7 +186,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
     const row = await createButton();
     
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 30000);
+    await buttonManager3(interaction, msg, 20000);
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -290,7 +290,7 @@ Gif ID is ${image.gifID} report any errors using ID.
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
 **Cost**
-**Money:** 60000
+**Money:** 20000
 
 **Your Balance**
 **Money:** ${player.money}
@@ -299,7 +299,7 @@ Gif ID is ${image.gifID} report any errors using ID.
     const row = await createButton();
 
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 60000);
+    await buttonManager3(interaction, msg, 20000);
 }
 
 async function viewStellarCard(card, interaction) { 
@@ -493,13 +493,13 @@ async function makeList(list) {
 async function switchPrice(rarity) {
     switch (rarity) {
         case 5:
-            return 30000;
+            return 20000;
         //red
         case 6:
             return 200000;
 
         case 7:
-            return 60000;
+            return 20000;
 
         case 9:
             return 2000000;

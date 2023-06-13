@@ -448,22 +448,25 @@ async function gamble(rarity, attempts) {
     let epic;
     let legendary;
     const rng = Math.floor(Math.random() * 1000);
-    switch (rarity) {
+    switch (await rarity) {
         case 4:
             //rare 5%
             //epic 1%
             //legendary .001%kekdog
-            rare = 800-attempts*30;
-            epic = 950-attempts*5;
+            rare = 800-(attempts*30);
+            epic = 950-(attempts*5);
             legendary = 999;
+            break;
 
         case 5://ruby
             //rare 1%
             //epic .2%
             //legendary .001%kekdog
-            rare = 940-attempts*2;
-            epic = 980-attempts*2;
-            legendary = 999-attempts/10;
+            rare = 920-(attempts*5);
+            epic = 980-attempts;
+            legendary = 999-(attempts/10);
+            console.log(rare);
+            break;
 
         case 6://dia
             //rare 5%
@@ -471,15 +474,17 @@ async function gamble(rarity, attempts) {
             //legendary .001%kekdog
             rare = 960-attempts*1;
             epic = 980-attempts*2;
-            legendary = 999-attempts/10;
+            legendary = 999-(attempts/10);
+            break;
 
         case 7://pinkdia
             //rare 5%
             //epic 1%
             //legendary .001%kekdog
-            rare = 940-attempts*2;
-            epic = 980-attempts*2;
+            rare = 920-(attempts*5);
+            epic = 980-attempts;
             legendary = 999-attempts/10;
+            break;
 
         case 9://stellar
             //epic .1%
@@ -487,14 +492,14 @@ async function gamble(rarity, attempts) {
             rare = 10000;
             epic = 995-attempts;
             legendary = 999-attempts/10;
-
+            break;
     }
     console.log(rng);
-    if (rng >= legendary) {
+    if (rng > legendary) {
         return 3;
-    } else if (rng >= epic) {
+    } else if (rng > epic) {
         return 2;
-    } else if (rng >= rare) {
+    } else if (rng > rare) {
         return 1;
     } else {
         return 0;
@@ -523,7 +528,16 @@ async function createWeapon(rarity, embed, card, interaction, attempts) {
     const rarityText = await convertRarity(rarity);
     embed.setFields({name: `Card Awakened!`,value:`
 Awakened Success after ${attempts} attempts!
-${rarityText} weapon ${weaponRNG.weaponName} bound to the card!
+${rarityText} weapon ${weaponRNG.name} bound to the card!
+`}).setThumbnail(weaponRNG.weaponSprite);
+    return interaction.editReply({embeds: [embed]});
+}
+
+async function createTheWeapon(embed, card, interaction, attempts, weaponRNG) {
+    card.update({ quantity: 0 , weapon: weaponRNG.id});
+    embed.setFields({name: `Card Awakened!`,value:`
+Awakened Success after ${attempts} attempts!
+weapon ${weaponRNG.name} bound to the card!
 `}).setThumbnail(weaponRNG.weaponSprite);
     return interaction.editReply({embeds: [embed]});
 }
@@ -534,6 +548,7 @@ async function buttonManager(embed, interaction, msg, card, attempts, rarity) {
         if(attempts == -1) {
             return;
         }
+        const weapon = await interaction.options.getInteger("wid");
         const player = await database.Player.findOne({where: {playerID: interaction.user.id}});
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
@@ -541,6 +556,14 @@ async function buttonManager(embed, interaction, msg, card, attempts, rarity) {
             i.deferUpdate();
             switch (i.customId){
                 case 'gone':
+                    if(weapon) {
+                        const weaponid = await database.Weapon.findOne({where: { id: weapon}});
+                        if (weaponid) {
+                            return await createTheWeapon(embed, card, interaction, attempts, weaponid);
+                        } else {
+                            return interaction.channel.send("the weapon doesn't exist.")
+                        }
+                    }
                     if (player.money < 500) {
                         return interaction.followUp(`You need at least 1000 coins to awaken.`)
                     }
@@ -613,6 +636,12 @@ module.exports = {
                 .setName("lid")
                 .setDescription("The inventory id of the card.")
                 .setRequired(true)
+                )
+        .addIntegerOption(option => 
+            option
+                .setName("wid")
+                .setDescription("The weapon u want.")
+                .setRequired(true)
                 ),
 	async execute(interaction) {
 		//first bring up list from 1 for default call.
@@ -626,7 +655,6 @@ module.exports = {
             const lid = interaction.options.getInteger('lid');
             const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}});
             const player = await database.Player.findOne({where: {playerID: uid}});
-            console.log(player.rpity);
             if (card) {
                 if (card.rarity >= 5) {
                     if(card.rarity == 10) {

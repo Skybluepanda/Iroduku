@@ -330,8 +330,6 @@ async function createRedCard(cid, interaction) {
         quantity: 1,
         rarity: 5,
     });
-    let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`A lucky player got a **Ruby :red_square: ${cid} | ${char.characterName} from ${series.seriesName}!**`);
     await viewRCard(newcard, interaction);
 }
 
@@ -811,6 +809,14 @@ async function gacha(interaction, embed) {
 **Gems:** ${burnRewards[1]}`)
         if(i%10 == 0) {
             await interaction.editReply({embeds: [embed]});
+            if(i%300 == 0) {
+                const player = await database.Player.findOne({where: {playerID: interaction.user.id}});
+                if (player.gems < 0) {
+                    i = amount;
+                    await interaction.channel.send("Insufficient Gems, ending gultimate.");
+                }
+            }
+            
         }
     }
     await interaction.followUp({embeds: [embed]});

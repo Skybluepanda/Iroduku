@@ -25,7 +25,7 @@ async function checkLevelup(interaction) {
     }
     if (player.xp >= xpLimit) {
         await database.Player.increment({Karma: (player.level+1)*100, xp: -xpLimit, level: 1}, {where: {playerID: interaction.user.id}});
-        await interaction.followUp({ embeds: [embed] }, {ephemeral: true});
+        await interaction.followUp({ embeds: [embed] });
     };
 }
 

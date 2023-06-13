@@ -344,8 +344,6 @@ async function createRedCard(cid, interaction) {
         quantity: 1,
         rarity: 5,
     });
-    let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`A lucky player got a **Ruby :red_square: ${cid} | ${char.characterName} from ${series.seriesName}!**`);
     await viewRCard(newcard, interaction);
     const gachaString = `:red_square:` + newcard.inventoryID + ` | ` + char.characterName + `(#${newcard.imageNumber})`;
     return gachaString;
@@ -677,10 +675,23 @@ async function allPool(interaction) {
 
 
 async function sideofftrashoff(interaction) {
+    const user = interaction.user.id;
     const embedS = await embedSucess(interaction);
     await interaction.reply({embeds: [embedS]});
     const list = [];
     for (let i = 0; i < 10; i++) {
+        if (i == 5) {
+            console.log(1);
+            const player = await database.Player.findOne({where: {playerID: user}});
+            console.log(2);
+            if (player.gems < 0) {
+                console.log(3);
+                i = 10;
+                console.log(4);
+                return await interaction.channel.send("Insufficient Gems, ending gtenroll.");
+                console.log(5);
+            }
+        }
         const rngPool = Math.floor(Math.random() * 100);
         if (rngPool >= 97) {
             list[i] = await wlPool(interaction);
@@ -697,10 +708,18 @@ async function sideofftrashoff(interaction) {
     
 }
 async function sideontrashoff(interaction) {
+    const user = interaction.user.id;
     const embedS = await embedSucess(interaction);
     await interaction.reply({embeds: [embedS]});
     const list = [];
     for (let i = 0; i < 10; i++) {
+        if (i == 5) {
+            const player = await database.Player.findOne({where: {playerID: user}});
+            if (player.gems < 0) {
+                i = 10;
+                return await interaction.channel.send("Insufficient Gems, ending gtenroll.");
+            }
+        }
         const rngPool = Math.floor(Math.random() * 100);
         if (rngPool >= 91) {
             list[i] = await wlPool(interaction);
@@ -714,10 +733,18 @@ async function sideontrashoff(interaction) {
     
 }
 async function sideontrashon(interaction) {
+    const user = interaction.user.id;
     const embedS = await embedSucess(interaction);
     await interaction.reply({embeds: [embedS]});
     const list = [];
     for (let i = 0; i < 10; i++) {
+        if (i == 5) {
+            const player = await database.Player.findOne({where: {playerID: user}});
+            if (player.gems < 0) {
+                i = 10;
+                return await interaction.channel.send("Insufficient Gems, ending gtenroll.");
+            }
+        }
         const rngPool = Math.floor(Math.random() * 100);
         if (rngPool >= 85) {
             list[i] = await wlPool(interaction);
