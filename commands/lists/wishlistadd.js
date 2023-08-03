@@ -138,20 +138,14 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
                     break;
                 
                 case 'wadd':
-                    const wlcount = await database.Wishlist.count({where: {playerID: interaction.user.id}});
-                    if (wlcount >= 20) {
-                        await interaction.channel.send(`You already have ${wlcount} wishlisted characters, max wishlist is 20. Initial embed has been disabled.`);
-                        break;
-                    } else {
-                        await database.Wishlist.create({
-                            playerID: interaction.user.id,
-                            characterID: cid
-                        })
-                        row = await wlCheck(interaction, cid, row);
-                        await updateButton(embed, interaction, row);
-                        await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row);
-                        break;
-                    }
+                    await database.Wishlist.create({
+                        playerID: interaction.user.id,
+                        characterID: cid
+                    })
+                    row = await wlCheck(interaction, cid, row);
+                    await updateButton(embed, interaction, row);
+                    await buttonManager(embed, interaction, msg, currentImage, totalImage, imageC, cid, row);
+                    break;
                 case 'wremove':
                     await database.Wishlist.destroy({
                         where: {

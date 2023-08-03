@@ -105,7 +105,7 @@ async function calcRank(interaction) {
     const allchars = await database.Character.findAll();
     console.log(allchars.length);
     for (let i = 0; i < allchars.length; i++) {
-        if (allchars[i].votes >= 10) {
+        if (allchars[i].votes >= 3) {
             const wishcount = await database.Wishlist.count({where: {characterID: allchars[i].characterID}});
             const final = await ((allchars[i].score + 2 * wishcount)/allchars[i].votes)
             await database.Character.update({final: final}, {where: {characterID: allchars[i].characterID}});

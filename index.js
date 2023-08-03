@@ -7,6 +7,7 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 
 client.commands = new Collection();
 client.buttons = new Collection();
+client.cooldowns = new Collection();
 
 const functions = fs.readdirSync("./functions").filter(file => file.endsWith(".js"));
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith(".js"));

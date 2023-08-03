@@ -565,10 +565,6 @@ async function switchRarity(card, rarity, interaction) {
                 burnCooldown.delete(uid);
                 return interaction.reply("Amethyst Cards Don't have Quantity. Try again without quantity.");
             }
-            if (card.weapon) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Can't burn awakened cards.");
-            }
             return viewPurpleCard(card, interaction);
             //Purple
         case 5:
@@ -579,10 +575,6 @@ async function switchRarity(card, rarity, interaction) {
             if (card.charred) {
                 burnCooldown.delete(uid);
                 return interaction.reply("Can't burn cards purchased from market.");
-            }
-            if (card.weapon) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Can't burn awakened cards.");
             }
             return viewRedCard(card, interaction);
             //red
@@ -596,10 +588,6 @@ async function switchRarity(card, rarity, interaction) {
                 burnCooldown.delete(uid);
                 return interaction.reply("Can't burn cards purchased from market.");
             }
-            if (card.weapon) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Can't burn awakened cards.");
-            }
             return viewDiaCard(card, interaction);
 
         case 7:
@@ -611,10 +599,6 @@ async function switchRarity(card, rarity, interaction) {
                 burnCooldown.delete(uid);
                 return interaction.reply("Can't burn cards purchased from market.");
             }
-            if (card.weapon) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Can't burn awakened cards.");
-            }
             return viewPinkCard(card, interaction);
 
         case 9:
@@ -625,10 +609,6 @@ async function switchRarity(card, rarity, interaction) {
             if (card.charred) {
                 burnCooldown.delete(uid);
                 return interaction.reply("Can't burn cards purchased from market.");
-            }
-            if (card.weapon) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Can't burn awakened cards.");
             }
             return viewStellarCard(card, interaction);
         

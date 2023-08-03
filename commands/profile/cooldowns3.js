@@ -22,10 +22,6 @@ async function createButton(interaction){
                 .setCustomId('collect')
                 .setLabel('collect')
                 .setStyle('PRIMARY'),
-            // new MessageButton()
-            //     .setCustomId('vote')
-            //     .setLabel('vote')
-            //     .setStyle('PRIMARY'),
         );
         if (await dailyCds(interaction) == false) {
             row.components[0].setDisabled(true);
@@ -33,9 +29,6 @@ async function createButton(interaction){
         if (await collectCds(interaction) == false) {
             row.components[1].setDisabled(true);
         }
-        // if (await voteCds(interaction) == false) {
-        //     row.components[2].setDisabled(true);
-        // }
         return row;
     } catch(error) {
         console.log("error has occured in crearteButton");
@@ -649,11 +642,22 @@ async function checkVote(interaction){
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('cds')
+        .setName('cds2')
         .setDescription('Check your cooldowns'),
     async execute(interaction) {
         try {
-            await viewCds(interaction);
+            const uid = interaction.userId;
+            console.log(uid);
+            const user = await database.Player.findOne({where: {playerID: uid}});
+            if (user) {
+                await viewCds(interaction);
+            } else {
+                const embedE = new MessageEmbed();
+                embedE.setTitle("User not found!")
+                        .setDescription("You aren't a registered player yet!, use /isekai to begin!")
+                        .setColor(color.red)
+                return interaction.reply({embeds:[embedE]});
+            }
         } catch(error) {
             await  interaction.reply(`${error} Error occured.`);
         }        

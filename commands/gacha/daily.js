@@ -223,6 +223,7 @@ async function cooldownDaily(interaction, timeDiff){
 }
 
 module.exports = {
+    cooldown: 5,
     data: new SlashCommandBuilder()
         .setName('daily')
         .setDescription('adds gem to your profile, can be used once a day.'),

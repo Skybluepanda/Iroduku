@@ -638,7 +638,7 @@ async function createAzurCard(interaction) {
     } else {
         await database.Azurite.create({
             cardID: newcard.cardID,
-            imageURL: 'https://cdn.discordapp.com/attachments/948195855742165013/998254327523180685/stockc.png',
+            imageURL: 'https://cdn.discordapp.com/attachments/1086674842893438976/1128897000109252779/Noimage.png',
             artist: image.artist,
             season: 1
         })

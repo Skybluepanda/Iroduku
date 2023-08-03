@@ -35,15 +35,6 @@ module.exports = (client) => {
         const rest = new REST({ version: "9" }).setToken(token);
         (async () => {
             try {
-                // rest.get(Routes.applicationGuildCommands(clientId, guildId))
-                //     .then(data => {
-                //         const promises = [];
-                //         for (const command of data) {
-                //             const deleteUrl = `${Routes.applicationGuildCommands(clientId, guildId)}/${command.id}`;
-                //             promises.push(rest.delete(deleteUrl));
-                //         }
-                //         return Promise.all(promises);
-                //     });
 
 
                 console.log("Started refreshing application (/) commands.");

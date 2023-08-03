@@ -12,7 +12,6 @@ module.exports = {
                 .setDescription("The rank you want to toggle.")
                 .setRequired(true)
                 .addChoice('main',1)
-                .addChoice('side',2)
                 .addChoice('extras',3)
                 ),
 	async execute(interaction) {

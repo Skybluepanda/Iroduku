@@ -3,7 +3,8 @@ const database = require('../../database.js');
 const color = require('../../color.json');
 const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton, IntegrationApplication } = require('discord.js');
 const { Op } = require("sequelize");
-var dayjs = require('dayjs')
+var dayjs = require('dayjs');
+const { cooldown } = require('../gacha/daily.js');
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
 
@@ -37,12 +38,6 @@ async function createButton() {
                     .setLabel('cancel')
                     .setStyle('DANGER')
             )
-            // .addComponents(
-            //     new MessageButton()
-            //         .setCustomId('search')
-            //         .setLabel('search')
-            //         .setStyle('PRIMARY')
-            // )
         return row;
     } catch(error) {
         console.log("error has occured in crearteButton");
@@ -614,41 +609,99 @@ async function deckCheck(interaction) {
     return false;
 }
 
+async function giftlid(interaction) {
+    try {
+        const user = await interaction.user.id
+        const lid = await interaction.options.getInteger('lid');
+        const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
+        const target = await interaction.options.getUser('targetuser');
+        console.log(target);
+        console.log(target.id);
+        const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
+        if (card && targetplayer) {
+            await switchRarity(card, card.rarity, interaction);
+        } else if (!card) {
+            interaction.reply("Error Invalid list ID");
+        } else if (!targetplayer) {
+            interaction.reply("Invalid user");
+        }
+    } catch(error) {
+        await  interaction.reply(`Error has occured while performing the command. ${error} `)
+    }
+}
+
+async function gifttag(interaction) {
+    try {
+        const user = await interaction.user.id
+        const lid = await interaction.options.getInteger('lid');
+        const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
+        const target = await interaction.options.getUser('targetuser');
+        console.log(target);
+        console.log(target.id);
+        const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
+        if (card && targetplayer) {
+            await switchRarity(card, card.rarity, interaction);
+        } else if (!card) {
+            interaction.reply("Error Invalid list ID");
+        } else if (!targetplayer) {
+            interaction.reply("Invalid user");
+        }
+    } catch(error) {
+        await  interaction.reply(`Error has occured while performing the command. ${error} `)
+    }
+}
+
+async function subswitch(interaction) {
+    const subcommand = await interaction.options.getSubcommand();
+    switch (subcommand) {
+        case "lid":
+            giftlid(interaction);
+            break;
+        
+        case "tag":
+            gifttag(interaction);
+            break;
+    }
+}
+
 module.exports = {
+    cooldown:5,
 	data: new SlashCommandBuilder()
 		.setName('gift')
 		.setDescription('gifts a card to a user.')
-        .addIntegerOption(option => 
-            option
+        .addSubcommand(subcommand => subcommand
                 .setName("lid")
-                .setDescription("The list id for the card you want to view")
-                .setRequired(true)
-                )
-        .addUserOption(option => 
-            option
-                .setName("targetuser")
-                .setDescription("The person you want to gift it to")
-                .setRequired(true)
-                ),
+                .setDescription("Gift a card using list ID.")
+                .addIntegerOption(option => 
+                    option
+                        .setName("lid")
+                        .setDescription("The list id for the card you want to view")
+                        .setRequired(true)
+                        )
+                .addUserOption(option => 
+                    option
+                        .setName("targetuser")
+                        .setDescription("The person you want to gift it to")
+                        .setRequired(true)
+                        ))
+        .addSubcommand(subcommand => subcommand
+            .setName("tag")
+            .setDescription("Gift a card using a chosen tag.")
+            .addIntegerOption(option => 
+                option
+                    .setName("tag")
+                    .setDescription("The tag you want to use to gift.")
+                    .setRequired(true)
+                    )
+            .addUserOption(option => 
+                option
+                    .setName("targetuser")
+                    .setDescription("The person you want to gift it to")
+                    .setRequired(true)
+                    )),
 	async execute(interaction) {
         try {
-            const user = await interaction.user.id
-            const lid = await interaction.options.getInteger('lid');
-            const card = await database.Card.findOne({where: {playerID: user, inventoryID: lid}});
-            const target = await interaction.options.getUser('targetuser');
-            console.log(target);
-            console.log(target.id);
-            const targetplayer = await database.Player.findOne({where: {playerID: target.id}});
-            if (card && targetplayer) {
-                if(await deckCheck(interaction)) {
-                    return interaction.reply("Can't gift awakened cards that is currently in a deck!");
-                }
-                await switchRarity(card, card.rarity, interaction);
-            } else if (!card) {
-                interaction.reply("Error Invalid list ID");
-            } else if (!targetplayer) {
-                interaction.reply("Invalid user");
-            }
+            subswitch(interaction);
         } catch(error) {
             await  interaction.reply(`Error has occured while performing the command. ${error} `)
         }        

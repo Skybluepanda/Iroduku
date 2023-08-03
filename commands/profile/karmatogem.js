@@ -40,6 +40,7 @@ module.exports = {
     async execute(interaction) {
         const embedError = embedE(interaction);
         const embedDone = embedD(interaction);
+        const amount = await interaction.options.getInteger('amount');
         try {
             const userId = await interaction.user.id;
             const player = await database.Player.findOne({ where: { playerID: userId } })

@@ -21,10 +21,9 @@ module.exports = {
 0.005% Stellarite
 
 **Character Pool Rates:**
-Main: Wishlist 3% ; Main 27% ; Side 70%
-Side: Wishlist 9% ; Main and Side 91%
-Extra: Wishlist 15% ; All 85%
-(If your wishlist has less than 5 characters, main will be used)
+Main: Rank 1 & 2 + Wishlisted characters from Rank 3
+Extra: All characters
+Setllarites will boost chance for wishlisted characters.
 
 **Karma Gacha Rates: costs 10 karma**
 55% Lapis
@@ -35,7 +34,7 @@ Extra: Wishlist 15% ; All 85%
 
 
 *Karma Gacha chooses characters from your wishlist.
-Therefore you must have 5 wishlist characters to use Karma Gacha.*
+Therefore you must have at least 5 wishlist characters to use Karma Gacha.*
 
 **Quartz:** Can only have image 1.
 **Jade:** Can only have image 1.
@@ -44,7 +43,7 @@ Therefore you must have 5 wishlist characters to use Karma Gacha.*
 **Ruby:** Same as amethyst. You can use /rubygamble to spend 500 coins for an attempt to upgrade to Pink Diamond
 **Pink Diamond:** Upgraded from Ruby. Can change the image using */diaset*.
 **Diamond:** Can change the image using */diaset*.
-**Stellarite:** Upload your choice of image of the character using */stellarupload*. Only one Stellarite can exist per character.
+**Stellarite:** Upload your choice of image of the character using */stellarupload*. Send the correct representation of the characters please.
 `)
 			.setColor(color.successgreen)
 		await interaction.reply({embeds: [embed]});

@@ -101,7 +101,8 @@ If the image isn't updated, it means they don't have a pic 1.
 Try refresh if image or name doesn't match.
 `)
             } else {
-                await embed.setDescription(`
+                const url = 'https://cdn.discordapp.com/attachments/1086674842893438976/1128897000109252779/Noimage.png';
+                await embed.setImage(url).setDescription(`
 Character ID: ${char.characterID}
 Character Alias: ${char.alias}
 Series: ${char.seriesID} | ${series.seriesName}
@@ -111,12 +112,12 @@ If the image isn't updated, it means they don't have a pic 1.
 Try refresh if image or name doesn't match.
 `)
             }
-        await embed       
-            .setTitle(`${char.characterName}`)
-            .setColor(color.successgreen);
-        const row = await createButton();
-        msg = await interaction.editReply( {embeds: [embed], components: [row], fetchReply: true})
-        await buttonManager(embed, interaction, msg, cid)
+            await embed.setTitle(`${char.characterName}`)
+                .setColor(color.successgreen);
+            const row = await createButton();
+            msg = await interaction.editReply( {embeds: [embed], components: [row], fetchReply: true})
+            msg = await interaction.editReply( {embeds: [embed], components: [row], fetchReply: true})
+            await buttonManager(embed, interaction, msg, cid)
         } else {
             await embed.setDescription(`You are done for now as there are no new characters.
 There will be a command in the future to let you know if there are new characters to vote for.

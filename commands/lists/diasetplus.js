@@ -128,6 +128,7 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
         const filter = i => i.user.id === interaction.user.id;
         const collector = msg.createMessageComponentCollector({ filter, max:1, time: 60000 });
         collector.on('collect', async i => {
+            i.deferUpdate();
             switch (i.customId){
                 case 'prev':
                     console.log('20')
@@ -145,7 +146,6 @@ async function buttonManager(embed, interaction, msg, currentImage, totalImage, 
                     await setImg(interaction, currentImage, imageC, cid);
                     break;
             };
-            i.deferUpdate();
         }
         );
 
@@ -289,6 +289,9 @@ async function viewPinkCard(interaction) {
     const lid = await interaction.options.getInteger('lid');
     const card = await database.Card.findOne({where: {playerID: player, inventoryID: lid}});
     const cid = await card.characterID;
+    const imageC = await countImage(cid);
+    const gifC = await countGif(cid);
+    const totalImage = imageC + gifC;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
     let image;
@@ -389,7 +392,8 @@ module.exports = {
             console.log('1')
             await raritySwitch(interaction);
         } catch(error) {
-            await  interaction.reply("Error has occured while performing the command.")
+            await  interaction.channel.send("Error has occured while performing the command.")
+            console.log(error);
         }        
     }
 }
