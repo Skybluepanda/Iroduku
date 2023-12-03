@@ -1,9 +1,10 @@
-const { SlashCommandBuilder, channelMention } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const database = require('../../database.js');
-const color = require('../../color.json');
-const { MessageEmbed, Guild, Message, MessageActionRow, MessageButton } = require('discord.js');
+const { MessageEmbed, Guild, Client, Collection } = require('discord.js');
 const { Op } = require("sequelize");
-var dayjs = require('dayjs')
+const color = require('../../color.json');
+const { MessageActionRow, MessageButton } = require('discord.js');
+var dayjs = require('dayjs');
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
 /**
@@ -51,53 +52,53 @@ async function inventorycheck(uid) {
 
 //White card zone
 //White card zone
-//White card zone
+// //White card zone
 
 
-async function createWhiteCard(cid, interaction) {
-    const user = await interaction.user.id;
-    const inventory = await inventorycheck(user);
-    const dupe = await database.Card.findOne({where: {playerID: user, characterID: cid, rarity: 1}});
-    if (dupe) {
-        dupe.increment({quantity: 1});
-        const char = await database.Character.findOne({where: {characterID: cid}});
-    } else {
-        const newcard = await database.Card.create({
-            playerID: user,
-            characterID: cid,
-            inventoryID: inventory,
-            quantity: 1,
-            rarity: 1,
-        });
-        const char = await database.Character.findOne({where: {characterID: cid}});
-    }
-}
+// async function createWhiteCard(cid, interaction) {
+//     const user = await interaction.user.id;
+//     const inventory = await inventorycheck(user);
+//     const dupe = await database.Card.findOne({where: {playerID: user, characterID: cid, rarity: 1}});
+//     if (dupe) {
+//         dupe.increment({quantity: 1});
+//         const char = await database.Character.findOne({where: {characterID: cid}});
+//     } else {
+//         const newcard = await database.Card.create({
+//             playerID: user,
+//             characterID: cid,
+//             inventoryID: inventory,
+//             quantity: 1,
+//             rarity: 1,
+//         });
+//         const char = await database.Character.findOne({where: {characterID: cid}});
+//     }
+// }
 
 
 //Green card zone
 //Green card zone
 //Green card zone
 
-async function createGreenCard(cid, interaction) {
-    const uid = await interaction.user.id;
-    const inventory = await inventorycheck(uid);
-    const dupe = await database.Card.findOne({where: {playerID: uid, characterID: cid, rarity: 2}});
-    if (dupe) {
-        dupe.increment({quantity: 1});
-        const char = await database.Character.findOne({where: {characterID: cid}});
-    } else {
-        const newcard = await database.Card.create({
-            playerID: uid,
-            characterID: cid,
-            inventoryID: inventory,
-            quantity: 1,
-            rarity: 2,
-        });
-        const char = await database.Character.findOne({where: {characterID: cid}});
-    }
+// async function createGreenCard(cid, interaction) {
+//     const uid = await interaction.user.id;
+//     const inventory = await inventorycheck(uid);
+//     const dupe = await database.Card.findOne({where: {playerID: uid, characterID: cid, rarity: 2}});
+//     if (dupe) {
+//         dupe.increment({quantity: 1});
+//         const char = await database.Character.findOne({where: {characterID: cid}});
+//     } else {
+//         const newcard = await database.Card.create({
+//             playerID: uid,
+//             characterID: cid,
+//             inventoryID: inventory,
+//             quantity: 1,
+//             rarity: 2,
+//         });
+//         const char = await database.Character.findOne({where: {characterID: cid}});
+//     }
     
     
-}
+// }
 
 async function rngImage(cid, interaction) {
     const char = await database.Character.findOne({ where: {characterID: cid}});
@@ -193,9 +194,9 @@ Gif ID is ${image.gifID} report any errors using ID.`}).setImage(url)
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity:** Lapis
+**Rarity:** Jade
 **Quantity:** ${card.quantity}`)
-        .setColor(color.blue);
+        .setColor(color.jade);
     
     await interaction.followUp({embeds: [embedCard]});
 }
@@ -423,7 +424,7 @@ async function createDiaCard(cid, interaction) {
         quantity: 1,
         rarity: 6,
     });
-    let channel = interaction.guild.channels.cache.get('948507565577367563');
+    let channel = interaction.guild.channels.cache.get('1140794715797737502');
     channel.send(`A luck sack got a **Diamond :large_blue_diamond: ${cid} | ${char.characterName} from ${series.seriesName}!**`);
     await viewDiaCard(newcard, interaction);
 }
@@ -474,9 +475,8 @@ Gif ID is ${image.gifID} report any errors using ID.
 }
 
 
-async function createAzurCard(interaction) {
+async function createAzurCard(cid, interaction) {
     console.log("creating");
-    const cid = await azurchar(interaction);
     const uid = await interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: interaction.user.id}});
     const char = await database.Character.findOne({ where: {characterID: cid}});
@@ -487,7 +487,7 @@ async function createAzurCard(interaction) {
         playerID: uid,
         characterID: cid,
         inventoryID: inumber,
-        rarity: 9,
+        rarity: 8,
     });
     if (image) {
         console.log("image found");
@@ -501,48 +501,48 @@ async function createAzurCard(interaction) {
         console.log("no image found");
         await database.Azurite.create({
             cardID: newcard.cardID,
-            imageURL: 'https://cdn.discordapp.com/attachments/948195855742165013/998254327523180685/stockc.png',
+            imageURL: 'https://cdn.discordapp.com/attachments/1086674842893438976/1128897000109252779/Noimage.png',
             artist: 'Image 1 Missing',
             season: 1
         })
     }
-    let channel = interaction.guild.channels.cache.get('948507565577367563');
-    channel.send(`A Legendary luck sack got a **Stellarite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!!!**`)
+    let channel = interaction.guild.channels.cache.get('1140794715797737502');
+    channel.send(`A Legendary luck sack got a **Azurite :diamond_shape_with_a_dot_inside: ${cid} | ${char.characterName} from ${series.seriesName}!!!**`)
     await viewAzurCard(newcard, interaction);
 }
 
 
-async function azurchar(interaction) {
-    console.log("we got to azurchar");
-    const user = interaction.user.id;
-    const player = await database.Player.findOne({where: {playerID: user}});
-    const rngpool = Math.floor(await (Math.random() * 1000 + player.apity/50));
-    const wcount = await database.Wishlist.count({where: {playerID: user}})
-    let cid;
-    if (wcount >= 5 && (rngpool >= 500)) {
-        const wlist = await database.Wishlist.findAll({where: {playerID: user}})
-        const rngChar = Math.floor(Math.random() * 1000);
-        const char = (rngChar%wlist.length);
-        cid = await wlist[char].characterID;
-        if(await player.apity > 10000) {
-            await player.increment({apity: -10000});
-        } else {
-            await player.update({apity: 0});
-        }
-    } else {
-        const rngChar = Math.floor(Math.random() * 10000);
-        const count = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
-        const offset = (rngChar%count);
-        const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
-        cid = await char.characterID;
-        if(await player.apity > 2000) {
-            await player.increment({apity: -2000});
-        } else {
-            await player.update({apity: 0});
-        }
-    }
-    return cid;
-}
+// async function azurchar(interaction) {
+//     console.log("we got to azurchar");
+//     const user = interaction.user.id;
+//     const player = await database.Player.findOne({where: {playerID: user}});
+//     const rngpool = Math.floor(await (Math.random() * 1000 + player.apity/50));
+//     const wcount = await database.Wishlist.count({where: {playerID: user}})
+//     let cid;
+//     if (wcount >= 5 && (rngpool >= 500)) {
+//         const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+//         const rngChar = Math.floor(Math.random() * 1000);
+//         const char = (rngChar%wlist.length);
+//         cid = await wlist[char].characterID;
+//         if(await player.apity > 10000) {
+//             await player.increment({apity: -10000});
+//         } else {
+//             await player.update({apity: 0});
+//         }
+//     } else {
+//         const rngChar = Math.floor(Math.random() * 10000);
+//         const count = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
+//         const offset = (rngChar%count);
+//         const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
+//         cid = await char.characterID;
+//         if(await player.apity > 2000) {
+//             await player.increment({apity: -2000});
+//         } else {
+//             await player.update({apity: 0});
+//         }
+//     }
+//     return cid;
+// }
 
 async function viewAzurCard(card, interaction) { 
     console.log("viewing...");
@@ -560,24 +560,16 @@ async function viewAzurCard(card, interaction) {
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity: Stellarite**
+**Rarity: Azurite**
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}`)
-        .setColor(color.stellar);
+        .setColor(color.azur);
     await interaction.followUp({embeds: [embedCard]});
 }
 
 
 
 async function rarityCreate(cid, rarity, interaction) {
-    switch (rarity) {
-        case 1:
-            await createWhiteCard(cid, interaction);
-            break;
-
-        case 2:
-            await createGreenCard(cid, interaction);
-            break;
-            
+    switch (rarity) {            
         case 3:
             await createBlueCard(cid, interaction);
             break;
@@ -595,7 +587,7 @@ async function rarityCreate(cid, rarity, interaction) {
             break;
 
         case 9:
-            await createAzurCard(interaction);
+            await createAzurCard(cid, interaction);
             break;
         
         default:
@@ -606,116 +598,116 @@ async function rarityCreate(cid, rarity, interaction) {
 async function rarityBurn(interaction, rarity) {
     switch (rarity) {
         case 1:
-            await database.Player.increment({gems: 1, money: 10}, {where: {playerID: interaction.user.id}});
-            return [10,1];
+            await database.Player.increment({gems: 15, money: 10}, {where: {playerID: interaction.user.id}});
+            return [10,15];
 
         case 2:
-            await database.Player.increment({gems: 5, money: 20}, {where: {playerID: interaction.user.id}});
-            return [20,5];
+            await database.Player.increment({gems: 15, money: 20}, {where: {playerID: interaction.user.id}});
+            return [20,15];
             
         case 3:
-            await database.Player.increment({gems: 10, money: 50}, {where: {playerID: interaction.user.id}});
-            return [50,10];
+            await database.Player.increment({gems: 15, money: 50}, {where: {playerID: interaction.user.id}});
+            return [50,15];
 
         case 4:
-            await database.Player.increment({gems: 10, money: 200}, {where: {playerID: interaction.user.id}});
-            return [200,10];
+            await database.Player.increment({gems: 15, money: 200}, {where: {playerID: interaction.user.id}});
+            return [200,15];
     }
 
 }
 
-async function wlPool(interaction, rarity) {
-    const user = interaction.user.id;
-    const wcount = await database.Wishlist.count({where: {playerID: user}})
-    if (wcount >= 5) {
-        const wlist = await database.Wishlist.findAll({where: {playerID: user}})
-        const rngChar = Math.floor(Math.random() * 1000);
-        const char = (rngChar%wlist.length);
-        const cid = await wlist[char].characterID;
-        return await rarityCreate(cid, rarity, interaction);
-    } else {
-        await mainPool(interaction, rarity);
-    }
-}
+// async function wlPool(interaction, rarity) {
+//     const user = interaction.user.id;
+//     const wcount = await database.Wishlist.count({where: {playerID: user}})
+//     if (wcount >= 5) {
+//         const wlist = await database.Wishlist.findAll({where: {playerID: user}})
+//         const rngChar = Math.floor(Math.random() * 1000);
+//         const char = (rngChar%wlist.length);
+//         const cid = await wlist[char].characterID;
+//         return await rarityCreate(cid, rarity, interaction);
+//     } else {
+//         await mainPool(interaction, rarity);
+//     }
+// }
 
-async function majorPool(interaction, rarity) {
-    const sideChar = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
-    const rngChar = Math.floor(Math.random() * 10000);
-    const offset = (rngChar%sideChar);
-    const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
-    const cid = await char.characterID;
-    return await rarityCreate(cid, rarity, interaction);
-}
+// async function majorPool(interaction, rarity) {
+//     const sideChar = await database.Character.count({where: {rank: {[Op.lt]: 3}}});
+//     const rngChar = Math.floor(Math.random() * 10000);
+//     const offset = (rngChar%sideChar);
+//     const char = await database.Character.findOne({offset: offset, where: {rank: {[Op.lt]: 3}}});
+//     const cid = await char.characterID;
+//     return await rarityCreate(cid, rarity, interaction);
+// }
 
-async function mainPool(interaction, rarity) {
-    const rngChar = Math.floor(Math.random() * 10000);
-    const offset = (rngChar%100);
-    const char = await database.Character.findOne({offset: offset, where: {rank: 1}});
-    const cid = await char.characterID;
-    return await rarityCreate(cid, rarity, interaction);
-}
+// async function mainPool(interaction, rarity) {
+//     const rngChar = Math.floor(Math.random() * 10000);
+//     const offset = (rngChar%100);
+//     const char = await database.Character.findOne({offset: offset, where: {rank: 1}});
+//     const cid = await char.characterID;
+//     return await rarityCreate(cid, rarity, interaction);
+// }
 
-async function sidePool(interaction, rarity) {
-    const sideChar = await database.Character.count({where: {rank: 2}});
-    const rngChar = Math.floor(Math.random() * 10000);
-    const offset = (rngChar%sideChar);
-    const char = await database.Character.findOne({offset: offset, where: {rank: 2}});
-    const cid = await char.characterID;
-    return await rarityCreate(cid, rarity, interaction);
-}
+// async function sidePool(interaction, rarity) {
+//     const sideChar = await database.Character.count({where: {rank: 2}});
+//     const rngChar = Math.floor(Math.random() * 10000);
+//     const offset = (rngChar%sideChar);
+//     const char = await database.Character.findOne({offset: offset, where: {rank: 2}});
+//     const cid = await char.characterID;
+//     return await rarityCreate(cid, rarity, interaction);
+// }
 
-async function allPool(interaction, rarity) {
-    const totalChar = await database.Character.count();
-    const rngChar = Math.floor(Math.random() * 100000);
-    const cid = (rngChar%totalChar)+1;
-    return await rarityCreate(cid, rarity, interaction);
-}
-
-
+// async function allPool(interaction, rarity) {
+//     const totalChar = await database.Character.count();
+//     const rngChar = Math.floor(Math.random() * 100000);
+//     const cid = (rngChar%totalChar)+1;
+//     return await rarityCreate(cid, rarity, interaction);
+// }
 
 
-async function sideofftrashoff(interaction, rarity) {
-    const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 97) {
-        await wlPool(interaction, rarity);
-    } else if (rngPool >= 70) {
-        await mainPool(interaction, rarity);
-    } else {
-        await sidePool(interaction, rarity);
-    }
+
+
+// async function sideofftrashoff(interaction, rarity) {
+//     const rngPool = Math.floor(Math.random() * 100);
+//     if (rngPool >= 97) {
+//         await wlPool(interaction, rarity);
+//     } else if (rngPool >= 70) {
+//         await mainPool(interaction, rarity);
+//     } else {
+//         await sidePool(interaction, rarity);
+//     }
     
     
-}
-async function sideontrashoff(interaction, rarity) {
-    const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 91) {
-        await wlPool(interaction, rarity);
-    } else {
-        await majorPool(interaction, rarity);
-    }
-}
-async function sideontrashon(interaction, rarity) {
-    const rngPool = Math.floor(Math.random() * 100);
-    if (rngPool >= 85) {
-        await wlPool(interaction, rarity);
-    } else {
-        await allPool(interaction, rarity);
-    }
+// }
+// async function sideontrashoff(interaction, rarity) {
+//     const rngPool = Math.floor(Math.random() * 100);
+//     if (rngPool >= 91) {
+//         await wlPool(interaction, rarity);
+//     } else {
+//         await majorPool(interaction, rarity);
+//     }
+// }
+// async function sideontrashon(interaction, rarity) {
+//     const rngPool = Math.floor(Math.random() * 100);
+//     if (rngPool >= 85) {
+//         await wlPool(interaction, rarity);
+//     } else {
+//         await allPool(interaction, rarity);
+//     }
     
-}
+// }
 
-async function poolswitch(interaction, rarity) {
-    const user = interaction.user.id;
-    const sideson = await database.Sideson.findOne({where: {playerID: user}});
-    const trashon = await database.Trashon.findOne({where: {playerID: user}});
-    if (!sideson && !trashon) {
-        return await sideofftrashoff(interaction, rarity);
-    } else if (sideson && !trashon){
-        return await sideontrashoff(interaction, rarity);
-    } else {
-        return await sideontrashon(interaction, rarity);
-    }
-}
+// async function poolswitch(interaction, rarity) {
+//     const user = interaction.user.id;
+//     const sideson = await database.Sideson.findOne({where: {playerID: user}});
+//     const trashon = await database.Trashon.findOne({where: {playerID: user}});
+//     if (!sideson && !trashon) {
+//         return await sideofftrashoff(interaction, rarity);
+//     } else if (sideson && !trashon){
+//         return await sideontrashoff(interaction, rarity);
+//     } else {
+//         return await sideontrashon(interaction, rarity);
+//     }
+// }
 
 //side off trash off 10%wl, 60%tops, 30% sides
 //sides on trash off 20%wl, 40%tops, 40%sides
@@ -725,41 +717,39 @@ async function raritySwitch(interaction) {
     const rngRarity = Math.floor(Math.random() * 100000);
     const user = interaction.user.id;
     const player = await database.Player.findOne({where: {playerID: user}});
-    await player.increment({gems: -10});
+    await player.increment({gems: -100});
     const pity = Math.floor(player.pity*3/10);
     const channel2 = interaction.guild.channels.cache.get('997873272014246018');
-    const apityrng = await (rngRarity + player.apity/700);
-    const pityrng = await (rngRarity + pity);
     await player.increment({apity: 1});
-    if (apityrng >= 99995) {
+    if ((rngRarity + player.apity/15) >= 99995 || player.apity > 1500) {
         channel2.send(`${interaction.user} rolled ${rngRarity} with ${player.apity} pity.`)
+        player.update({apity: 0});
+        player.increment({pity: 1});
         return 9;
-    }else if (rngRarity >= 99900) {
+    }else if (rngRarity + player.apity/5 >= 99700) {
         channel2.send(`${interaction.user} rolled ${rngRarity}.`)
-        player.increment({apity: -50});
+        player.increment({pity: 1, apity: 1});
         return 6;
-    } else if (pityrng >= 99200) {
-        if (player.pity < 400) {
-            await player.update({pity: 0});
-        } else {
-            await player.increment({pity: -400});
-        }
-        player.increment({apity: -3});
+    } else if (player.pity > 70 || (rngRarity + player.pity*100) >= 99000) {
+        await player.update({pity: 0});
+        await player.increment({apity: 1});
         return 5;
-    } else if (rngRarity >= 95000) {
+    } else if (rngRarity >= 85000) {
         await player.increment({pity: 1});
         return 4;
-    } else if (rngRarity >= 80000) {
-        await player.increment({pity: 1});
-        return 3;
-    } else if (rngRarity >= 60000) {
-        await player.increment({pity: 1});
-        return 2;
     } else {
         await player.increment({pity: 1});
-        return 1;
+        return 3;
     }
 }
+
+async function rngChar(charlist) {
+    const charCount = charlist.length;
+    const rng = Math.floor(Math.random() * 10000) % charCount;
+    const char = charlist[rng];
+    return char;
+}
+
 
 async function gacha(interaction, embed) {
     const user = interaction.user.id;
@@ -774,12 +764,26 @@ async function gacha(interaction, embed) {
     const gachaArray = [0,0,0,0,0,0,0,0,0,0];
     const burnRewards = [0,0];//coin, gems
     const timeStart = Date.now();
+    const wishlist = await database.Wishlist.findAll({
+        attributes: ['characterID'],
+        where: {playerID: user}
+    });
+    const charlist = await database.Character.findAll({
+        where: {
+            [Op.or]: [
+                {rank: 1}, 
+                {characterID: {[Op.in]: wishlist}}
+            ]
+        }
+    });
     embed.setTitle('Processing Gacha');
     for (let i = 0; i < amount; i++) {
         const rarity = await raritySwitch(interaction);
         if (rarity > setRarity) {
+            const char = await rngChar(charlist);
+
             //roll character
-            await poolswitch(interaction, rarity)
+            await rarityCreate(char.characterID, rarity, interaction);
             gachaArray[rarity] += 1;
         } else {
             //burn card.
@@ -793,19 +797,15 @@ async function gacha(interaction, embed) {
 **Burning:** ${rarityName} and lesser
 
 **Gacha Stats**
-**Quartz:** ${gachaArray[1]}
-**Jade:** ${gachaArray[2]}
-**Lapis:** ${gachaArray[3]}
+**Jade:** ${gachaArray[3]}
 **Amethyst:** ${gachaArray[4]}
 **Ruby:** ${gachaArray[5]}
 **Diamond:** ${gachaArray[6]}
-**Stellarite:** ${gachaArray[9]}
+**Azurite:** ${gachaArray[9]}
 
 
 **Burn Stats**
-**Quartz:** ${burnArray[1]}
-**Jade:** ${burnArray[2]}
-**Lapis:** ${burnArray[3]}
+**Jade:** ${burnArray[3]}
 **Amethyst:** ${burnArray[4]}
 **Coins:** ${burnRewards[0]}
 **Gems:** ${burnRewards[1]}`)
@@ -1047,19 +1047,19 @@ async function bluecard(card) {
     if (lock) {
         const lockstatus = '**|**';
         if (tag) {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
+            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
             return cardString
         } else {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
+            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
             return cardString
         }
     } else {
         const lockstatus = '|';
         if (tag) {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
+            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + tag + charname + ` (#${inumber})` + ` ×${quantity}`;
             return cardString
         } else {
-            const cardString =`:blue_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
+            const cardString =`:green_square:` + ID + ` ${lockstatus} ` + charname + ` (#${inumber})` + `×${quantity}`;
             return cardString
         }
     }
@@ -1295,7 +1295,7 @@ async function switchRarity(card, rarity) {
         case 7:
             return pinkcard(card);
 
-        case 9:
+        case 8:
             return azurcard(card);
 
         case 10:
@@ -1316,14 +1316,14 @@ async function switchRarity(card, rarity) {
 
 async function returnRarityName(rarity) {
     switch(rarity) {
-        case 0:
-            return 'no'
         case 1:
-            return 'all quartz';
-        case 2:
-            return `all jade`;
+            return 'no'
+        // case 1:
+        //     return 'all quartz';
+        // case 2:
+        //     return `all jade`;
         case 3:
-            return `all lapis`;
+            return `all jade`;
         case 4:
             return `all amethyst`;
     }
@@ -1338,7 +1338,7 @@ async function confirmGacha(interaction) {
     const embed = await embedSucess(interaction);
     const rarityName = await returnRarityName(setRarity);
     embed.setTitle('Confirm Gacha?')
-    embed.setDescription(`You are spending ${amount*10} gems for ${amount} gachas
+    embed.setDescription(`You are spending ${amount*100} gems for ${amount} gachas
 while burning ${rarityName} and lesser rarity cards.`)
 //deploy button then manage button to confirm.
     const row = await createButton();
@@ -1422,7 +1422,8 @@ module.exports = {
             option.setName('rarity')
                 .setDescription('Character ID.')
                 .setRequired(false)
-                .addChoice('lapis', 3)
+                .addChoice('no', 1)
+                .addChoice('jade', 3)
                 .addChoice('amethyst', 4))
         .addBooleanOption(option => 
             option.setName('endping')
@@ -1437,19 +1438,13 @@ module.exports = {
                 if (amount > 1000) {
                     return interaction.reply("1000 Gacha is the maximum limit.");
                 }
-                if (player.gems >= 10*amount){
-                    const wlist = await database.Wishlist.count({where: {playerID: user}})
-                    if (wlist >= 5) {
-                        await confirmGacha(interaction);
-                    }else {
-                        await interaction.channel.send("Characters in your wishlist have a higher chance of appearing in gacha. It is recommended to have at least 5 characters in your wishlist.")
-                        await confirmGacha(interaction);
-                    }
+                if (player.gems >= 100*amount){
+                    await confirmGacha(interaction);
                     
                 } else {
                     //not enough gems embed.
                     const embedE = await embedError(interaction);
-                    (embedE).setDescription(`You need ${amount * 10} gems to gacha.\nDo dailies, add new series, characters or send images to gain more gems`)
+                    (embedE).setDescription(`You need ${amount * 100} gems to gacha.\nDo dailies, add new series, characters or send images to gain more gems`)
                     return await interaction.reply({embeds: [embedE]});
                 }
                 
