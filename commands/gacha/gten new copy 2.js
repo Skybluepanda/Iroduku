@@ -1060,7 +1060,7 @@ async function buttonManager2(interaction, msg, list, embed) {
                     embed.addFields(
                         {
                             name: "Burn Reward", value: `${j} Jades Burnt
-Gems: ${player.gems}(+${15*j}) <:waifugem:947388797916700672>
+Gems: ${player.gems}(+${15*j}) <:waifugem:1182852147197526087>
 Money: ${player.money}(+${50*j}) <:datacoin:947388797828612127>`
                         }
                     )
@@ -1388,7 +1388,7 @@ module.exports = {
                 } else {
                     //not enough gems embed.
                     const embedE = await embedError(interaction);
-                    (embedE).setDescription("You need 1000 gems <:waifugem:947388797916700672> to gacha.\nDo dailies, add new series, characters or send images to gain more gems")
+                    (embedE).setDescription("You need 1000 gems <:waifugem:1182852147197526087> to gacha.\nDo dailies, add new series, characters or send images to gain more gems")
                     return await interaction.reply({embeds: [embedE]});
                 }
                 

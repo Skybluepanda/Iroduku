@@ -8,8 +8,6 @@ var dayjs = require('dayjs');
 //import dayjs from 'dayjs' // ES 2015
 dayjs().format()
 
-const burnCooldown = new Collection();
-
 function embedSucess(interaction) {
     const embed = new MessageEmbed();
 
@@ -71,16 +69,8 @@ async function buttonManager(interaction, msg, coins, gems) {
                     await interaction.followUp("Burning in progress, may take up to 15 seconds.");
                     const uid = await interaction.user.id;
                     const lid = await interaction.options.getInteger('lid');
-                    let quantity = await interaction.options.getInteger('quantity');
-                    if (!quantity) {
-                        quantity = 1;
-                    }
                     const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}});
-                    if (card.quantity == quantity) {
-                        card.destroy();
-                    } else {
-                        card.increment({quantity: -quantity});
-                    }
+                    await card.destroy();
                     await database.Player.increment({money: coins, gems: gems}, {where: {playerID: uid}});
                     await interaction.channel.send(`Card ${lid} burnt. ${coins} coins and ${gems} gems refunded.`)
                     break;
@@ -92,9 +82,6 @@ async function buttonManager(interaction, msg, coins, gems) {
             i.deferUpdate();
         }
         );
-        collector.on('end', (collected, reason) => {
-            burnCooldown.delete(interaction.user.id);
-            });
     } catch(error) {
         console.log("Error has occured in button Manager");
     }
@@ -140,7 +127,7 @@ async function buttonManager3(interaction, msg, coins, gems, karmaadd, card) {
                     console.log(7);
                     await database.Player.increment({money: coins, gems: gems, karma: karmaadd}, {where: {playerID: uid}});
                     console.log(8);
-                    await interaction.channel.send(`Card ${lid} Sold to Market for ${coins} coins and ${karmaadd} karma.`)
+                    await interaction.channel.send(`Card ${lid} Sold to Market for ${coins} coins and ${gems} gems.`)
                     break;
                     
                 case 'cancel':
@@ -150,124 +137,126 @@ async function buttonManager3(interaction, msg, coins, gems, karmaadd, card) {
             };
             
         });
-
-        collector.on('end', (collected, reason) => {
-            burnCooldown.delete(interaction.user.id)
-        });
     } catch(error) {
         console.log("Error has occured in button Manager");
     }
 }
 
-async function viewWhiteCard(card, interaction) { 
-    let quantity = await interaction.options.getInteger('quantity');
-    if (!quantity) {
-        quantity = 1;
-    }
-    const embedCard = new MessageEmbed();
-    const coins = quantity * 10;
-    const gem = quantity * 1;
-    //all we get is inventory id and player id
-    const player = await interaction.user.id;
-    const cid = await card.characterID;
-    const char = await database.Character.findOne({ where: {characterID: cid}});
-    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
-    let imgID = await card.imageID;
-    let imgNumber = await card.imageNumber;
-    let image;
-    if (imgID) {
-        image = await database.Image.findOne({ where: { imageID: imgID}});
-    } else if (imgNumber) {
-        image = await database.Image.findOne({ where: { characterID: cid, imageNumber: card.imageNumber}})
+// async function viewWhiteCard(card, interaction) { 
+//     let quantity = await interaction.options.getInteger('quantity');
+//     if (!quantity) {
+//         quantity = 1;
+//     }
+//     const embedCard = new MessageEmbed();
+//     const coins = quantity * 10;
+//     const gem = quantity * 1;
+//     //all we get is inventory id and player id
+//     const player = await interaction.user.id;
+//     const cid = await card.characterID;
+//     const char = await database.Character.findOne({ where: {characterID: cid}});
+//     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+//     let imgID = await card.imageID;
+//     let imgNumber = await card.imageNumber;
+//     let image;
+//     if (imgID) {
+//         image = await database.Image.findOne({ where: { imageID: imgID}});
+//     } else if (imgNumber) {
+//         image = await database.Image.findOne({ where: { characterID: cid, imageNumber: card.imageNumber}})
+//     } else {
+//         image = await database.Image.findOne({ where: { characterID: cid, imageNumber: 1}})
+//     }
+
+//     //card is a card object
+//     //cid, inventory id, rarity , tag, image number, image id, quantity. createdAt.
+//     if (image) {
+//         embedCard.setImage(image.imageURL)
+//             .setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+// Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageURL)
+//     } else {
+//         embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
+//     }
+//     embedCard.setTitle(`${char.characterName}`)
+//         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+//         .setDescription(`Card Info
+// **LID:** ${card.inventoryID} | **CID: **${cid}
+// **Series: **${char.seriesID} | ${series.seriesName}
+// **Rarity: Quartz**
+// **Quantity:** ${card.quantity}
+
+// Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:1182852147197526087>`)
+//         .setColor(color.white);
+//         const row = await createButton();
+//         msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+//         await buttonManager(interaction, msg, coins, gem);
+// }
+
+// async function viewGreenCard(card, interaction) { 
+//     let quantity = await interaction.options.getInteger('quantity');
+//     if (!quantity) {
+//         quantity = 1;
+//     }
+//     const coins = quantity * 20;
+//     const gem = quantity * 5;
+//     const embedCard = new MessageEmbed();
+//     //all we get is inventory id and player id
+//     const player = await interaction.user.id;
+//     const cid = await card.characterID;
+//     const char = await database.Character.findOne({ where: {characterID: cid}});
+//     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+//     let imgID = await card.imageID;
+//     let imgNumber = await card.imageNumber;
+//     let image;
+//     if (imgID) {
+//         image = await database.Image.findOne({ where: { imageID: imgID}});
+//     } else if (imgNumber) {
+//         image = await database.Image.findOne({ where: { characterID: cid, imageNumber: card.imageNumber}})
+//     } else {
+//         image = await database.Image.findOne({ where: { characterID: cid, imageNumber: 1}})
+//     }
+
+//     //card is a card object
+//     //cid, inventory id, rarity , tag, image number, image id, quantity. createdAt.
+//     if (image) {
+//         embedCard.setImage(image.imageURL)
+//             .setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
+//         Image ID is ${image.imageID} report any errors using ID.`)
+//     } else {
+//         embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
+//     }
+//     embedCard.setTitle(`${char.characterName}`)
+//         .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+//         .setDescription(`Card Info
+// **LID:** ${card.inventoryID} | **CID:** ${cid}
+// **Series:** ${char.seriesID} | ${series.seriesName}
+// **Rarity:** Jade
+// **Quantity:** ${card.quantity}
+
+// Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:1182852147197526087>`)
+//         .setColor(color.green);
+//         const row = await createButton();
+//         msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+//         await buttonManager(interaction, msg, coins, gem);
+// }
+
+async function ranktext(rank) {
+    if(rank == 1) {
+        return "Core";
     } else {
-        image = await database.Image.findOne({ where: { characterID: cid, imageNumber: 1}})
+        return "Extra"
     }
-
-    //card is a card object
-    //cid, inventory id, rarity , tag, image number, image id, quantity. createdAt.
-    if (image) {
-        embedCard.setImage(image.imageURL)
-            .setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageURL)
-    } else {
-        embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
-    }
-    embedCard.setTitle(`${char.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Card Info
-**LID:** ${card.inventoryID} | **CID: **${cid}
-**Series: **${char.seriesID} | ${series.seriesName}
-**Rarity: Quartz**
-**Quantity:** ${card.quantity}
-
-Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:947388797916700672>`)
-        .setColor(color.white);
-        const row = await createButton();
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg, coins, gem);
-}
-
-async function viewGreenCard(card, interaction) { 
-    let quantity = await interaction.options.getInteger('quantity');
-    if (!quantity) {
-        quantity = 1;
-    }
-    const coins = quantity * 20;
-    const gem = quantity * 5;
-    const embedCard = new MessageEmbed();
-    //all we get is inventory id and player id
-    const player = await interaction.user.id;
-    const cid = await card.characterID;
-    const char = await database.Character.findOne({ where: {characterID: cid}});
-    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
-    let imgID = await card.imageID;
-    let imgNumber = await card.imageNumber;
-    let image;
-    if (imgID) {
-        image = await database.Image.findOne({ where: { imageID: imgID}});
-    } else if (imgNumber) {
-        image = await database.Image.findOne({ where: { characterID: cid, imageNumber: card.imageNumber}})
-    } else {
-        image = await database.Image.findOne({ where: { characterID: cid, imageNumber: 1}})
-    }
-
-    //card is a card object
-    //cid, inventory id, rarity , tag, image number, image id, quantity. createdAt.
-    if (image) {
-        embedCard.setImage(image.imageURL)
-            .setFooter(`#${image.imageNumber} Art by ${image.artist} | Uploaded by ${image.uploader}
-        Image ID is ${image.imageID} report any errors using ID.`)
-    } else {
-        embedCard.addField("no image 1 found", "Send an official image 1 for this character. Green cards can't be gifs.");
-    }
-    embedCard.setTitle(`${char.characterName}`)
-        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
-        .setDescription(`Card Info
-**LID:** ${card.inventoryID} | **CID:** ${cid}
-**Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity:** Jade
-**Quantity:** ${card.quantity}
-
-Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:947388797916700672>`)
-        .setColor(color.green);
-        const row = await createButton();
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg, coins, gem);
 }
 
 async function viewBlueCard(card, interaction) {
-    let quantity = await interaction.options.getInteger('quantity');
-    if (!quantity) {
-        quantity = 1;
-    }
     const embedCard = new MessageEmbed();
     //all we get is inventory id and player id
     const player = await interaction.user.id;
     const cid = await card.characterID;
     const char = await database.Character.findOne({ where: {characterID: cid}});
     const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
-    const coins = quantity * 50;
-    const gem = quantity * 10;
+    const simps = await database.Wishlist.count({where: {characterID: cid}});
+    const ranktxt = ranktext(char.rank);
+    const coins = 50;
+    const gem = 15;
     let image;
     let url;
     if (card.imageNumber > 0) {
@@ -297,23 +286,15 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
         .setDescription(`Card Info
 **LID:** ${card.inventoryID} | **CID:** ${cid}
 **Series:** ${char.seriesID} | ${series.seriesName}
-**Rarity:** Lapis
-**Quantity:** ${card.quantity}
+**Rank: **${ranktxt} | **Simps: **${simps}
+**Rarity:** Jade
 
-BURNING THIS CARD WILL YIELD 50 COINS AND 10 GEMS PER COPY
-${quantity} copies being burnt for ${coins} coins and ${gem} gems`)
-        .setColor(color.blue);
+BURNING THIS CARD WILL YIELD 50 COINS AND 10 GEMS
+Card is being burnt for ${coins} coins and ${gem} gems`)
+        .setColor(color.jade);
     const row = await createButton();
-    const nsfw = await image.nsfw;
-    if (nsfw) {
-        await interaction.reply(`||${image.imageURL}||`);
-        msg = await interaction.editReply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg, coins, gem);
-        return await interaction.followUp("**Above embed may contain explicit content.**")
-    } else {
-        msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-        await buttonManager(interaction, msg, coins, gem);
-    }
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager(interaction, msg, coins, gem);
 }
 
 async function viewPurpleCard(card, interaction) { 
@@ -357,11 +338,11 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 200 <:datacoin:947388797828612127> | 20 <:waifugem:947388797916700672>`)
+Burn Reward: 200 <:datacoin:947388797828612127> | 15 <:waifugem:1182852147197526087>`)
         .setColor(color.purple);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager(interaction, msg, 200, 20);
+    await buttonManager(interaction, msg, 200, 15);
 }
 
 async function viewRedCard(card, interaction) { 
@@ -405,11 +386,11 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Ruby
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 1500 <:datacoin:947388797828612127> | 25 <:karma:947388797627281409>`)
+Burn Reward: 1500 <:datacoin:947388797828612127> | 15 <:waifugem:1182852147197526087>`)
         .setColor(color.red);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 1500, 0, 25, card);
+    await buttonManager3(interaction, msg, 1500, 15, 5, card);
 }
 
 async function viewPinkCard(card, interaction) { 
@@ -453,11 +434,11 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Pink Diamond
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 3000 <:datacoin:947388797828612127> | 25 <:karma:947388797627281409>`)
+Burn Reward: 3000 <:datacoin:947388797828612127> | 15 <:waifugem:1182852147197526087>`)
         .setColor(color.pink);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 3000, 0, 25, card);
+    await buttonManager3(interaction, msg, 3000, 15, 5, card);
 }
 
 async function viewDiaCard(card, interaction) { 
@@ -501,11 +482,38 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Diamond
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 10000 <:datacoin:947388797828612127> | 100 <:karma:947388797627281409>`)
+Burn Reward: 10000 <:datacoin:947388797828612127> | 15 <:waifugem:1182852147197526087>`)
         .setColor(color.diamond);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 10000, 0, 100, card);
+    await buttonManager3(interaction, msg, 10000, 15, 10, card);
+}
+
+async function viewAzurCard(card, interaction) { 
+    const Azurite = await database.Azurite.findOne({where: {cardID: card.cardID}});
+    const embedCard = new MessageEmbed();
+    //all we get is inventory id and player id
+    const player = await interaction.user.id;
+    const cid = await card.characterID;
+    const char = await database.Character.findOne({ where: {characterID: cid}});
+    const series = await database.Series.findOne({ where: {seriesID: char.seriesID}});
+    let image;
+    let url;
+    embedCard.setTitle(`${char.characterName}`)
+        .setFooter(`Art by ${Azurite.artist}
+*Upload your choice of image of the character using with /azurupload*`).setImage(Azurite.imageURL)
+        .setAuthor(interaction.user.username, interaction.user.avatarURL({ dynamic: true }))
+        .setDescription(`Card Info
+**LID:** ${card.inventoryID} | **CID:** ${cid}
+**Series:** ${char.seriesID} | ${series.seriesName}
+**Rarity:** Azurite
+**Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
+
+Burn Reward: 100000 <:datacoin:947388797828612127> | 15 <:waifugem:1182852147197526087>`)
+        .setColor(color.azur);
+    const row = await createButton();
+    msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
+    await buttonManager3(interaction, msg, 100000, 15, 20, card);
 }
 
 async function viewStellarCard(card, interaction) { 
@@ -528,97 +536,55 @@ async function viewStellarCard(card, interaction) {
 **Rarity:** Stellarite
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 100000 <:datacoin:947388797828612127> | 200 <:karma:947388797627281409>`)
+Burn Reward: 100000 <:datacoin:947388797828612127> | 15 <:waifugem:1182852147197526087>`)
         .setColor(color.stellar);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
-    await buttonManager3(interaction, msg, 100000, 0, 200, card);
+    await buttonManager3(interaction, msg, 100000, 15, 20, card);
 }
 
 async function switchRarity(card, rarity, interaction) {
     const uid = interaction.user.id
-    let quantity = await interaction.options.getInteger('quantity');
     switch (rarity) {
-        case 1:
-            if (card.quantity < quantity) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Insufficient Quantity. Enter a smaller quantity.");
-            }
-            return viewWhiteCard(card, interaction);
-            //white
-        case 2:
-            if (card.quantity < quantity) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Insufficient Quantity. Enter a smaller quantity.");
-            }
-            return viewGreenCard(card, interaction);
-            //green
         case 3:
-            if (card.quantity < quantity) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Insufficient Quantity. Enter a smaller quantity.");
-            }
             return viewBlueCard(card, interaction);
             //Blue
         case 4:
-            if (quantity) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Amethyst Cards Don't have Quantity. Try again without quantity.");
-            }
             return viewPurpleCard(card, interaction);
             //Purple
         case 5:
-            if (quantity) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Ruby Cards Don't have Quantity. Try again without quantity.");
-            }
             if (card.charred) {
-                burnCooldown.delete(uid);
                 return interaction.reply("Can't burn cards purchased from market.");
             }
             return viewRedCard(card, interaction);
             //red
 
         case 6:
-            if (quantity) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Diamond Cards Don't have Quantity. Try again without quantity.");
-            }
             if (card.charred) {
-                burnCooldown.delete(uid);
                 return interaction.reply("Can't burn cards purchased from market.");
             }
             return viewDiaCard(card, interaction);
 
         case 7:
-            if (quantity) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Pink Diamond Cards Don't have Quantity. Try again without quantity.");
-            }
             if (card.charred) {
-                burnCooldown.delete(uid);
                 return interaction.reply("Can't burn cards purchased from market.");
             }
             return viewPinkCard(card, interaction);
 
-        case 9:
-            if (quantity) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Stellarite Cards Don't have Quantity. Try again without quantity.");
-            }
+        case 8:
             if (card.charred) {
-                burnCooldown.delete(uid);
                 return interaction.reply("Can't burn cards purchased from market.");
             }
-            return viewStellarCard(card, interaction);
+            return viewAzurCard(card, interaction);
+
+        case 9:
+            return interaction.reply("You can't burn stellarites cards.");
         
         
         case 10:
-            burnCooldown.delete(uid);
             return interaction.reply("You can't burn Special cards.");
 
         default:
-            burnCooldown.delete(uid);
             return interaction.reply("Error");
             //wtf?
     }
@@ -630,12 +596,10 @@ async function burnLid(interaction){
     const card = await database.Card.findOne({where: {playerID: uid, inventoryID: lid}})
     if (card) {
         if (card.lock) {
-            burnCooldown.delete(uid);
             return interaction.reply(`Card ${lid} is locked. Unlock the card before burning.`)
         }
         return await switchRarity(card, card.rarity, interaction);
     } else {
-        burnCooldown.delete(uid);
         return interaction.reply("Invalid List ID.")
     }
 }
@@ -652,7 +616,6 @@ async function burnTag(interaction){
         return burnList(embed, interaction, 1);
     } else {
         console.log("4");
-        burnCooldown.delete(uid);
         return interaction.reply("Invalid List ID.")
     }
 }
@@ -698,29 +661,7 @@ async function burnList(embed, interaction, page){
             weapon: null
         }}
     );
-    const whiteCount = await database.Card.sum('quantity',
-        {
-            where: {
-            rarity: 1,
-            tag: tag,
-            playerID: uid,
-            lock: false,
-            charred: false,
-            weapon: null
-        }}
-    );
-    const greenCount = await database.Card.sum('quantity',
-        {
-            where: {
-            rarity: 2,
-            tag: tag,
-            playerID: uid,
-            lock: false,
-            charred: false,
-            weapon: null
-        }}
-    );
-    const blueCount = await database.Card.sum('quantity',
+    const blueCount = await database.Card.count(
         {
             where: {
             rarity: 3,
@@ -775,9 +716,10 @@ async function burnList(embed, interaction, page){
             weapon: null
         }}
     );
-    const totalCoin = diaCount * 10000 + pinkCount * 3000 + redCount * 1500 + purpleCount*200 + blueCount*50+ greenCount*20 + whiteCount*10;
-    const totalGem = purpleCount*20 + blueCount*10+ greenCount*5 + whiteCount*1;
-    const totalKarma = diaCount * 100 + pinkCount * 25 + redCount * 25;
+    const totalCoin = diaCount * 10000 + pinkCount * 3000 + redCount * 1500 + purpleCount*200 + blueCount*50;
+    const totalCards = diaCount+pinkCount+redCount+purpleCount+blueCount;
+    const totalGem = totalCards*15;
+    const totalKarma = diaCount * 10 + pinkCount * 5 + redCount * 5;
 
     
     const totalPage = Math.ceil(maxPage/20);
@@ -789,14 +731,13 @@ async function burnList(embed, interaction, page){
     const fullList = await listString.join(`\n`);
     await embed.setDescription(`**List of ${interaction.user.username} Cards**\n${fullList}
     Burning total of:
-    Quartz: ${whiteCount} cards for ${whiteCount*10} coins and ${whiteCount*1} gems,
-    Jade: ${greenCount} cards for ${greenCount*20} coins and ${greenCount*5} gems,
-    Lapis: ${blueCount} cards for ${blueCount*50} coins and ${blueCount*10} gems,
-    Amethyst: ${purpleCount} cards for ${purpleCount*200} coins and ${purpleCount*20} gems.
-    Ruby: ${redCount} cards for ${redCount*1500} coins and ${redCount*25} karma.
-    Pink: ${pinkCount} cards for ${pinkCount*3000} coins and ${pinkCount*25} karma.
-    Diamond: ${diaCount} cards for ${diaCount*10000} coins and ${diaCount*100} karma.
-    Total: ${totalCoin} coins, ${totalGem} gems and ${totalKarma} karma.
+    Jade: ${blueCount} cards for ${blueCount*50} coins.
+    Amethyst: ${purpleCount} cards for ${purpleCount*200} coins.
+    Ruby: ${redCount} cards for ${redCount*1500} coins.
+    Pink: ${pinkCount} cards for ${pinkCount*3000} coins.
+    Diamond: ${diaCount} cards for ${diaCount*10000} coins.
+    Gems: ${totalCards} cards for 15 gems each.
+    Total: ${totalCoin} coins, ${totalGem} gems.
     `);
     await embed.setFooter(`page ${page} of ${totalPage} | ${maxPage} results found`);
     const msg = await updateReply(interaction, embed);
@@ -1012,7 +953,6 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
         );
 
         collector.on('end', (collected, reason) => {
-            burnCooldown.delete(interaction.user.id);
             });
     } catch(error) {
         console.log("Error has occured in button Manager");
@@ -1020,55 +960,55 @@ async function buttonManager2(embed, interaction, msg, page, maxPage, addcoins, 
 }
 
 
-async function whitecard(card) {
-    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
-    const ID = card.inventoryID;
-    //white block :white_large_square:
+// async function whitecard(card) {
+//     //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+//     const ID = card.inventoryID;
+//     //white block :white_large_square:
 
-    //check for tag 
-    const tag = card.tag;
+//     //check for tag 
+//     const tag = card.tag;
     
-    //find charname
-    const char = await database.Character.findOne({where: {characterID: card.characterID}});
-    const charname = char.characterName;
-    //check quantity
-    let quantity = card.quantity;
+//     //find charname
+//     const char = await database.Character.findOne({where: {characterID: card.characterID}});
+//     const charname = char.characterName;
+//     //check quantity
+//     let quantity = card.quantity;
     
-    if (tag) {
-        const cardString =`:white_large_square:` + ID + ` | ${tag} ` + charname + ` ×${quantity}`;
-        console.log(cardString);
-        return cardString
-    } else {
-        const cardString =`:white_large_square:` + ID + ` | ` + charname + `×${quantity}`;
-        console.log(cardString);
-        return cardString
-    }
-}
+//     if (tag) {
+//         const cardString =`:white_large_square:` + ID + ` | ${tag} ` + charname + ` ×${quantity}`;
+//         console.log(cardString);
+//         return cardString
+//     } else {
+//         const cardString =`:white_large_square:` + ID + ` | ` + charname + `×${quantity}`;
+//         console.log(cardString);
+//         return cardString
+//     }
+// }
 
-async function greencard(card) {
-    //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
-    const ID = card.inventoryID;
-    //white block :white_large_square:
+// async function greencard(card) {
+//     //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
+//     const ID = card.inventoryID;
+//     //white block :white_large_square:
 
-    //check for tag 
-    const tag = card.tag;
+//     //check for tag 
+//     const tag = card.tag;
     
-    //find charname
-    const char = await database.Character.findOne({where: {characterID: card.characterID}});
-    const charname = char.characterName;
-    //check quantity
-    let quantity = card.quantity;
+//     //find charname
+//     const char = await database.Character.findOne({where: {characterID: card.characterID}});
+//     const charname = char.characterName;
+//     //check quantity
+//     let quantity = card.quantity;
     
-    if (tag) {
-        const cardString = `:green_square:`+ ID + ` | ${tag} ` + charname + ` ×${quantity}`;
-        console.log(cardString);
-        return cardString
-    } else {
-        const cardString = `:green_square:` + ID + ` | ` + charname + `×${quantity}`;
-        console.log(cardString);
-        return cardString
-    }
-}
+//     if (tag) {
+//         const cardString = `:green_square:`+ ID + ` | ${tag} ` + charname + ` ×${quantity}`;
+//         console.log(cardString);
+//         return cardString
+//     } else {
+//         const cardString = `:green_square:` + ID + ` | ` + charname + `×${quantity}`;
+//         console.log(cardString);
+//         return cardString
+//     }
+// }
 
 async function bluecard(card) {
     //ID| Rarity color block, tag,, charname  Imagenumber(if blue+) x quantity if more than 1 for whit-blue
@@ -1084,14 +1024,13 @@ async function bluecard(card) {
     //image number of card
     const inumber = card.imageNumber;
     //check quantity
-    let quantity = card.quantity;
     
     if (tag) {
-        const cardString = `:blue_square:` +ID + ` | ${tag} ` + charname + ` (#${inumber})×${quantity}`;
+        const cardString = `:green_square:` +ID + ` | ${tag} ` + charname + ` (#${inumber})`;
         console.log(cardString);
         return cardString
     } else {
-        const cardString = `:blue_square:` + ID + ` | ` + charname + `(#${inumber})×${quantity}`;
+        const cardString = `:green_square:` + ID + ` | ` + charname + `(#${inumber})`;
         console.log(cardString);
         return cardString
     }
@@ -1263,7 +1202,7 @@ async function switchRarity2(card, rarity) {
         case 7:
             return pinkcard(card);
 
-        case 9:
+        case 8:
             return azurcard(card);
 
         case 10:
@@ -1296,6 +1235,7 @@ async function makeList(list) {
  * 
  */
 module.exports = {
+    cooldown: 15,
 	data: new SlashCommandBuilder()
 		.setName('burn')
 		.setDescription('Single or Bulk all with tag.')
@@ -1308,12 +1248,6 @@ module.exports = {
                         .setName("lid")
                         .setDescription("The inventory id u want to apply tag to")
                         .setRequired(true)
-                        )
-                .addIntegerOption(option => 
-                    option
-                        .setName("quantity")
-                        .setDescription("If empty only one copy will be burnt in the case of stacked cards.")
-                        .setRequired(false)
                         ))
         .addSubcommand(subcommand =>
             subcommand
@@ -1340,15 +1274,8 @@ module.exports = {
         //
         const uid = interaction.user.id;
         try {
-            if (burnCooldown.get(uid)) {
-                burnCooldown.delete(uid);
-                return interaction.reply("Existing Burn Command in Progress.");
-            } else {
-                burnCooldown.set(uid, true);
-            }
             await subSwitch(interaction);
         } catch (error) {
-            burnCooldown.delete(uid);
             return interaction.editReply("Error has occured");
             
         }

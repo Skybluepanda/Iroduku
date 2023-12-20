@@ -200,7 +200,7 @@ Image ID is ${image.imageID} report any errors using ID.`).setImage(image.imageU
 **Rarity: Quartz**
 **Quantity:** ${card.quantity}
 
-Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:947388797916700672>`)
+Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:1182852147197526087>`)
         .setColor(color.white);
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
@@ -248,7 +248,7 @@ async function viewGreenCard(card, interaction) {
 **Rarity:** Jade
 **Quantity:** ${card.quantity}
 
-Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:947388797916700672>`)
+Burn Reward: ${coins} <:datacoin:947388797828612127> | ${gem} <:waifugem:1182852147197526087>`)
         .setColor(color.green);
         const row = await createButton();
         msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
@@ -357,7 +357,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Amethyst
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 200 <:datacoin:947388797828612127> | 20 <:waifugem:947388797916700672>`)
+Burn Reward: 200 <:datacoin:947388797828612127> | 20 <:waifugem:1182852147197526087>`)
         .setColor(color.purple);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
@@ -405,7 +405,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Ruby
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 1500 <:datacoin:947388797828612127> | 250 <:waifugem:947388797916700672>`)
+Burn Reward: 1500 <:datacoin:947388797828612127> | 250 <:waifugem:1182852147197526087>`)
         .setColor(color.red);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
@@ -453,7 +453,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Pink Diamond
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 3000 <:datacoin:947388797828612127> | 500 <:waifugem:947388797916700672>`)
+Burn Reward: 3000 <:datacoin:947388797828612127> | 500 <:waifugem:1182852147197526087>`)
         .setColor(color.pink);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});
@@ -501,7 +501,7 @@ Gif ID is ${image.gifID} report any errors using ID.`).setImage(url)
 **Rarity:** Diamond
 **Date Pulled:** ${dayjs(card.createdAt).format('DD/MM/YYYY')}
 
-Burn Reward: 10000 <:datacoin:947388797828612127> | 1000 <:waifugem:947388797916700672>`)
+Burn Reward: 10000 <:datacoin:947388797828612127> | 1000 <:waifugem:1182852147197526087>`)
         .setColor(color.diamond);
     const row = await createButton();
     msg = await interaction.reply( {embeds: [embedCard], components: [row], fetchReply: true});

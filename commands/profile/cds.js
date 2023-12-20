@@ -76,9 +76,9 @@ async function processXP(interaction, player, pid) {
     await database.Player.increment({xp: +10}, {where: {playerID: interaction.user.id}});
     if (player.xp+10 >= xpLimit) {
         //reduce xp to xp - xplimit
-        await database.Player.increment({xp: -xpLimit, level: +1, karma: +(player.level+1)*100}, {where: {playerID: interaction.user.id}});
+        await database.Player.increment({xp: -xpLimit, level: +1, karma: +100}, {where: {playerID: interaction.user.id}});
         const embed = embedLVL(interaction);
-        embed.setDescription(`Level ${player.level+1} reached!\nLevel up karma reward +${(player.level+1)*100} Karma\nDaily gem reward increased by 100!`);
+        embed.setDescription(`Level ${player.level+1} reached!\nLevel up karma reward +100 Karma\nDaily gem reward increased by 50!`);
         interaction.followUp({embeds:[embed]});
     }
 }
@@ -91,27 +91,24 @@ async function streakDaily(interaction, player, pid, daily, streak, embedS) {
     }
     player = await database.Player.findOne({where: {playerID: interaction.user.id}});
     if (streak > 10) {
-        const reward = 1000 + 100*player.level;
-        await database.Player.increment({gems: +reward, karma: +30}, {where: {playerID: interaction.user.id}});
+        const reward = 1000 + 50*player.level;
+        await database.Player.increment({gems: +reward}, {where: {playerID: interaction.user.id}});
         embedS.addFields({name: "Daily Rewards", value:`Streak: (bonus capped) ${streak+1}
 Gems: ${player.gems+reward} (+${reward})
-Karma: ${player.karma+30} (+30)
 xp: ${player.xp+10}/${xpLimit} (+10)
 Use daily again within two days to continue the streak.`});
     } else if (streak == 0) {
-        const reward = 500 + 100*player.level;
-        await database.Player.increment({gems: +reward, karma: +30}, {where: {playerID: interaction.user.id}});
+        const reward = 500 + 50*player.level;
+        await database.Player.increment({gems: +reward}, {where: {playerID: interaction.user.id}});
         embedS.addFields({name: "Daily Rewards", value:`Streak: (reset) 1
 Gems: ${player.gems+reward} (+${reward})
-Karma: ${player.karma+30} (+30)
 xp: ${player.xp+10}/${xpLimit} (+10)
 Use daily again within two days to continue the streak.`});
     } else {
-        const reward = 500 + streak*50 + 100*player.level;
-        await database.Player.increment({gems: +reward, karma: +30}, {where: {playerID: interaction.user.id}});
+        const reward = 500 + streak*50 + 50*player.level;
+        await database.Player.increment({gems: +reward}, {where: {playerID: interaction.user.id}});
         embedS.addFields({name: "Daily Rewards", value:`Streak: ${streak+1}
 Gems: ${player.gems+reward} (+${reward})
-Karma: ${player.karma+30} (+30)
 xp: ${player.xp+10}/${xpLimit} (+10)
 Use daily again within two days to continue the streak.`}); 
     }
@@ -124,6 +121,7 @@ Use daily again within two days to continue the streak.`});
 async function checkDaily(interaction, embedS, player, pid) {
     const userId = interaction.user.id;
     const daily = await database.Daily.findOne({where: {playerID: userId}})
+    const channelLog = interaction.guild.channels.cache.get('1148423605026291833');
     if (daily) {
         const lastDaily = daily.lastDaily;
         const timeNow = Date.now();
@@ -133,9 +131,22 @@ async function checkDaily(interaction, embedS, player, pid) {
             await streakDaily(interaction, player, pid, daily, daily.streak, embedS);
             await database.Daily.update({lastDaily: timeNow}, {where: {playerID: userId}});
             await database.Daily.increment({streak: 1}, {where: {playerID: userId}});
-        } else {
+            player = await database.Player.findOne({where: {playerID: userId}});
+            await channelLog.send(`${interaction.user} Daily log
+Gems: ${player.gems}
+Karma: ${player.karma}
+Collects: ${player.kpity}`);
+            await player.update({kpity: 0});
+
+        } else if (timeDiff>= 79200000) {
             await streakDaily(interaction, player, pid, daily, 0, embedS);
             await database.Daily.update({lastDaily: timeNow, streak: 1}, {where: {playerID: userId}});
+            player = await database.Player.findOne({where: {playerID: userId}});
+            channelLog.send(`${interaction.user} Daily log
+Gems: ${player.gems}
+Karma: ${player.karma}
+Collects: ${player.kpity}`);
+            await player.update({kpity: 0});
         }
     }
 }
@@ -143,26 +154,22 @@ async function checkDaily(interaction, embedS, player, pid) {
 
 async function maxCollect(interaction, player, pid, embedS) {
     player = await database.Player.findOne({where: {playerID: interaction.user.id}});
-    await database.Player.increment({gems: +650}, {where: {playerID: interaction.user.id}});
+    await database.Player.increment({gems: +1000, kpity: 1}, {where: {playerID: interaction.user.id}});
     embedS.addFields({name: "Gems Collected!", 
-        value: `Gems Collected: (Capped! +650) ${player.gems+650}`});
+        value: `Gems Collected: (+1000) ${player.gems+1000}`});
 }
 
 async function normalCollect(interaction, player, playerIndex, amount, embedS) {
-    let bonus;
+    let bonus = 100;
     player = await database.Player.findOne({where: {playerID: interaction.user.id}});
-    if (amount >= 25) {
-        bonus = 50;
-    } else {
-        bonus = amount *2;
-    }
-    await database.Player.increment({gems: +(amount+bonus)}, {where: {playerID: interaction.user.id}});
+    await database.Player.increment({gems: +(amount+bonus), kpity: 1}, {where: {playerID: interaction.user.id}});
     embedS.addFields({name: "Gems Collected!", 
-        value: `Gems Collected: (${amount + bonus}) ${player.gems+amount+bonus}`});
+        value: `Gems Collected: (+${amount + bonus}) ${player.gems+amount+bonus}`});
 }
 
 async function checkCollect(interaction, embedS, player, playerIndex) {
     player = await database.Player.findOne({where: {playerID: interaction.user.id}});
+    await checkDaily(interaction, embedS, player, playerIndex)
     const userId = interaction.user.id;
     const collect = await database.Collect.findOne({where: {playerID: userId}});
     if (collect) {
@@ -170,14 +177,17 @@ async function checkCollect(interaction, embedS, player, playerIndex) {
         const timeNow = Date.now();
         const timeDiff = timeNow - lastCheck;
         const timeLeft = (timeDiff%480000);
-        if (57600000 > timeDiff && timeDiff >= 480000) {
-            const amount = 5 * Math.floor(timeDiff/480000);
+        if (28800000 > timeDiff && timeDiff >= 480000) {
+            const amount = 15 * Math.floor(timeDiff/480000);
             
             await database.Collect.update({lastcollect: timeNow-timeLeft}, {where: {playerID: userId}});
-            return normalCollect(interaction, player, playerIndex, amount, embedS);
-        } else {
+            await normalCollect(interaction, player, playerIndex, amount, embedS);
+        } else if (timeDiff >= 480000){
             await database.Collect.update({lastcollect: timeNow}, {where: {playerID: userId}});
-            return maxCollect(interaction, player, playerIndex, embedS);
+            await maxCollect(interaction, player, playerIndex, embedS);
+        }
+        if (collect.alert > 0) {
+            setTimeout(() => interaction.followUp(`${interaction.user} collect alert!`), collect.alert*1000);
         }
     }
 }
@@ -188,20 +198,20 @@ async function createButton(interaction){
     try {
         const row = new MessageActionRow()
             .addComponents(
-                new MessageButton()
-                    .setCustomId('daily')
-                    .setLabel('daily')
-                    .setStyle('PRIMARY'),
+                // new MessageButton()
+                //     .setCustomId('daily')
+                //     .setLabel('daily')
+                //     .setStyle('PRIMARY'),
                 new MessageButton()
                     .setCustomId('collect')
                     .setLabel('collect')
                     .setStyle('PRIMARY'),
         );
-        if (await dailyCds(interaction) == false) {
+        // if (await dailyCds(interaction) == false) {
+        //     row.components[0].setDisabled(true);
+        // }
+        if (await collectCds(interaction) == false && await dailyCds(interaction) == false) {
             row.components[0].setDisabled(true);
-        }
-        if (await collectCds(interaction) == false) {
-            row.components[1].setDisabled(true);
         }
         return row;
     } catch(error) {
@@ -256,11 +266,11 @@ async function buttonManager(interaction, msg, embedS, player, playerIndex) {
         const collector = msg.createMessageComponentCollector({filter, max:1, time: 60000 });
         collector.on('collect', async i => {
             switch (i.customId) {
-                case 'daily':
-                    i.deferUpdate()
-                    await checkDaily(interaction, embedS, player, playerIndex)
-                    await viewCds(interaction, embedS, interaction.user.id, player, playerIndex);
-                    break;
+                // case 'daily':
+                //     i.deferUpdate()
+                //     await checkDaily(interaction, embedS, player, playerIndex)
+                //     await viewCds(interaction, embedS, interaction.user.id, player, playerIndex);
+                //     break;
 
                 case 'collect':
                     i.deferUpdate()
@@ -271,7 +281,7 @@ async function buttonManager(interaction, msg, embedS, player, playerIndex) {
                 default:
                     const row = createButton(interaction);
                     row.components[0].setDisabled(true);
-                    row.components[1].setDisabled(true);
+                    // row.components[1].setDisabled(true);
                     interaction.editReply({components: [row]});
                     break;
             }
@@ -314,33 +324,28 @@ async function textCollect(collect) {
         const timeNow = Date.now();
         console.log(timeNow);
         const timeDiff = timeNow - lastCheck;
-        const timefull = 57600000 - timeDiff;
+        const timefull = 22800000 - timeDiff;
         console.log(timeDiff);
         const fulltime = dayjs.duration(timefull).format('HH[hr : ]mm[m : ]ss[s]');
-        if (57600000 > timeDiff && timeDiff >= 480000) {
+        if (22800000 > timeDiff && timeDiff >= 480000) {
             //some collected show cooldown.
-            const amount = 5 * Math.floor(timeDiff/480000);
-            let bonus;
-            if (amount >= 25) {
-                bonus = 50;
-            } else {
-                bonus = amount * 2
-            }
+            const amount = 15 * Math.floor(timeDiff/480000);
+            let bonus = 100
             const cooltime = (timeDiff%480000);
             const timeLeft = 480000 - cooltime;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(${amount+bonus}/650) gems collected. 
-${remain} until next 5 gems.
+            return `(${amount+bonus}/1000) gems collected. 
+${remain} until next 15 gems.
 ${fulltime} until collect is capped.`;
         } else if (timeDiff < 480000) {
             const timeLeft = 480000 - timeDiff;
             const remain = dayjs.duration(timeLeft).format('mm[m : ]ss[s]');
-            return `(0/650) gems collected. 
-${remain} until next 5 gems.
+            return `(0/1000) gems collected. 
+${remain} until next 15 gems.
 ${fulltime} until collect is capped.`;
             //none collected show cooldown
         } else {
-            return `(650/650) gems collected. 
+            return `(1000/1000) gems collected. 
 At maximum capacity.`;
             //capped out
         }
@@ -374,13 +379,25 @@ async function viewCds1(interaction, uid) {
     const collect = await database.Collect.findOne({where: {playerID: uid}})
     const voteTrack = await database.Votetrack.findOne({where: {playerID: uid}})
     console.log("1");
+    if (player.level > 6) {
+        xpLimit = 500;
+    } else {
+        xpLimit = (2**player.level)*10;
+    }
     const dailyText = await textDaily(daily);
     const collectText = await textCollect(collect);
     const cvote = await checkCvote(voteTrack);
     const isvote = await checkIsvote(voteTrack);
     const embed = embedS(interaction);
     console.log("2");
-    embed.setTitle('Cooldowns').setDescription(`
+    embed.setTitle('Cooldowns').setDescription(`**Stats**
+**Level:** ${player.level} (${player.xp}/${xpLimit})
+**Gems:** ${player.gems} <:waifugem:1182852147197526087>
+**Money:** ${player.money} <:datacoin:947388797828612127>
+**Karma:** ${player.karma} <:karma:947388797627281409>
+
+
+**Cooldowns**
 **Daily:** ${dailyText}
 
 **Collect:** ${collectText}
@@ -402,12 +419,26 @@ async function viewCds(interaction, embed, uid, player, playerIndex) {
     const collect = await database.Collect.findOne({where: {playerID: uid}})
     const vTrack = await database.Votetrack.findOne({where: {playerID: uid}})
     console.log("1");
+    let xpLimit;
+    if (player.level > 6) {
+        xpLimit = 500;
+    } else {
+        xpLimit = (2**player.level)*10;
+    }
     const dailyText = await textDaily(daily);
     const collectText = await textCollect(collect);
     const cvote = await checkCvote(vTrack);
     const isvote = await checkIsvote(vTrack);
     console.log("2");
-    embed.setTitle('Cooldowns').setDescription(`
+    embed.setTitle('Cooldowns').setDescription(`**Stats**
+**Level:** ${player.level} (${player.xp}/${xpLimit})
+**Gems:** ${player.gems} <:waifugem:1182852147197526087>
+**Money:** ${player.money} <:datacoin:947388797828612127>
+**Karma:** ${player.karma} <:karma:947388797627281409>
+
+
+**Cooldowns**
+
 **Daily:** ${dailyText}
 
 **Collect:** ${collectText}
